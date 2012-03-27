@@ -1,0 +1,30 @@
+name: CrazyLogin
+main: de.st_ddt.crazylogin.CrazyLogin
+author: ST-DDT
+#C*=needed core version
+version: C3_2
+softdepend: [PermissionsBukkit]
+depend: [CrazyCore]
+commands:
+  login:
+    description: Show information about player
+    usage: /<command> <Player>
+  logout:
+    description: Show information about online player
+    usage: /<command>
+  crazylogin:
+    description: Plugin Main Menu
+    usage: /<command> password <new Password>
+permissions:
+  crazylogin.*:
+    description: Access to all commands
+    default: false
+    children:
+      crazylogin.admin: true
+      crazylogin.mode: true
+  crazyonline.admin:
+    description: Allow changing passwords for other players
+    default: op
+  crazyonline.mode:
+    description: Allow changing plugin mode
+    default: op

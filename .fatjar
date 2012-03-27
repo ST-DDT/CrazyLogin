@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Sat Mar 24 02:01:58 CET 2012
+onejar.license.required=true
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=C\:\\Program Files (x86)\\Minecraft\\MCOnlineServer\\CrazyLogin.jar
+manifest.mergeall=true
+manifest.mainclass=
+manifest.file=<createnew>
+jarname.isextern=true
+onejar.expand=
+excludes=<po|Bukkit Login>~resource/~lang/~de_de.lang;<po|Bukkit Default>;<jar|bukkit.jar>;<jar|PermissionsBukkit-1.6.jar>;<jar|WorldEdit.jar>
+includes=
