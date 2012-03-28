@@ -2,7 +2,7 @@ name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
 #C*=needed core version
-version: C3_2
+version: C4_2
 softdepend: [PermissionsBukkit]
 depend: [CrazyCore]
 commands:
