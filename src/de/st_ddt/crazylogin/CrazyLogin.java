@@ -194,10 +194,20 @@ public class CrazyLogin extends CrazyPlugin
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
 				{
 					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true"))
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
 						newValue = true;
 					alwaysNeedPassword = newValue;
 					sendLocaleMessage("MODE.CHANGE", sender, "alwaysNeedPassword", alwaysNeedPassword ? "True" : "False");
+					save();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoLogout"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					autoLogout = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout ? "True" : "False");
 					save();
 					return;
 				}
@@ -206,6 +216,11 @@ public class CrazyLogin extends CrazyPlugin
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "alwaysNeedPassword", alwaysNeedPassword ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoLogout"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout ? "True" : "False");
 					return;
 				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
@@ -248,16 +263,12 @@ public class CrazyLogin extends CrazyPlugin
 			return !alwaysNeedPassword;
 		return data.isOnline() && player.isOnline();
 	}
-	
-	
 
-	
 	public boolean isAlwaysNeedPassword()
 	{
 		return alwaysNeedPassword;
 	}
 
-	
 	public boolean isAutoLogoutEnabled()
 	{
 		return autoLogout;
