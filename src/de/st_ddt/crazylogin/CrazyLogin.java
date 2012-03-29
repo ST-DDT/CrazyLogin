@@ -25,6 +25,7 @@ public class CrazyLogin extends CrazyPlugin
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
 	protected boolean alwaysNeedPassword;
+	protected boolean autoLogout;
 
 	@Override
 	public void onEnable()
@@ -218,6 +219,7 @@ public class CrazyLogin extends CrazyPlugin
 	{
 		super.load();
 		FileConfiguration config = getConfig();
+		autoLogout = config.getBoolean("autoLogout", false);
 		if (config.getConfigurationSection("players") != null)
 			for (String name : config.getConfigurationSection("players").getKeys(false))
 			{
@@ -235,6 +237,7 @@ public class CrazyLogin extends CrazyPlugin
 		for (Pair<String, PlayerData> pair : datas)
 			pair.getData2().save(config, "players." + pair.getData1() + ".");
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
+		config.set("autoLogout", autoLogout);
 		super.save();
 	}
 
@@ -244,6 +247,20 @@ public class CrazyLogin extends CrazyPlugin
 		if (data == null)
 			return !alwaysNeedPassword;
 		return data.isOnline() && player.isOnline();
+	}
+	
+	
+
+	
+	public boolean isAlwaysNeedPassword()
+	{
+		return alwaysNeedPassword;
+	}
+
+	
+	public boolean isAutoLogoutEnabled()
+	{
+		return autoLogout;
 	}
 
 	public PairList<String, PlayerData> getPlayerData()

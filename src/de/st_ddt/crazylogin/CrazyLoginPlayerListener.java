@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
@@ -49,6 +50,18 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(event.getPlayer()))
 			return;
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
+	}
+
+	@EventHandler
+	public void PlayerQuit(PlayerQuitEvent event)
+	{
+		if (plugin.isAutoLogoutEnabled())
+		{
+			Player player = event.getPlayer();
+			PlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
+			if (playerdata != null)
+				playerdata.logout();
+		}
 	}
 
 	@EventHandler
