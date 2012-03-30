@@ -50,6 +50,9 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(event.getPlayer()))
 			return;
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
+		int autoKick = plugin.getAutoKick();
+		if (autoKick >= 60)
+			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST")), autoKick * 20);
 	}
 
 	@EventHandler
@@ -166,7 +169,7 @@ public class CrazyLoginPlayerListener implements Listener
 		String message = event.getMessage().toLowerCase();
 		if (message.startsWith("/"))
 		{
-			if (message.startsWith("/login") || message.startsWith("/crazylogin password") || message.startsWith("/crazylanguage"))
+			if (message.startsWith("/login") || message.startsWith("/crazylogin password") || message.startsWith("/crazylanguage") || message.startsWith("/language"))
 				return;
 			event.setCancelled(true);
 			plugin.sendLocaleMessage("LOGIN.REQUEST", player);

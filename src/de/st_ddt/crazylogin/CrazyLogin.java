@@ -11,6 +11,7 @@ import de.st_ddt.crazyplugin.CrazyPlugin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandNoSuchException;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandParameterException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
@@ -21,15 +22,23 @@ import de.st_ddt.crazyutil.PairList;
 public class CrazyLogin extends CrazyPlugin
 {
 
+	private static CrazyLogin plugin;
 	protected final PairList<String, PlayerData> datas = new PairList<String, PlayerData>();
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
 	protected boolean alwaysNeedPassword;
 	protected boolean autoLogout;
+	protected int autoKick;
+
+	public static CrazyLogin getPlugin()
+	{
+		return plugin;
+	}
 
 	@Override
 	public void onEnable()
 	{
+		plugin = this;
 		registerHooks();
 		super.onEnable();
 	}
@@ -211,6 +220,22 @@ public class CrazyLogin extends CrazyPlugin
 					save();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("autoKick"))
+				{
+					int time = autoKick;
+					try
+					{
+						time = Integer.parseInt(args[1]);
+					}
+					catch (NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds > 60");
+					}
+					autoKick = time;
+					sendLocaleMessage("MODE.CHANGE", sender, "autoKick", autoKick == -1 ? "disabled" : autoKick + " seconds");
+					save();
+					return;
+				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			case 1:
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
@@ -221,6 +246,11 @@ public class CrazyLogin extends CrazyPlugin
 				else if (args[0].equalsIgnoreCase("autoLogout"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoKick"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "autoKick", autoKick == -1 ? "disabled" : autoKick + " seconds");
 					return;
 				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
@@ -235,6 +265,8 @@ public class CrazyLogin extends CrazyPlugin
 		super.load();
 		FileConfiguration config = getConfig();
 		autoLogout = config.getBoolean("autoLogout", false);
+		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
+		autoKick = Math.max(config.getInt("autoKick", -1), -1);
 		if (config.getConfigurationSection("players") != null)
 			for (String name : config.getConfigurationSection("players").getKeys(false))
 			{
@@ -242,7 +274,6 @@ public class CrazyLogin extends CrazyPlugin
 				PlayerData data = new PlayerData(config, "players." + name + ".");
 				datas.add(player.getName().toLowerCase(), data);
 			}
-		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 	}
 
 	@Override
@@ -253,6 +284,7 @@ public class CrazyLogin extends CrazyPlugin
 			pair.getData2().save(config, "players." + pair.getData1() + ".");
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("autoLogout", autoLogout);
+		config.set("autoKick", autoKick);
 		super.save();
 	}
 
@@ -272,6 +304,11 @@ public class CrazyLogin extends CrazyPlugin
 	public boolean isAutoLogoutEnabled()
 	{
 		return autoLogout;
+	}
+
+	public int getAutoKick()
+	{
+		return autoKick;
 	}
 
 	public PairList<String, PlayerData> getPlayerData()
