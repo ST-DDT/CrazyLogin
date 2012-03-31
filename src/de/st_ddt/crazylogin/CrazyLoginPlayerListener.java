@@ -51,7 +51,7 @@ public class CrazyLoginPlayerListener implements Listener
 			return;
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
 		int autoKick = plugin.getAutoKick();
-		if (autoKick >= 60)
+		if (autoKick >= 10)
 			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST")), autoKick * 20);
 	}
 
