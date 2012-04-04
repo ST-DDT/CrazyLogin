@@ -1,9 +1,9 @@
-CRAZYLOGIN.REGISTER.HEADER=Aus Sicherheitsgruenden muss ein Passwort erstellt werden.
-CRAZYLOGIN.REGISTER.MESSAGE=Nutze /crazylogin password <Password...> das Passwort zu aendern!
+﻿CRAZYLOGIN.REGISTER.HEADER=Aus Sicherheitsgründen muss ein Passwort erstellt werden.
+CRAZYLOGIN.REGISTER.MESSAGE=Nutze /crazylogin password <Password...> das Passwort zu ändern!
 CRAZYLOGIN.LOGIN.FAILED=&CLOGIN FEHLGESCHLAGEN!
 CRAZYLOGIN.LOGIN.FAILEDLOG=&CWARNUNG! Fehlgeschlagener Loginversuch! $0$ @ $1$
 CRAZYLOGIN.LOGIN.SUCCESS=&ALogin erfolgreich
 CRAZYLOGIN.LOGOUT.SUCCESS=&ALogout erfolgreich 
-CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Passwort geaendert!
+CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Passwort geändert!
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Passwort>
 CRAZYLOGIN.MODE.CHANGE=Modus "$0$"="$1$" gesetzt
