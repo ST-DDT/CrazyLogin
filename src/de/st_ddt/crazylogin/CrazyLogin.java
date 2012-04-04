@@ -75,9 +75,7 @@ public class CrazyLogin extends CrazyPlugin
 		if (args.length == 0)
 			throw new CrazyCommandUsageException("/login <Passwort...>");
 		Player player = (Player) sender;
-		String password = "";
-		for (String arg : args)
-			password = password + " " + arg;
+		String password = " " + ChatHelper.listToString(args);
 		PlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
 		{
@@ -135,9 +133,16 @@ public class CrazyLogin extends CrazyPlugin
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
-		if (args.length == 0)
-			throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
 		Player player = (Player) sender;
+		if (args.length == 0)
+		{
+			if (alwaysNeedPassword)
+				throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
+			datas.removeDataVia1(player.getName().toLowerCase());
+			sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
+			save();
+			return;
+		}
 		PlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
 		{
@@ -146,9 +151,7 @@ public class CrazyLogin extends CrazyPlugin
 		}
 		else if (!isLoggedIn(player))
 			throw new CrazyCommandPermissionException();
-		String password = "";
-		for (String arg : args)
-			password = password + " " + arg;
+		String password = " " + ChatHelper.listToString(args);
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
@@ -165,8 +168,27 @@ public class CrazyLogin extends CrazyPlugin
 		}
 		if (!sender.hasPermission("crazylogin.admin"))
 			throw new CrazyCommandPermissionException();
-		if (args.length < 2)
-			throw new CrazyCommandUsageException("/crazylogin admin <Player> <Passwort...>");
+		switch (args.length)
+		{
+			case 0:
+				throw new CrazyCommandUsageException("/crazylogin admin <Player> <Passwort...>");
+			case 1:
+				if (alwaysNeedPassword)
+					throw new CrazyCommandUsageException("/crazylogin admin <Player> <Passwort...>");
+				OfflinePlayer target = getServer().getPlayerExact(args[0]);
+				if (target == null)
+				{
+					target = getServer().getPlayer(args[0]);
+					if (target == null)
+						target = getServer().getOfflinePlayer(args[0]);
+				}
+				if (target == null)
+					throw new CrazyCommandNoSuchException("Player", args[0]);
+				datas.removeDataVia1(target.getName().toLowerCase());
+				sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
+				save();
+				return;
+		}
 		OfflinePlayer target = getServer().getPlayerExact(args[0]);
 		if (target == null)
 		{
@@ -179,9 +201,7 @@ public class CrazyLogin extends CrazyPlugin
 		PlayerData data = datas.findDataVia1(target.getName().toLowerCase());
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player", args[0]);
-		String password = "";
-		for (String arg : ChatHelper.shiftArray(args, 1))
-			password = password + " " + arg;
+		String password = " " + ChatHelper.listToString(ChatHelper.shiftArray(args, 1));
 		data.setPassword(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
 		save();
@@ -280,6 +300,7 @@ public class CrazyLogin extends CrazyPlugin
 	public void save()
 	{
 		FileConfiguration config = getConfig();
+		config.set("players", null);
 		for (Pair<String, PlayerData> pair : datas)
 			pair.getData2().save(config, "players." + pair.getData1() + ".");
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
