@@ -121,11 +121,12 @@ public class CrazyLoginPlayerListener implements Listener
 			return;
 		}
 		if (player.getBedSpawnLocation() != null)
-			if (target.distance(player.getBedSpawnLocation()) < 10)
-			{
-				savelogin.setDataVia1(player, event.getTo());
-				return;
-			}
+			if (target.getWorld() == player.getBedSpawnLocation().getWorld())
+				if (target.distance(player.getBedSpawnLocation()) < 10)
+				{
+					savelogin.setDataVia1(player, event.getTo());
+					return;
+				}
 		event.setCancelled(true);
 		plugin.sendLocaleMessage("LOGIN.REQUEST", event.getPlayer());
 	}
