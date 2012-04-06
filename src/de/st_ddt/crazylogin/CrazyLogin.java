@@ -1,5 +1,7 @@
 package de.st_ddt.crazylogin;
 
+import java.util.List;
+
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -29,6 +31,7 @@ public class CrazyLogin extends CrazyPlugin
 	protected boolean alwaysNeedPassword;
 	protected boolean autoLogout;
 	protected int autoKick;
+	protected List<String> commandWhiteList;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -63,6 +66,11 @@ public class CrazyLogin extends CrazyPlugin
 		if (commandLabel.equalsIgnoreCase("logout"))
 		{
 			CommandLogout(sender, args);
+			return true;
+		}
+		if (commandLabel.equalsIgnoreCase("register"))
+		{
+			CommandMainPassword(sender, args);
 			return true;
 		}
 		return false;
@@ -287,6 +295,13 @@ public class CrazyLogin extends CrazyPlugin
 		autoLogout = config.getBoolean("autoLogout", false);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
+		commandWhiteList = config.getStringList("commandWhitelist");
+		if (commandWhiteList.size() == 0)
+		{
+			commandWhiteList.add("/login");
+			commandWhiteList.add("/register");
+			commandWhiteList.add("/crazylogin password");
+		}
 		if (config.getConfigurationSection("players") != null)
 			for (String name : config.getConfigurationSection("players").getKeys(false))
 			{
@@ -306,6 +321,7 @@ public class CrazyLogin extends CrazyPlugin
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
+		config.set("commandWhitelist", commandWhiteList);
 		super.save();
 	}
 
@@ -330,6 +346,11 @@ public class CrazyLogin extends CrazyPlugin
 	public int getAutoKick()
 	{
 		return autoKick;
+	}
+
+	public List<String> getCommandWhiteList()
+	{
+		return commandWhiteList;
 	}
 
 	public PairList<String, PlayerData> getPlayerData()

@@ -174,6 +174,9 @@ public class CrazyLoginPlayerListener implements Listener
 		{
 			if (message.startsWith("/login") || message.startsWith("/crazylogin password") || message.startsWith("/crazylanguage") || message.startsWith("/language"))
 				return;
+			for (String command : plugin.getCommandWhiteList())
+				if (message.startsWith(command))
+					return;
 			event.setCancelled(true);
 			plugin.sendLocaleMessage("LOGIN.REQUEST", player);
 			return;

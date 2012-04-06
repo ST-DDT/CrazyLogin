@@ -2,7 +2,7 @@ name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
 #C*=needed core version
-version: C5_2.4
+version: C5_2.5
 softdepend: [PermissionsBukkit]
 depend: [CrazyCore]
 commands:
@@ -12,6 +12,9 @@ commands:
   logout:
     description: Show information about online player
     usage: /<command>
+  register:
+    description: Create/Change password
+    usage: /<command> <new Password>
   crazylogin:
     description: Plugin Main Menu
     usage: /<command> password <new Password>
