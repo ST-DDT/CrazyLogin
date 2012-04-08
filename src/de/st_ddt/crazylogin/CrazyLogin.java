@@ -14,6 +14,7 @@ import org.bukkit.plugin.PluginManager;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
 import de.st_ddt.crazylogin.crypt.DefaultCrypt;
 import de.st_ddt.crazylogin.crypt.Encryptor;
+import de.st_ddt.crazylogin.crypt.PlainCrypt;
 import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
 import de.st_ddt.crazyplugin.CrazyPlugin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
@@ -26,7 +27,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.Pair;
 import de.st_ddt.crazyutil.PairList;
-import de.st_ddt.crazyutil.locales.CrazyLocale;
 
 public class CrazyLogin extends CrazyPlugin
 {
@@ -323,6 +323,10 @@ public class CrazyLogin extends CrazyPlugin
 		{
 			encryptor = new WhirlPoolCrypt();
 		}
+		else if (algorithm.equalsIgnoreCase("Plaintext"))
+		{
+			encryptor = new PlainCrypt();
+		}
 		else
 		{
 			try
@@ -417,23 +421,5 @@ public class CrazyLogin extends CrazyPlugin
 	public PairList<String, PlayerData> getPlayerData()
 	{
 		return datas;
-	}
-
-	// FIX to avoid upgrade to Coreversion 6
-	public final void broadcastLocaleMessage(final boolean console, final boolean op, final String permission, final String localepath, final String... args)
-	{
-		broadcastLocaleMessage(console, op, permission, getLocale().getLanguageEntry(localepath), args);
-	}
-
-	public final void broadcastLocaleMessage(final boolean console, final boolean op, final String permission, final CrazyLocale locale, final String... args)
-	{
-		if (console)
-			sendLocaleMessage(locale, Bukkit.getConsoleSender(), args);
-		for (Player player : Bukkit.getOnlinePlayers())
-			if (player.isOp())
-				sendLocaleMessage(locale, player, args);
-			else if (permission != null)
-				if (player.hasPermission(permission))
-					sendLocaleMessage(locale, player, args);
 	}
 }
