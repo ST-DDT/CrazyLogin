@@ -2,7 +2,7 @@ name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
 #C*=needed core version
-version: C5_2.5
+version: C5_3
 softdepend: [PermissionsBukkit]
 depend: [CrazyCore]
 commands:
@@ -25,8 +25,19 @@ permissions:
     children:
       crazylogin.admin: true
       crazylogin.mode: true
+      crazylogin.warnloginfailure: true
+      crazylogin.warncommandexploits: true
   crazyonline.admin:
     description: Allow changing passwords for other players
+    default: op
+    children: 
+      crazylogin.warnloginfailure: true
+      crazylogin.warncommandexploits: true
+  crazylogin.warnloginfailure:
+    description: Get informed if someone fails to login
+    default: op
+  crazylogin.warncommandexploits:
+    description: Get informed if someone tries to execute a none whitelisted command.
     default: op
   crazyonline.mode:
     description: Allow changing plugin mode

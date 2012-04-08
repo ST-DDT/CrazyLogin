@@ -178,6 +178,12 @@ public class CrazyLoginPlayerListener implements Listener
 				if (message.startsWith(command))
 					return;
 			event.setCancelled(true);
+			plugin.broadcastLocaleMessage(true, true, "crazylogin.warncommandexploits", "COMMAND.EXPLOITWARN", player.getName(), player.getAddress().getAddress().getHostAddress(), message);
+			if (plugin.isAutoKickCommandUsers())
+			{
+				player.kickPlayer(plugin.getLocale().getLocaleMessage(player, "LOGIN.REQUEST"));
+				return;
+			}
 			plugin.sendLocaleMessage("LOGIN.REQUEST", player);
 			return;
 		}

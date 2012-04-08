@@ -46,7 +46,7 @@ public class PlayerData
 	{
 		try
 		{
-			this.password = crypt(password);
+			this.password = CrazyLogin.getPlugin().getEncryptor().encrypt(player, genSeed(), password);
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -58,21 +58,20 @@ public class PlayerData
 		}
 	}
 
-	public boolean isPassword(String password)
+	private String genSeed()
 	{
-		try
+		while (true)
 		{
-			return this.password.equals(crypt(password));
-		}
-		catch (Exception e)
-		{
-			return false;
+			long value = Math.round(Math.random() * Long.MAX_VALUE);
+			String seed = String.valueOf(value);
+			if (seed.length() > 10)
+				return seed.substring(0, 9);
 		}
 	}
 
-	private String crypt(String password) throws NoSuchAlgorithmException, UnsupportedEncodingException
+	public boolean isPassword(String password)
 	{
-		return EncryptPassword.SHA512("ÜÄaeut//&/=I" + password + "7421€547" + player + "__+IÄIH§%NK" + password);
+		return CrazyLogin.getPlugin().getEncryptor().match(player, password, this.password);
 	}
 
 	public void addIP(String ip)

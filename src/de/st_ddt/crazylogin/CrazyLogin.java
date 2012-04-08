@@ -1,7 +1,9 @@
 package de.st_ddt.crazylogin;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -9,6 +11,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
+import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
+import de.st_ddt.crazylogin.crypt.DefaultCrypt;
+import de.st_ddt.crazylogin.crypt.Encryptor;
+import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
 import de.st_ddt.crazyplugin.CrazyPlugin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
@@ -20,6 +26,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.Pair;
 import de.st_ddt.crazyutil.PairList;
+import de.st_ddt.crazyutil.locales.CrazyLocale;
 
 public class CrazyLogin extends CrazyPlugin
 {
@@ -32,6 +39,9 @@ public class CrazyLogin extends CrazyPlugin
 	protected boolean autoLogout;
 	protected int autoKick;
 	protected List<String> commandWhiteList;
+	protected boolean autoKickCommandUsers;
+	protected String uniqueIDKey;
+	protected Encryptor encryptor;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -56,7 +66,7 @@ public class CrazyLogin extends CrazyPlugin
 	}
 
 	@Override
-	public boolean Command(CommandSender sender, String commandLabel, String[] args) throws CrazyException
+	public boolean Command(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
 	{
 		if (commandLabel.equalsIgnoreCase("login"))
 		{
@@ -76,14 +86,14 @@ public class CrazyLogin extends CrazyPlugin
 		return false;
 	}
 
-	private void CommandLogin(CommandSender sender, String[] args) throws CrazyCommandException
+	private void CommandLogin(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
 		if (args.length == 0)
 			throw new CrazyCommandUsageException("/login <Passwort...>");
 		Player player = (Player) sender;
-		String password = " " + ChatHelper.listToString(args);
+		String password = ChatHelper.listToString(args);
 		PlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
 		{
@@ -94,7 +104,7 @@ public class CrazyLogin extends CrazyPlugin
 		if (!data.login(password))
 		{
 			sendLocaleMessage("LOGIN.FAILED", player);
-			sendLocaleMessage("LOGIN.FAILEDLOG", getServer().getConsoleSender(), player.getName(), player.getAddress().getAddress().getHostAddress());
+			broadcastLocaleMessage(true, true, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			return;
 		}
 		sendLocaleMessage("LOGIN.SUCCESS", player);
@@ -102,7 +112,7 @@ public class CrazyLogin extends CrazyPlugin
 		save();
 	}
 
-	private void CommandLogout(CommandSender sender, String[] args) throws CrazyCommandException
+	private void CommandLogout(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
@@ -117,7 +127,7 @@ public class CrazyLogin extends CrazyPlugin
 	}
 
 	@Override
-	public boolean CommandMain(CommandSender sender, String commandLabel, String[] args) throws CrazyException
+	public boolean CommandMain(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
 	{
 		if (commandLabel.equalsIgnoreCase("password"))
 		{
@@ -137,7 +147,7 @@ public class CrazyLogin extends CrazyPlugin
 		return false;
 	}
 
-	private void CommandMainPassword(CommandSender sender, String[] args) throws CrazyCommandException
+	private void CommandMainPassword(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
@@ -159,14 +169,14 @@ public class CrazyLogin extends CrazyPlugin
 		}
 		else if (!isLoggedIn(player))
 			throw new CrazyCommandPermissionException();
-		String password = " " + ChatHelper.listToString(args);
+		String password = ChatHelper.listToString(args);
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
 		save();
 	}
 
-	private void CommandMainAdmin(CommandSender sender, String[] args) throws CrazyCommandException
+	private void CommandMainAdmin(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof Player)
 		{
@@ -209,13 +219,13 @@ public class CrazyLogin extends CrazyPlugin
 		PlayerData data = datas.findDataVia1(target.getName().toLowerCase());
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player", args[0]);
-		String password = " " + ChatHelper.listToString(ChatHelper.shiftArray(args, 1));
+		String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1));
 		data.setPassword(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
 		save();
 	}
 
-	private void CommandMainMode(CommandSender sender, String[] args) throws CrazyCommandException
+	private void CommandMainMode(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof Player)
 		{
@@ -296,11 +306,34 @@ public class CrazyLogin extends CrazyPlugin
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
 		commandWhiteList = config.getStringList("commandWhitelist");
+		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		if (commandWhiteList.size() == 0)
 		{
 			commandWhiteList.add("/login");
 			commandWhiteList.add("/register");
 			commandWhiteList.add("/crazylogin password");
+		}
+		uniqueIDKey = config.getString("uniqueIDKey");
+		String algorithm = config.getString("algorithm", "CrazyCrypt1");
+		if (algorithm.equalsIgnoreCase("CrazyCrypt1"))
+		{
+			encryptor = new CrazyCrypt1();
+		}
+		else if (algorithm.equalsIgnoreCase("Whirlpool"))
+		{
+			encryptor = new WhirlPoolCrypt();
+		}
+		else
+		{
+			try
+			{
+				encryptor = new DefaultCrypt(algorithm);
+			}
+			catch (NoSuchAlgorithmException e)
+			{
+				sendLocaleMessage("ALGORITHM.MISSING", Bukkit.getConsoleSender(), algorithm);
+				encryptor = new CrazyCrypt1();
+			}
 		}
 		if (config.getConfigurationSection("players") != null)
 			for (String name : config.getConfigurationSection("players").getKeys(false))
@@ -322,10 +355,13 @@ public class CrazyLogin extends CrazyPlugin
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
 		config.set("commandWhitelist", commandWhiteList);
+		config.set("autoKickCommandUsers", autoKickCommandUsers);
+		config.set("uniqueIDKey", uniqueIDKey);
+		config.set("algorithm", encryptor.getAlgorithm());
 		super.save();
 	}
 
-	public boolean isLoggedIn(Player player)
+	public boolean isLoggedIn(final Player player)
 	{
 		PlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
@@ -353,8 +389,51 @@ public class CrazyLogin extends CrazyPlugin
 		return commandWhiteList;
 	}
 
+	public boolean isAutoKickCommandUsers()
+	{
+		return autoKickCommandUsers;
+	}
+
+	public String getUniqueIDKey()
+	{
+		if (uniqueIDKey == null)
+			try
+			{
+				uniqueIDKey = new CrazyCrypt1().encrypt(getServer().getName(), null, "randomKeyGen" + (Math.random() * Integer.MAX_VALUE) + "V:" + getServer().getBukkitVersion() + "'_+'#");
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				return null;
+			}
+		return uniqueIDKey;
+	}
+
+	public Encryptor getEncryptor()
+	{
+		return encryptor;
+	}
+
 	public PairList<String, PlayerData> getPlayerData()
 	{
 		return datas;
+	}
+
+	// FIX to avoid upgrade to Coreversion 6
+	public final void broadcastLocaleMessage(final boolean console, final boolean op, final String permission, final String localepath, final String... args)
+	{
+		broadcastLocaleMessage(console, op, permission, getLocale().getLanguageEntry(localepath), args);
+	}
+
+	public final void broadcastLocaleMessage(final boolean console, final boolean op, final String permission, final CrazyLocale locale, final String... args)
+	{
+		if (console)
+			sendLocaleMessage(locale, Bukkit.getConsoleSender(), args);
+		for (Player player : Bukkit.getOnlinePlayers())
+			if (player.isOp())
+				sendLocaleMessage(locale, player, args);
+			else if (permission != null)
+				if (player.hasPermission(permission))
+					sendLocaleMessage(locale, player, args);
 	}
 }
