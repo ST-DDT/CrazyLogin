@@ -291,6 +291,11 @@ public class CrazyLogin extends CrazyPlugin
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKick", autoKick == -1 ? "disabled" : autoKick + " seconds");
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("algorithm"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "algorithm", encryptor.getAlgorithm());
+					return;
+				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			default:
 				throw new CrazyCommandUsageException("/crazylogin mode <Mode> <Value>");
