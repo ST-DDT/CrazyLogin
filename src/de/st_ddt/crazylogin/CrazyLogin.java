@@ -66,27 +66,27 @@ public class CrazyLogin extends CrazyPlugin
 	}
 
 	@Override
-	public boolean Command(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
+	public boolean command(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
 	{
 		if (commandLabel.equalsIgnoreCase("login"))
 		{
-			CommandLogin(sender, args);
+			commandLogin(sender, args);
 			return true;
 		}
 		if (commandLabel.equalsIgnoreCase("logout"))
 		{
-			CommandLogout(sender, args);
+			commandLogout(sender, args);
 			return true;
 		}
 		if (commandLabel.equalsIgnoreCase("register"))
 		{
-			CommandMainPassword(sender, args);
+			commandMainPassword(sender, args);
 			return true;
 		}
 		return false;
 	}
 
-	private void CommandLogin(final CommandSender sender, final String[] args) throws CrazyCommandException
+	private void commandLogin(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
@@ -112,7 +112,7 @@ public class CrazyLogin extends CrazyPlugin
 		save();
 	}
 
-	private void CommandLogout(final CommandSender sender, final String[] args) throws CrazyCommandException
+	private void commandLogout(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
@@ -127,27 +127,27 @@ public class CrazyLogin extends CrazyPlugin
 	}
 
 	@Override
-	public boolean CommandMain(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
+	public boolean commandMain(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
 	{
 		if (commandLabel.equalsIgnoreCase("password"))
 		{
-			CommandMainPassword(sender, args);
+			commandMainPassword(sender, args);
 			return true;
 		}
 		if (commandLabel.equalsIgnoreCase("admin"))
 		{
-			CommandMainAdmin(sender, args);
+			commandMainAdmin(sender, args);
 			return true;
 		}
 		if (commandLabel.equalsIgnoreCase("mode"))
 		{
-			CommandMainMode(sender, args);
+			commandMainMode(sender, args);
 			return true;
 		}
 		return false;
 	}
 
-	private void CommandMainPassword(final CommandSender sender, final String[] args) throws CrazyCommandException
+	private void commandMainPassword(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
@@ -176,7 +176,7 @@ public class CrazyLogin extends CrazyPlugin
 		save();
 	}
 
-	private void CommandMainAdmin(final CommandSender sender, final String[] args) throws CrazyCommandException
+	private void commandMainAdmin(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof Player)
 		{
@@ -225,7 +225,7 @@ public class CrazyLogin extends CrazyPlugin
 		save();
 	}
 
-	private void CommandMainMode(final CommandSender sender, final String[] args) throws CrazyCommandException
+	private void commandMainMode(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof Player)
 		{
