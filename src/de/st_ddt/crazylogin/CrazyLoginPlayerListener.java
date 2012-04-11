@@ -23,7 +23,7 @@ public class CrazyLoginPlayerListener implements Listener
 {
 
 	private final CrazyLogin plugin;
-	private final PairList<String, PlayerData> datas;
+	private final PairList<String, LoginPlayerData> datas;
 	private final PairList<Player, Location> savelogin = new PairList<Player, Location>();
 
 	public CrazyLoginPlayerListener(CrazyLogin plugin)
@@ -38,7 +38,7 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		Player player = event.getPlayer();
 		savelogin.setDataVia1(player, player.getLocation());
-		PlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
+		LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
 		if (playerdata == null)
 		{
 			plugin.sendLocaleMessage("REGISTER.HEADER", player);
@@ -61,7 +61,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isAutoLogoutEnabled())
 		{
 			Player player = event.getPlayer();
-			PlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
+			LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
 			if (playerdata != null)
 				playerdata.logout();
 		}

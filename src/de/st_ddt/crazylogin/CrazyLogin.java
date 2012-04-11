@@ -17,6 +17,8 @@ import de.st_ddt.crazylogin.crypt.DefaultCrypt;
 import de.st_ddt.crazylogin.crypt.Encryptor;
 import de.st_ddt.crazylogin.crypt.PlainCrypt;
 import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
+import de.st_ddt.crazylogin.databases.CrazyLoginConfigurationDatabase;
+import de.st_ddt.crazylogin.databases.CrazyLoginMySQLDatabase;
 import de.st_ddt.crazyplugin.CrazyPlugin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
@@ -27,14 +29,15 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
-import de.st_ddt.crazyutil.Pair;
 import de.st_ddt.crazyutil.PairList;
+import de.st_ddt.crazyutil.databases.Database;
+import de.st_ddt.crazyutil.databases.MySQLConnection;
 
 public class CrazyLogin extends CrazyPlugin
 {
 
 	private static CrazyLogin plugin;
-	protected final PairList<String, PlayerData> datas = new PairList<String, PlayerData>();
+	protected final PairList<String, LoginPlayerData> datas = new PairList<String, LoginPlayerData>();
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
 	protected boolean alwaysNeedPassword;
@@ -44,6 +47,9 @@ public class CrazyLogin extends CrazyPlugin
 	protected boolean autoKickCommandUsers;
 	protected String uniqueIDKey;
 	protected Encryptor encryptor;
+	protected String saveType;
+	protected String tableName;
+	protected Database<LoginPlayerData> database;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -65,6 +71,97 @@ public class CrazyLogin extends CrazyPlugin
 		PluginManager pm = this.getServer().getPluginManager();
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(vehicleListener, this);
+	}
+
+	@Override
+	public void load()
+	{
+		super.load();
+		FileConfiguration config = getConfig();
+		autoLogout = config.getBoolean("autoLogout", false);
+		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
+		autoKick = Math.max(config.getInt("autoKick", -1), -1);
+		commandWhiteList = config.getStringList("commandWhitelist");
+		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
+		if (commandWhiteList.size() == 0)
+		{
+			commandWhiteList.add("/login");
+			commandWhiteList.add("/register");
+			commandWhiteList.add("/crazylogin password");
+		}
+		uniqueIDKey = config.getString("uniqueIDKey");
+		String algorithm = config.getString("algorithm", "CrazyCrypt1");
+		if (algorithm.equalsIgnoreCase("CrazyCrypt1"))
+		{
+			encryptor = new CrazyCrypt1();
+		}
+		else if (algorithm.equalsIgnoreCase("Whirlpool"))
+		{
+			encryptor = new WhirlPoolCrypt();
+		}
+		else if (algorithm.equalsIgnoreCase("Plaintext"))
+		{
+			encryptor = new PlainCrypt();
+		}
+		else if (algorithm.equalsIgnoreCase("Custom"))
+		{
+			String encryption = config.getString("customEncryptor.class");
+			encryptor = ObjectSaveLoadHelper.load(encryption, CustomEncryptor.class, new Class[0], new Object[0]);
+		}
+		else
+		{
+			try
+			{
+				encryptor = new DefaultCrypt(algorithm);
+			}
+			catch (NoSuchAlgorithmException e)
+			{
+				sendLocaleMessage("ALGORITHM.MISSING", Bukkit.getConsoleSender(), algorithm);
+				encryptor = new CrazyCrypt1();
+			}
+		}
+		saveType = config.getString("database.saveType", "flat").toLowerCase();
+		tableName = config.getString("database.tableName", "players");
+		if (saveType.equals("flat"))
+		{
+			database = new CrazyLoginConfigurationDatabase(config, tableName);
+		}
+		else if (saveType.equals("mysql"))
+		{
+			String host = config.getString("database.host", "localhost");
+			config.set("database.host", host);
+			String port = config.getString("database.port", "3306");
+			config.set("database.port", port);
+			String databasename = config.getString("database.dbname", "Crazy");
+			config.set("database.dbname", databasename);
+			String user = config.getString("database.user", "root");
+			config.set("database.user", user);
+			String password = config.getString("database.password", "");
+			config.set("database.password", password);
+			MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
+			database = new CrazyLoginMySQLDatabase(connection, tableName);
+		}
+		if (database != null)
+			for (LoginPlayerData data : database.getAllEntries())
+				datas.setDataVia1(data.getName().toLowerCase(), data);
+	}
+
+	@Override
+	public void save()
+	{
+		FileConfiguration config = getConfig();
+		config.set("database.saveType", saveType);
+		config.set("database.tableName", tableName);
+		if (database != null)
+			database.saveAll(datas.getData2List());
+		config.set("alwaysNeedPassword", alwaysNeedPassword);
+		config.set("autoLogout", autoLogout);
+		config.set("autoKick", autoKick);
+		config.set("commandWhitelist", commandWhiteList);
+		config.set("autoKickCommandUsers", autoKickCommandUsers);
+		config.set("uniqueIDKey", uniqueIDKey);
+		config.set("algorithm", encryptor.getAlgorithm());
+		super.save();
 	}
 
 	@Override
@@ -96,7 +193,7 @@ public class CrazyLogin extends CrazyPlugin
 			throw new CrazyCommandUsageException("/login <Passwort...>");
 		Player player = (Player) sender;
 		String password = ChatHelper.listToString(args);
-		PlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
 		{
 			sendLocaleMessage("REGISTER.HEADER", player);
@@ -121,7 +218,7 @@ public class CrazyLogin extends CrazyPlugin
 		Player player = (Player) sender;
 		if (!isLoggedIn(player))
 			throw new CrazyCommandPermissionException();
-		PlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data != null)
 			data.logout();
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
@@ -163,10 +260,10 @@ public class CrazyLogin extends CrazyPlugin
 			save();
 			return;
 		}
-		PlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
 		{
-			data = new PlayerData(player);
+			data = new LoginPlayerData(player);
 			datas.setDataVia1(player.getName().toLowerCase(), data);
 		}
 		else if (!isLoggedIn(player))
@@ -218,7 +315,7 @@ public class CrazyLogin extends CrazyPlugin
 		}
 		if (target == null)
 			throw new CrazyCommandNoSuchException("Player", args[0]);
-		PlayerData data = datas.findDataVia1(target.getName().toLowerCase());
+		LoginPlayerData data = datas.findDataVia1(target.getName().toLowerCase());
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player", args[0]);
 		String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1));
@@ -304,82 +401,9 @@ public class CrazyLogin extends CrazyPlugin
 		}
 	}
 
-	@Override
-	public void load()
-	{
-		super.load();
-		FileConfiguration config = getConfig();
-		autoLogout = config.getBoolean("autoLogout", false);
-		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
-		autoKick = Math.max(config.getInt("autoKick", -1), -1);
-		commandWhiteList = config.getStringList("commandWhitelist");
-		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
-		if (commandWhiteList.size() == 0)
-		{
-			commandWhiteList.add("/login");
-			commandWhiteList.add("/register");
-			commandWhiteList.add("/crazylogin password");
-		}
-		uniqueIDKey = config.getString("uniqueIDKey");
-		String algorithm = config.getString("algorithm", "CrazyCrypt1");
-		if (algorithm.equalsIgnoreCase("CrazyCrypt1"))
-		{
-			encryptor = new CrazyCrypt1();
-		}
-		else if (algorithm.equalsIgnoreCase("Whirlpool"))
-		{
-			encryptor = new WhirlPoolCrypt();
-		}
-		else if (algorithm.equalsIgnoreCase("Plaintext"))
-		{
-			encryptor = new PlainCrypt();
-		}
-		else if (algorithm.equalsIgnoreCase("Custom"))
-		{
-			String encryption = config.getString("customEncryptor.class");
-			encryptor = ObjectSaveLoadHelper.load(encryption, CustomEncryptor.class, new Class[0], new Object[0]);
-		}
-		else
-		{
-			try
-			{
-				encryptor = new DefaultCrypt(algorithm);
-			}
-			catch (NoSuchAlgorithmException e)
-			{
-				sendLocaleMessage("ALGORITHM.MISSING", Bukkit.getConsoleSender(), algorithm);
-				encryptor = new CrazyCrypt1();
-			}
-		}
-		if (config.getConfigurationSection("players") != null)
-			for (String name : config.getConfigurationSection("players").getKeys(false))
-			{
-				OfflinePlayer player = getServer().getOfflinePlayer(name);
-				PlayerData data = new PlayerData(config, "players." + name + ".");
-				datas.add(player.getName().toLowerCase(), data);
-			}
-	}
-
-	@Override
-	public void save()
-	{
-		FileConfiguration config = getConfig();
-		config.set("players", null);
-		for (Pair<String, PlayerData> pair : datas)
-			pair.getData2().save(config, "players." + pair.getData1() + ".");
-		config.set("alwaysNeedPassword", alwaysNeedPassword);
-		config.set("autoLogout", autoLogout);
-		config.set("autoKick", autoKick);
-		config.set("commandWhitelist", commandWhiteList);
-		config.set("autoKickCommandUsers", autoKickCommandUsers);
-		config.set("uniqueIDKey", uniqueIDKey);
-		config.set("algorithm", encryptor.getAlgorithm());
-		super.save();
-	}
-
 	public boolean isLoggedIn(final Player player)
 	{
-		PlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
 			return !alwaysNeedPassword;
 		return data.isOnline() && player.isOnline();
@@ -430,7 +454,7 @@ public class CrazyLogin extends CrazyPlugin
 		return encryptor;
 	}
 
-	public PairList<String, PlayerData> getPlayerData()
+	public PairList<String, LoginPlayerData> getPlayerData()
 	{
 		return datas;
 	}

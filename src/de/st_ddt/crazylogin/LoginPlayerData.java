@@ -2,15 +2,19 @@ package de.st_ddt.crazylogin;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
+import de.st_ddt.crazyutil.databases.ConfigurationDatabaseEntry;
+import de.st_ddt.crazyutil.databases.MySQLConnection;
+import de.st_ddt.crazyutil.databases.MySQLDatabaseEntry;
 
-public class PlayerData
+public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabaseEntry
 {
 
 	private final String player;
@@ -18,13 +22,13 @@ public class PlayerData
 	private final ArrayList<String> ips = new ArrayList<String>();
 	private boolean online;
 
-	public PlayerData(Player player)
+	public LoginPlayerData(Player player)
 	{
 		this(player.getName(), player.getAddress().getAddress().getHostAddress());
 		online = true;
 	}
 
-	public PlayerData(String player, String ip)
+	public LoginPlayerData(String player, String ip)
 	{
 		super();
 		this.player = player;
@@ -32,14 +36,73 @@ public class PlayerData
 		online = false;
 	}
 
-	public PlayerData(FileConfiguration config, String path)
+	public LoginPlayerData(ConfigurationSection config)
 	{
 		super();
-		this.player = config.getString(path + "name");
-		for (String entry : config.getStringList(path + "ips"))
+		this.player = config.getString("name");
+		for (String entry : config.getStringList("ips"))
 			ips.add(entry);
-		this.password = config.getString(path + "password");
+		this.password = config.getString("password");
 		online = false;
+	}
+
+	public void save(ConfigurationSection config, String path)
+	{
+		config.set(path + "name", this.player);
+		config.set(path + "password", this.password);
+		config.set(path + "ips", this.ips);
+	}
+
+	public LoginPlayerData(ResultSet rawData)
+	{
+		super();
+		String name = null;
+		try
+		{
+			name = rawData.getString("Name");
+		}
+		catch (Exception e)
+		{
+			name = "ERROR";
+			e.printStackTrace();
+		}
+		finally
+		{
+			this.player = name;
+		}
+		try
+		{
+			password = rawData.getString("Password");
+		}
+		catch (SQLException e)
+		{
+			password = "FAILEDLOADING";
+			e.printStackTrace();
+		}
+		try
+		{
+			String ipsString = rawData.getString("IPs");
+			String[] ips = ipsString.split(",");
+			for (String ip : ips)
+				this.ips.add(ip);
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		online = false;
+	}
+
+	@Override
+	public void save(MySQLConnection connection, String table)
+	{
+		// EDIT Auto-generated method stub
+	}
+
+	@Override
+	public String getName()
+	{
+		return player;
 	}
 
 	public void setPassword(String password) throws CrazyCommandException
@@ -109,12 +172,5 @@ public class PlayerData
 	{
 		this.online = false;
 		ips.clear();
-	}
-
-	public void save(FileConfiguration config, String path)
-	{
-		config.set(path + "name", this.player);
-		config.set(path + "password", this.password);
-		config.set(path + "ips", this.ips);
 	}
 }
