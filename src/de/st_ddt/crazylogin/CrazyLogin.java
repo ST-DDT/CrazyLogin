@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
+import de.st_ddt.crazylogin.crypt.CustomEncryptor;
 import de.st_ddt.crazylogin.crypt.DefaultCrypt;
 import de.st_ddt.crazylogin.crypt.Encryptor;
 import de.st_ddt.crazylogin.crypt.PlainCrypt;
@@ -25,6 +26,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
+import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.Pair;
 import de.st_ddt.crazyutil.PairList;
 
@@ -331,6 +333,11 @@ public class CrazyLogin extends CrazyPlugin
 		else if (algorithm.equalsIgnoreCase("Plaintext"))
 		{
 			encryptor = new PlainCrypt();
+		}
+		else if (algorithm.equalsIgnoreCase("Custom"))
+		{
+			String encryption = config.getString("customEncryptor.class");
+			encryptor = ObjectSaveLoadHelper.load(encryption, CustomEncryptor.class, new Class[0], new Object[0]);
 		}
 		else
 		{
