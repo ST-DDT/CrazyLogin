@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -373,6 +374,42 @@ public class CrazyLogin extends CrazyPlugin
 					save();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("saveType"))
+				{
+					String newValue = args[1];
+					boolean changed = saveType.equals(newValue);
+					if (newValue.equalsIgnoreCase("flat"))
+						saveType = "flat";
+					else if (newValue.equalsIgnoreCase("mysql"))
+						saveType = "mysql";
+					else
+						throw new CrazyCommandNoSuchException("SaveType", newValue);
+					sendLocaleMessage("MODE.CHANGE", sender, "saveType", saveType);
+					if (changed)
+						return;
+					ConfigurationSection config = getConfig();
+					if (saveType.equals("flat"))
+					{
+						database = new CrazyLoginConfigurationDatabase(config, tableName);
+					}
+					else if (saveType.equals("mysql"))
+					{
+						String host = config.getString("database.host", "localhost");
+						config.set("database.host", host);
+						String port = config.getString("database.port", "3306");
+						config.set("database.port", port);
+						String databasename = config.getString("database.dbname", "Crazy");
+						config.set("database.dbname", databasename);
+						String user = config.getString("database.user", "root");
+						config.set("database.user", user);
+						String password = config.getString("database.password", "");
+						config.set("database.password", password);
+						MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
+						database = new CrazyLoginMySQLDatabase(connection, tableName);
+					}
+					save();
+					return;
+				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			case 1:
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
@@ -393,6 +430,11 @@ public class CrazyLogin extends CrazyPlugin
 				else if (args[0].equalsIgnoreCase("algorithm"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "algorithm", encryptor.getAlgorithm());
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("saveType"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "saveType", saveType);
 					return;
 				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
