@@ -4,12 +4,14 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
+import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.databases.ConfigurationDatabaseEntry;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
 import de.st_ddt.crazyutil.databases.MySQLDatabaseEntry;
@@ -96,7 +98,17 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public void save(MySQLConnection connection, String table)
 	{
-		// EDIT Auto-generated method stub
+		Statement query;
+		try
+		{
+			query = connection.getConnection().createStatement();
+			query.executeUpdate("INSERT INTO " + table + " (Name,Password,IPs) VALUES ('" + player + "','" + password + "','" + ChatHelper.listToString(ips, ",") + "')");
+			query.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	@Override
