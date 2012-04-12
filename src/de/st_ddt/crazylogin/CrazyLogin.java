@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
+import de.st_ddt.crazylogin.crypt.AuthMeCrypt;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
 import de.st_ddt.crazylogin.crypt.CustomEncryptor;
 import de.st_ddt.crazylogin.crypt.DefaultCrypt;
@@ -103,6 +104,10 @@ public class CrazyLogin extends CrazyPlugin
 		else if (algorithm.equalsIgnoreCase("Plaintext"))
 		{
 			encryptor = new PlainCrypt();
+		}
+		else if (algorithm.equalsIgnoreCase("AuthMe"))
+		{
+			encryptor = new AuthMeCrypt();
 		}
 		else if (algorithm.equalsIgnoreCase("Custom"))
 		{
