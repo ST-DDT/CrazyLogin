@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -49,9 +48,13 @@ public class CrazyLogin extends CrazyPlugin
 	protected boolean autoKickCommandUsers;
 	protected String uniqueIDKey;
 	protected Encryptor encryptor;
+	// Database
 	protected String saveType;
 	protected String tableName;
 	protected Database<LoginPlayerData> database;
+	private String colName;
+	private String colPassword;
+	private String colIPs;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -126,6 +129,15 @@ public class CrazyLogin extends CrazyPlugin
 				encryptor = new CrazyCrypt1();
 			}
 		}
+		setupDatabase();
+		if (database != null)
+			for (LoginPlayerData data : database.getAllEntries())
+				datas.setDataVia1(data.getName().toLowerCase(), data);
+	}
+
+	public void setupDatabase()
+	{
+		FileConfiguration config = getConfig();
 		saveType = config.getString("database.saveType", "flat").toLowerCase();
 		tableName = config.getString("database.tableName", "players");
 		if (saveType.equals("flat"))
@@ -145,11 +157,13 @@ public class CrazyLogin extends CrazyPlugin
 			String password = config.getString("database.password", "");
 			config.set("database.password", password);
 			MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
-			database = new CrazyLoginMySQLDatabase(connection, tableName);
+			colName = config.getString("database.columns.name", "Name");
+			config.set("database.columns.name", colName);
+			colPassword = config.getString("database.columns.name", "Password");
+			config.set("database.columns.name", colPassword);
+			config.set("database.columns.name", colIPs);
+			database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs);
 		}
-		if (database != null)
-			for (LoginPlayerData data : database.getAllEntries())
-				datas.setDataVia1(data.getName().toLowerCase(), data);
 	}
 
 	@Override
@@ -392,26 +406,7 @@ public class CrazyLogin extends CrazyPlugin
 					sendLocaleMessage("MODE.CHANGE", sender, "saveType", saveType);
 					if (changed)
 						return;
-					ConfigurationSection config = getConfig();
-					if (saveType.equals("flat"))
-					{
-						database = new CrazyLoginConfigurationDatabase(config, tableName);
-					}
-					else if (saveType.equals("mysql"))
-					{
-						String host = config.getString("database.host", "localhost");
-						config.set("database.host", host);
-						String port = config.getString("database.port", "3306");
-						config.set("database.port", port);
-						String databasename = config.getString("database.dbname", "Crazy");
-						config.set("database.dbname", databasename);
-						String user = config.getString("database.user", "root");
-						config.set("database.user", user);
-						String password = config.getString("database.password", "");
-						config.set("database.password", password);
-						MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
-						database = new CrazyLoginMySQLDatabase(connection, tableName);
-					}
+					setupDatabase();
 					save();
 					return;
 				}
@@ -504,5 +499,21 @@ public class CrazyLogin extends CrazyPlugin
 	public PairList<String, LoginPlayerData> getPlayerData()
 	{
 		return datas;
+	}
+
+	// Database stuff
+	public String getColName()
+	{
+		return colName;
+	}
+
+	public String getColPassword()
+	{
+		return colPassword;
+	}
+
+	public String getColIPs()
+	{
+		return colIPs;
 	}
 }

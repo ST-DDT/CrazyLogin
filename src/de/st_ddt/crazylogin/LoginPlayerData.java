@@ -61,7 +61,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		String name = null;
 		try
 		{
-			name = rawData.getString("Name");
+			name = rawData.getString(CrazyLogin.getPlugin().getColName());
 		}
 		catch (Exception e)
 		{
@@ -74,7 +74,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		}
 		try
 		{
-			password = rawData.getString("Password");
+			password = rawData.getString(CrazyLogin.getPlugin().getColPassword());
 		}
 		catch (SQLException e)
 		{
@@ -83,7 +83,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		}
 		try
 		{
-			String ipsString = rawData.getString("IPs");
+			String ipsString = rawData.getString(CrazyLogin.getPlugin().getColIPs());
 			String[] ips = ipsString.split(",");
 			for (String ip : ips)
 				this.ips.add(ip);
@@ -102,7 +102,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		try
 		{
 			query = connection.getConnection().createStatement();
-			query.executeUpdate("INSERT INTO " + table + " (Name,Password,IPs) VALUES ('" + player + "','" + password + "','" + ChatHelper.listToString(ips, ",") + "')");
+			query.executeUpdate("INSERT INTO " + table + " (" + CrazyLogin.getPlugin().getColName() + "," + CrazyLogin.getPlugin().getColPassword() + "," + CrazyLogin.getPlugin().getColIPs() + ") VALUES ('" + player + "','" + password + "','" + ChatHelper.listToString(ips, ",") + "')");
 			query.close();
 		}
 		catch (SQLException e)
