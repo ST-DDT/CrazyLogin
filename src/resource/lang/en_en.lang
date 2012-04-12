@@ -1,4 +1,5 @@
-﻿CRAZYLOGIN.REGISTER.HEADER=For security reasons you need to specify a personal password!
+﻿CRAZYLOGIN=CrazyLogin
+CRAZYLOGIN.REGISTER.HEADER=For security reasons you need to specify a personal password!
 CRAZYLOGIN.REGISTER.MESSAGE=Use /crazylogin password <Password...> to change it!
 CRAZYLOGIN.LOGIN.FAILED=&CLOGIN FAILED!
 CRAZYLOGIN.LOGIN.FAILEDLOG=&CWARNING! FAILED LOGIN ATTEMPT! $0$ @ $1$

@@ -1,4 +1,5 @@
-﻿CRAZYLOGIN.REGISTER.HEADER=Aus Sicherheitsgründen muss ein Passwort erstellt werden.
+﻿CRAZYLOGIN=CrazyLogin
+CRAZYLOGIN.REGISTER.HEADER=Aus Sicherheitsgründen muss ein Passwort erstellt werden.
 CRAZYLOGIN.REGISTER.MESSAGE=Nutze /crazylogin password <Password...> das Passwort zu ändern!
 CRAZYLOGIN.LOGIN.FAILED=&CLOGIN FEHLGESCHLAGEN!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CWARNUNG! Fehlgeschlagener Loginversuch! $0$ @ $1$
