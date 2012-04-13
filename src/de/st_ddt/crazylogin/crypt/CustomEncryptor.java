@@ -7,7 +7,7 @@ public abstract class CustomEncryptor implements Encryptor
 {
 	
 	//You have to use the default constructor (without parameters)
-	//If you access the config, please use "customEncryptor.XXX" to store data
+	//If you access the config, please use "customEncryptor.valueName" to store data
 
 	@Override
 	public abstract String encrypt(String name, String salt, String password) throws UnsupportedEncodingException, NoSuchAlgorithmException;

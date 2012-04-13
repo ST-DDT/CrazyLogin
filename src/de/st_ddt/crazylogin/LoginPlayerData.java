@@ -102,7 +102,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		try
 		{
 			query = connection.getConnection().createStatement();
-			query.executeUpdate("INSERT INTO " + table + " (" + CrazyLogin.getPlugin().getColName() + "," + CrazyLogin.getPlugin().getColPassword() + "," + CrazyLogin.getPlugin().getColIPs() + ") VALUES ('" + player + "','" + password + "','" + ChatHelper.listToString(ips, ",") + "')");
+			query.executeUpdate("REPLACE INTO " + table + " (" + CrazyLogin.getPlugin().getColName() + "," + CrazyLogin.getPlugin().getColPassword() + "," + CrazyLogin.getPlugin().getColIPs() + ") VALUES ('" + player + "','" + password + "','" + ChatHelper.listToString(ips, ",") + "')");
 			query.close();
 		}
 		catch (SQLException e)
