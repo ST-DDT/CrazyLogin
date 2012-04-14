@@ -49,7 +49,7 @@ public class CrazyLoginPlayerListener implements Listener
 			playerdata.logout();
 		if (plugin.isLoggedIn(player))
 			return;
-		plugin.requestLogin(player);
+		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
 		int autoKick = plugin.getAutoKick();
 		if (autoKick >= 10)
 			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST")), autoKick * 20);

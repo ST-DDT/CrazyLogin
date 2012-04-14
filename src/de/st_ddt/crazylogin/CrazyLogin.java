@@ -55,6 +55,7 @@ public class CrazyLogin extends CrazyPlugin
 	private String colName;
 	private String colPassword;
 	private String colIPs;
+	private boolean doNotSpamRequests;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -86,6 +87,7 @@ public class CrazyLogin extends CrazyPlugin
 		autoLogout = config.getBoolean("autoLogout", false);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
+		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		commandWhiteList = config.getStringList("commandWhitelist");
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		if (commandWhiteList.size() == 0)
@@ -177,6 +179,7 @@ public class CrazyLogin extends CrazyPlugin
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
+		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("commandWhitelist", commandWhiteList);
 		config.set("autoKickCommandUsers", autoKickCommandUsers);
 		config.set("uniqueIDKey", uniqueIDKey);
@@ -503,6 +506,8 @@ public class CrazyLogin extends CrazyPlugin
 
 	public void requestLogin(Player player)
 	{
+		if (doNotSpamRequests)
+			return;
 		if (datas.findDataVia1(player.getName().toLowerCase()) == null)
 			sendLocaleMessage("REGISTER.REQUEST", player);
 		else
