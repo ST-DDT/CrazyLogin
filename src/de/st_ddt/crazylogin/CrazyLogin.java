@@ -501,6 +501,14 @@ public class CrazyLogin extends CrazyPlugin
 		return datas;
 	}
 
+	public void requestLogin(Player player)
+	{
+		if (datas.findDataVia1(player.getName().toLowerCase()) == null)
+			sendLocaleMessage("REGISTER.REQUEST", player);
+		else
+			sendLocaleMessage("LOGIN.REQUEST", player);
+	}
+
 	// Database stuff
 	public String getColName()
 	{

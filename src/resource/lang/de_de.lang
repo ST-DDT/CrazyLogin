@@ -7,5 +7,6 @@ CRAZYLOGIN.LOGIN.SUCCESS=&ALogin erfolgreich
 CRAZYLOGIN.LOGOUT.SUCCESS=&ALogout erfolgreich 
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNUNG! Vereiteltes Befehlskommando! $0$ @ $1$: $2$
 CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Passwort geändert!
+CRAZYLOGIN.REGISTER.REQUEST=&CBitte registrieren! /register <Passwort>
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Passwort>
 CRAZYLOGIN.MODE.CHANGE=Modus "$0$"="$1$" gesetzt

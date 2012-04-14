@@ -7,5 +7,6 @@ CRAZYLOGIN.LOGIN.SUCCESS=&ALogin successful
 CRAZYLOGIN.LOGOUT.SUCCESS=&ALogout successful
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNING! Forbidden command execution! $0$ @ $1$: $2$
 CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Password changed!
+CRAZYLOGIN.REGISTER.REQUEST=&Please register! /register <Passwort>
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Password>
 CRAZYLOGIN.MODE.CHANGE=Mode "$0$"="$1$" set

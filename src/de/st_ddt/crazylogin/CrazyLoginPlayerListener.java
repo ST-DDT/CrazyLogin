@@ -47,9 +47,9 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 		if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))
 			playerdata.logout();
-		if (plugin.isLoggedIn(event.getPlayer()))
+		if (plugin.isLoggedIn(player))
 			return;
-		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
+		plugin.requestLogin(player);
 		int autoKick = plugin.getAutoKick();
 		if (autoKick >= 10)
 			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST")), autoKick * 20);
@@ -73,7 +73,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(event.getPlayer()))
 			return;
 		event.setCancelled(true);
-		plugin.sendLocaleMessage("LOGIN.REQUEST", event.getPlayer());
+		plugin.requestLogin(event.getPlayer());
 	}
 
 	@EventHandler
@@ -82,7 +82,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(event.getPlayer()))
 			return;
 		event.setCancelled(true);
-		plugin.sendLocaleMessage("LOGIN.REQUEST", event.getPlayer());
+		plugin.requestLogin(event.getPlayer());
 	}
 
 	@EventHandler
@@ -91,7 +91,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(event.getPlayer()))
 			return;
 		event.setCancelled(true);
-		plugin.sendLocaleMessage("LOGIN.REQUEST", event.getPlayer());
+		plugin.requestLogin(event.getPlayer());
 	}
 
 	@EventHandler
@@ -130,7 +130,7 @@ public class CrazyLoginPlayerListener implements Listener
 					return;
 				}
 		event.setCancelled(true);
-		plugin.sendLocaleMessage("LOGIN.REQUEST", event.getPlayer());
+		plugin.requestLogin(event.getPlayer());
 	}
 
 	@EventHandler
@@ -184,7 +184,7 @@ public class CrazyLoginPlayerListener implements Listener
 				player.kickPlayer(plugin.getLocale().getLocaleMessage(player, "LOGIN.REQUEST"));
 				return;
 			}
-			plugin.sendLocaleMessage("LOGIN.REQUEST", player);
+			plugin.requestLogin(event.getPlayer());
 			return;
 		}
 	}
@@ -196,7 +196,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
+		plugin.requestLogin(event.getPlayer());
 		return;
 	}
 }
