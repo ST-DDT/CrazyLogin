@@ -101,8 +101,9 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		Statement query;
 		try
 		{
+			String IPs = ChatHelper.listToString(ips, ",");
 			query = connection.getConnection().createStatement();
-			query.executeUpdate("INSERT INTO " + table + " (" + CrazyLogin.getPlugin().getColName() + "," + CrazyLogin.getPlugin().getColPassword() + "," + CrazyLogin.getPlugin().getColIPs() + ") VALUES ('" + player + "','" + password + "','" + ChatHelper.listToString(ips, ",") + "') " + " ON DUPLICATE KEY UPDATE " + CrazyLogin.getPlugin().getColPassword() + "='" + password + "', " + CrazyLogin.getPlugin().getColIPs() + "='" + ChatHelper.listToString(ips, ",") + "'");
+			query.executeUpdate("INSERT INTO " + table + " (" + CrazyLogin.getPlugin().getColName() + "," + CrazyLogin.getPlugin().getColPassword() + "," + CrazyLogin.getPlugin().getColIPs() + ") VALUES ('" + player + "','" + password + "','" + IPs + "') " + " ON DUPLICATE KEY UPDATE " + CrazyLogin.getPlugin().getColPassword() + "='" + password + "', " + CrazyLogin.getPlugin().getColIPs() + "='" + IPs + "'");
 			query.close();
 		}
 		catch (SQLException e)

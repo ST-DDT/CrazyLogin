@@ -18,6 +18,7 @@ import de.st_ddt.crazylogin.crypt.DefaultCrypt;
 import de.st_ddt.crazylogin.crypt.Encryptor;
 import de.st_ddt.crazylogin.crypt.PlainCrypt;
 import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
+import de.st_ddt.crazylogin.crypt.xAuthCrypt;
 import de.st_ddt.crazylogin.databases.CrazyLoginConfigurationDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginMySQLDatabase;
 import de.st_ddt.crazyplugin.CrazyPlugin;
@@ -114,6 +115,10 @@ public class CrazyLogin extends CrazyPlugin
 		{
 			encryptor = new AuthMeCrypt();
 		}
+		else if (algorithm.equalsIgnoreCase("xAuth"))
+		{
+			encryptor = new xAuthCrypt();
+		}
 		else if (algorithm.equalsIgnoreCase("Custom"))
 		{
 			String encryption = config.getString("customEncryptor.class");
@@ -161,9 +166,10 @@ public class CrazyLogin extends CrazyPlugin
 			MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
 			colName = config.getString("database.columns.name", "Name");
 			config.set("database.columns.name", colName);
-			colPassword = config.getString("database.columns.name", "Password");
-			config.set("database.columns.name", colPassword);
-			config.set("database.columns.name", colIPs);
+			colPassword = config.getString("database.columns.colPassword", "Password");
+			config.set("database.columns.colPassword", colPassword);
+			colIPs = config.getString("database.columns.colIPs", "IPs");
+			config.set("database.columns.colIPs", colIPs);
 			database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs);
 		}
 	}
