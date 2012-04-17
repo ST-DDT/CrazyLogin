@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -166,10 +167,10 @@ public class CrazyLogin extends CrazyPlugin
 			MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
 			colName = config.getString("database.columns.name", "Name");
 			config.set("database.columns.name", colName);
-			colPassword = config.getString("database.columns.colPassword", "Password");
-			config.set("database.columns.colPassword", colPassword);
-			colIPs = config.getString("database.columns.colIPs", "IPs");
-			config.set("database.columns.colIPs", colIPs);
+			colPassword = config.getString("database.columns.password", "Password");
+			config.set("database.columns.password", colPassword);
+			colIPs = config.getString("database.columns.ips", "IPs");
+			config.set("database.columns.ips", colIPs);
 			database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs);
 		}
 	}
@@ -182,6 +183,13 @@ public class CrazyLogin extends CrazyPlugin
 		config.set("database.tableName", tableName);
 		if (database != null)
 			database.saveAll(datas.getData2List());
+		saveConfiguration();
+		super.save();
+	}
+
+	public void saveConfiguration()
+	{
+		ConfigurationSection config = getConfig();
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
@@ -190,7 +198,6 @@ public class CrazyLogin extends CrazyPlugin
 		config.set("autoKickCommandUsers", autoKickCommandUsers);
 		config.set("uniqueIDKey", uniqueIDKey);
 		config.set("algorithm", encryptor.getAlgorithm());
-		super.save();
 	}
 
 	@Override
@@ -237,7 +244,8 @@ public class CrazyLogin extends CrazyPlugin
 		}
 		sendLocaleMessage("LOGIN.SUCCESS", player);
 		data.addIP(player.getAddress().getAddress().getHostAddress());
-		save();
+		if (database != null)
+			database.save(data);
 	}
 
 	private void commandLogout(final CommandSender sender, final String[] args) throws CrazyCommandException
@@ -251,7 +259,8 @@ public class CrazyLogin extends CrazyPlugin
 		if (data != null)
 			data.logout();
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
-		save();
+		if (database != null)
+			database.save(data);
 	}
 
 	@Override
@@ -286,7 +295,8 @@ public class CrazyLogin extends CrazyPlugin
 				throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
 			datas.removeDataVia1(player.getName().toLowerCase());
 			sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
-			save();
+			if (database != null)
+				database.delete(player.getName());
 			return;
 		}
 		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
@@ -301,7 +311,8 @@ public class CrazyLogin extends CrazyPlugin
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
-		save();
+		if (database != null)
+			database.save(data);
 	}
 
 	private void commandMainAdmin(final CommandSender sender, final String[] args) throws CrazyCommandException
@@ -332,7 +343,8 @@ public class CrazyLogin extends CrazyPlugin
 					throw new CrazyCommandNoSuchException("Player", args[0]);
 				datas.removeDataVia1(target.getName().toLowerCase());
 				sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
-				save();
+				if (database != null)
+					database.delete(target.getName());
 				return;
 		}
 		OfflinePlayer target = getServer().getPlayerExact(args[0]);
@@ -350,7 +362,8 @@ public class CrazyLogin extends CrazyPlugin
 		String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1));
 		data.setPassword(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
-		save();
+		if (database != null)
+			database.save(data);
 	}
 
 	private void commandMainMode(final CommandSender sender, final String[] args) throws CrazyCommandException
@@ -373,7 +386,7 @@ public class CrazyLogin extends CrazyPlugin
 						newValue = true;
 					alwaysNeedPassword = newValue;
 					sendLocaleMessage("MODE.CHANGE", sender, "alwaysNeedPassword", alwaysNeedPassword ? "True" : "False");
-					save();
+					saveConfiguration();
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("autoLogout"))
@@ -383,7 +396,7 @@ public class CrazyLogin extends CrazyPlugin
 						newValue = true;
 					autoLogout = newValue;
 					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout ? "True" : "False");
-					save();
+					saveConfiguration();
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("autoKick"))
@@ -399,7 +412,7 @@ public class CrazyLogin extends CrazyPlugin
 					}
 					autoKick = time;
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKick", autoKick == -1 ? "disabled" : autoKick + " seconds");
-					save();
+					saveConfiguration();
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("saveType"))
