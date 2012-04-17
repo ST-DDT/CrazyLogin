@@ -148,30 +148,43 @@ public class CrazyLogin extends CrazyPlugin
 		FileConfiguration config = getConfig();
 		saveType = config.getString("database.saveType", "flat").toLowerCase();
 		tableName = config.getString("database.tableName", "players");
-		if (saveType.equals("flat"))
+		try
 		{
-			database = new CrazyLoginConfigurationDatabase(config, tableName);
+			if (saveType.equals("flat"))
+			{
+				database = new CrazyLoginConfigurationDatabase(config, tableName);
+			}
+			else if (saveType.equals("mysql"))
+			{
+				String host = config.getString("database.host", "localhost");
+				config.set("database.host", host);
+				String port = config.getString("database.port", "3306");
+				config.set("database.port", port);
+				String databasename = config.getString("database.dbname", "Crazy");
+				config.set("database.dbname", databasename);
+				String user = config.getString("database.user", "root");
+				config.set("database.user", user);
+				String password = config.getString("database.password", "");
+				config.set("database.password", password);
+				MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
+				colName = config.getString("database.columns.name", "Name");
+				config.set("database.columns.name", colName);
+				colPassword = config.getString("database.columns.password", "Password");
+				config.set("database.columns.password", colPassword);
+				colIPs = config.getString("database.columns.ips", "IPs");
+				config.set("database.columns.ips", colIPs);
+				database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs);
+			}
 		}
-		else if (saveType.equals("mysql"))
+		catch (Exception e)
 		{
-			String host = config.getString("database.host", "localhost");
-			config.set("database.host", host);
-			String port = config.getString("database.port", "3306");
-			config.set("database.port", port);
-			String databasename = config.getString("database.dbname", "Crazy");
-			config.set("database.dbname", databasename);
-			String user = config.getString("database.user", "root");
-			config.set("database.user", user);
-			String password = config.getString("database.password", "");
-			config.set("database.password", password);
-			MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
-			colName = config.getString("database.columns.name", "Name");
-			config.set("database.columns.name", colName);
-			colPassword = config.getString("database.columns.password", "Password");
-			config.set("database.columns.password", colPassword);
-			colIPs = config.getString("database.columns.ips", "IPs");
-			config.set("database.columns.ips", colIPs);
-			database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs);
+			e.printStackTrace();
+			database = null;
+		}
+		finally
+		{
+			if (database == null)
+				broadcastLocaleMessage(true, true, "crazylogn.warndatabase", "CRAZYLOGIN.DATABASE.ACCESSWARN", saveType);
 		}
 	}
 

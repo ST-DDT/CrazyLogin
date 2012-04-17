@@ -6,6 +6,7 @@ CRAZYLOGIN.LOGIN.FAILEDWARN=&CWARNUNG! Fehlgeschlagener Loginversuch! $0$ @ $1$
 CRAZYLOGIN.LOGIN.SUCCESS=&ALogin erfolgreich
 CRAZYLOGIN.LOGOUT.SUCCESS=&ALogout erfolgreich 
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNUNG! Vereiteltes Befehlskommando! $0$ @ $1$: $2$
+CRAZYLOGIN.DATABASE.ACCESSWARN=&CWARNUNG! Datenbank nicht erreichbar!
 CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Passwort geändert!
 CRAZYLOGIN.REGISTER.REQUEST=&CBitte registrieren! /register <Passwort>
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Passwort>
