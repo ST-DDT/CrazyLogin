@@ -13,10 +13,11 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.databases.ConfigurationDatabaseEntry;
+import de.st_ddt.crazyutil.databases.FlatDatabaseEntry;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
 import de.st_ddt.crazyutil.databases.MySQLDatabaseEntry;
 
-public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabaseEntry
+public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabaseEntry, FlatDatabaseEntry
 {
 
 	private final String player;
@@ -38,30 +39,43 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		online = false;
 	}
 
-	public LoginPlayerData(ConfigurationSection config)
+	// aus Config-Datenbank laden
+	public LoginPlayerData(ConfigurationSection config, String[] columnNames)
 	{
 		super();
-		this.player = config.getString("name");
-		for (String entry : config.getStringList("ips"))
+		String colName = columnNames[0];
+		String colPassword = columnNames[1];
+		String colIPs = columnNames[2];
+		this.player = config.getString(colName);
+		this.password = config.getString(colPassword);
+		for (String entry : config.getStringList(colIPs))
 			ips.add(entry);
-		this.password = config.getString("password");
 		online = false;
 	}
 
-	public void save(ConfigurationSection config, String path)
+	// in Config-Datenbank speichern
+	@Override
+	public void saveToConfigDatabase(ConfigurationSection config, String path, String[] columnNames)
 	{
-		config.set(path + "name", this.player);
-		config.set(path + "password", this.password);
-		config.set(path + "ips", this.ips);
+		String colName = columnNames[0];
+		String colPassword = columnNames[1];
+		String colIPs = columnNames[2];
+		config.set(path + colName, this.player);
+		config.set(path + colPassword, this.password);
+		config.set(path + colIPs, this.ips);
 	}
 
-	public LoginPlayerData(ResultSet rawData)
+	// aus MySQL-Datenbank laden
+	public LoginPlayerData(ResultSet rawData, String[] columnNames)
 	{
 		super();
+		String colName = columnNames[0];
+		String colPassword = columnNames[1];
+		String colIPs = columnNames[2];
 		String name = null;
 		try
 		{
-			name = rawData.getString(CrazyLogin.getPlugin().getColName());
+			name = rawData.getString(colName);
 		}
 		catch (Exception e)
 		{
@@ -74,7 +88,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		}
 		try
 		{
-			password = rawData.getString(CrazyLogin.getPlugin().getColPassword());
+			password = rawData.getString(colPassword);
 		}
 		catch (SQLException e)
 		{
@@ -83,7 +97,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		}
 		try
 		{
-			String ipsString = rawData.getString(CrazyLogin.getPlugin().getColIPs());
+			String ipsString = rawData.getString(colIPs);
 			String[] ips = ipsString.split(",");
 			for (String ip : ips)
 				this.ips.add(ip);
@@ -95,21 +109,50 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		online = false;
 	}
 
+	// in MySQL-Datenbank speichern
 	@Override
-	public void save(MySQLConnection connection, String table)
+	public void saveToMySQLDatabase(MySQLConnection connection, String table, String[] columnNames)
 	{
 		Statement query;
+		String colName = columnNames[0];
+		String colPassword = columnNames[1];
+		String colIPs = columnNames[2];
+		String IPs = ChatHelper.listToString(ips, ",");
 		try
 		{
-			String IPs = ChatHelper.listToString(ips, ",");
 			query = connection.getConnection().createStatement();
-			query.executeUpdate("INSERT INTO " + table + " (" + CrazyLogin.getPlugin().getColName() + "," + CrazyLogin.getPlugin().getColPassword() + "," + CrazyLogin.getPlugin().getColIPs() + ") VALUES ('" + player + "','" + password + "','" + IPs + "') " + " ON DUPLICATE KEY UPDATE " + CrazyLogin.getPlugin().getColPassword() + "='" + password + "', " + CrazyLogin.getPlugin().getColIPs() + "='" + IPs + "'");
+			query.executeUpdate("INSERT INTO " + table + " (" + colName + "," + colPassword + "," + colIPs + ") VALUES ('" + player + "','" + password + "','" + IPs + "') " + " ON DUPLICATE KEY UPDATE " + colPassword + "='" + password + "', " + colIPs + "='" + IPs + "'");
 			query.close();
 		}
 		catch (SQLException e)
 		{
 			e.printStackTrace();
 		}
+	}
+
+	// aus Flat-Datenbank laden
+	public LoginPlayerData(String[] rawData)
+	{
+		super();
+		this.player = rawData[0];
+		this.password = rawData[1];
+		String[] ips = rawData[2].split(",");
+		for (String ip : ips)
+			this.ips.add(ip);
+		for (String entry : ips)
+			this.ips.add(entry);
+		online = false;
+	}
+
+	// in Flat-Datenbank speichern
+	@Override
+	public String[] saveToFlatDatabase()
+	{
+		String[] strings = new String[3];
+		strings[0] = player;
+		strings[1] = password;
+		strings[2] = ChatHelper.listToString(ips, ",");
+		return strings;
 	}
 
 	@Override

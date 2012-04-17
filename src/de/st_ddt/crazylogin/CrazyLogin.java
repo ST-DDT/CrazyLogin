@@ -1,5 +1,6 @@
 package de.st_ddt.crazylogin;
 
+import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import de.st_ddt.crazylogin.crypt.PlainCrypt;
 import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
 import de.st_ddt.crazylogin.crypt.xAuthCrypt;
 import de.st_ddt.crazylogin.databases.CrazyLoginConfigurationDatabase;
+import de.st_ddt.crazylogin.databases.CrazyLoginFlatDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginMySQLDatabase;
 import de.st_ddt.crazyplugin.CrazyPlugin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
@@ -54,9 +56,6 @@ public class CrazyLogin extends CrazyPlugin
 	protected String saveType;
 	protected String tableName;
 	protected Database<LoginPlayerData> database;
-	private String colName;
-	private String colPassword;
-	private String colIPs;
 	private boolean doNotSpamRequests;
 
 	public static CrazyLogin getPlugin()
@@ -148,11 +147,18 @@ public class CrazyLogin extends CrazyPlugin
 		FileConfiguration config = getConfig();
 		saveType = config.getString("database.saveType", "flat").toLowerCase();
 		tableName = config.getString("database.tableName", "players");
+		// Columns
+		String colName = config.getString("database.columns.name", "name");
+		config.set("database.columns.name", colName);
+		String colPassword = config.getString("database.columns.password", "password");
+		config.set("database.columns.password", colPassword);
+		String colIPs = config.getString("database.columns.ips", "ips");
+		config.set("database.columns.ips", colIPs);
 		try
 		{
-			if (saveType.equals("flat"))
+			if (saveType.equals("config"))
 			{
-				database = new CrazyLoginConfigurationDatabase(config, tableName);
+				database = new CrazyLoginConfigurationDatabase(config, tableName, colName, colPassword, colIPs);
 			}
 			else if (saveType.equals("mysql"))
 			{
@@ -167,13 +173,12 @@ public class CrazyLogin extends CrazyPlugin
 				String password = config.getString("database.password", "");
 				config.set("database.password", password);
 				MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
-				colName = config.getString("database.columns.name", "Name");
-				config.set("database.columns.name", colName);
-				colPassword = config.getString("database.columns.password", "Password");
-				config.set("database.columns.password", colPassword);
-				colIPs = config.getString("database.columns.ips", "IPs");
-				config.set("database.columns.ips", colIPs);
 				database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs);
+			}
+			else if (saveType.equals("flat"))
+			{
+				File file = new File(getDataFolder().getPath() + "/" + tableName + ".db");
+				database = new CrazyLoginFlatDatabase(file, colName, colPassword, colIPs);
 			}
 		}
 		catch (Exception e)
@@ -432,15 +437,18 @@ public class CrazyLogin extends CrazyPlugin
 				{
 					String newValue = args[1];
 					boolean changed = saveType.equals(newValue);
-					if (newValue.equalsIgnoreCase("flat"))
-						saveType = "flat";
+					if (newValue.equalsIgnoreCase("config"))
+						saveType = "config";
 					else if (newValue.equalsIgnoreCase("mysql"))
 						saveType = "mysql";
+					else if (newValue.equalsIgnoreCase("flat"))
+						saveType = "flat";
 					else
 						throw new CrazyCommandNoSuchException("SaveType", newValue);
 					sendLocaleMessage("MODE.CHANGE", sender, "saveType", saveType);
 					if (changed)
 						return;
+					getConfig().set("database.saveType", saveType);
 					setupDatabase();
 					save();
 					return;
@@ -544,21 +552,5 @@ public class CrazyLogin extends CrazyPlugin
 			sendLocaleMessage("REGISTER.REQUEST", player);
 		else
 			sendLocaleMessage("LOGIN.REQUEST", player);
-	}
-
-	// Database stuff
-	public String getColName()
-	{
-		return colName;
-	}
-
-	public String getColPassword()
-	{
-		return colPassword;
-	}
-
-	public String getColIPs()
-	{
-		return colIPs;
 	}
 }
