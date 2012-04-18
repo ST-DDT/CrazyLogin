@@ -27,6 +27,7 @@ permissions:
       crazylogin.mode: true
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
+      crazylogin.warndatabase: true
   crazyonline.admin:
     description: Allow changing passwords for other players
     default: op

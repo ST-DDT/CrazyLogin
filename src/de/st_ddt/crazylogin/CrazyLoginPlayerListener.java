@@ -13,6 +13,8 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -31,6 +33,21 @@ public class CrazyLoginPlayerListener implements Listener
 		super();
 		this.plugin = plugin;
 		this.datas = plugin.getPlayerData();
+	}
+
+	@EventHandler
+	public void PlayerLogin(PlayerPreLoginEvent event)
+	{
+		if (!plugin.isForceSingleSessionEnabled())
+			return;
+		String name = event.getName();
+		Player player = plugin.getServer().getPlayer(name);
+		if (player == null)
+			return;
+		if (player.getAddress().getAddress().getHostAddress().equals(event.getAddress().getHostAddress()))
+			return;
+		event.setResult(Result.KICK_OTHER);
+		event.setKickMessage("You are already online! Please wait for client timeout or contact an operator.");
 	}
 
 	@EventHandler

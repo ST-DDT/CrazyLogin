@@ -56,7 +56,8 @@ public class CrazyLogin extends CrazyPlugin
 	protected String saveType;
 	protected String tableName;
 	protected Database<LoginPlayerData> database;
-	private boolean doNotSpamRequests;
+	protected boolean doNotSpamRequests;
+	protected boolean forceSingleSession;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -91,6 +92,7 @@ public class CrazyLogin extends CrazyPlugin
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		commandWhiteList = config.getStringList("commandWhitelist");
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
+		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		if (commandWhiteList.size() == 0)
 		{
 			commandWhiteList.add("/login");
@@ -552,5 +554,10 @@ public class CrazyLogin extends CrazyPlugin
 			sendLocaleMessage("REGISTER.REQUEST", player);
 		else
 			sendLocaleMessage("LOGIN.REQUEST", player);
+	}
+
+	public boolean isForceSingleSessionEnabled()
+	{
+		return forceSingleSession;
 	}
 }
