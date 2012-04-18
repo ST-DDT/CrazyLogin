@@ -257,7 +257,7 @@ public class CrazyLogin extends CrazyPlugin
 		if (!data.login(password))
 		{
 			sendLocaleMessage("LOGIN.FAILED", player);
-			broadcastLocaleMessage(true, true, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
+			broadcastLocaleMessage(true, false, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			return;
 		}
 		sendLocaleMessage("LOGIN.SUCCESS", player);
