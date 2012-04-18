@@ -33,11 +33,15 @@ permissions:
     children: 
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
+      crazylogin.warndatabase: true
   crazylogin.warnloginfailure:
     description: Get informed if someone fails to login
     default: op
   crazylogin.warncommandexploits:
     description: Get informed if someone tries to execute a none whitelisted command.
+    default: op
+  crazylogin.warndatabase:
+    description: Get informed if database connection fails
     default: op
   crazyonline.mode:
     description: Allow changing plugin mode
