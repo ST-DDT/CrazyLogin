@@ -44,8 +44,8 @@ public class CrazyLoginPlayerListener implements Listener
 		Player player = plugin.getServer().getPlayer(name);
 		if (player == null)
 			return;
-		if (player.getAddress().getAddress().getHostAddress().equals(event.getAddress().getHostAddress()))
-			return;
+		// if (player.getAddress().getAddress().getHostAddress().equals(event.getAddress().getHostAddress()))
+		// return;
 		event.setResult(Result.KICK_OTHER);
 		event.setKickMessage("You are already online! Please wait for client timeout or contact an operator.");
 	}

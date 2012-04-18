@@ -113,7 +113,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public void saveToMySQLDatabase(MySQLConnection connection, String table, String[] columnNames)
 	{
-		Statement query;
+		Statement query = null;
 		String colName = columnNames[0];
 		String colPassword = columnNames[1];
 		String colIPs = columnNames[2];
@@ -122,11 +122,21 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		{
 			query = connection.getConnection().createStatement();
 			query.executeUpdate("INSERT INTO " + table + " (" + colName + "," + colPassword + "," + colIPs + ") VALUES ('" + player + "','" + password + "','" + IPs + "') " + " ON DUPLICATE KEY UPDATE " + colPassword + "='" + password + "', " + colIPs + "='" + IPs + "'");
-			query.close();
 		}
 		catch (SQLException e)
 		{
 			e.printStackTrace();
+		}
+		finally
+		{
+			if (query != null)
+				try
+				{
+					query.close();
+				}
+				catch (SQLException e)
+				{}
+			connection.closeConnection();
 		}
 	}
 
