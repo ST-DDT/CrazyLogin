@@ -20,7 +20,6 @@ import de.st_ddt.crazylogin.crypt.DefaultCrypt;
 import de.st_ddt.crazylogin.crypt.Encryptor;
 import de.st_ddt.crazylogin.crypt.PlainCrypt;
 import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
-import de.st_ddt.crazylogin.crypt.xAuthCrypt;
 import de.st_ddt.crazylogin.databases.CrazyLoginConfigurationDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginFlatDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginMySQLDatabase;
@@ -116,10 +115,6 @@ public class CrazyLogin extends CrazyPlugin
 		else if (algorithm.equalsIgnoreCase("AuthMe"))
 		{
 			encryptor = new AuthMeCrypt();
-		}
-		else if (algorithm.equalsIgnoreCase("xAuth"))
-		{
-			encryptor = new xAuthCrypt();
 		}
 		else if (algorithm.equalsIgnoreCase("Custom"))
 		{
