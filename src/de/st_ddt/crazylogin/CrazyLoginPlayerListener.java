@@ -189,7 +189,7 @@ public class CrazyLoginPlayerListener implements Listener
 		String message = event.getMessage().toLowerCase();
 		if (message.startsWith("/"))
 		{
-			if (message.startsWith("/login") || message.startsWith("/crazylogin password") || message.startsWith("/crazylanguage") || message.startsWith("/language"))
+			if (message.startsWith("/login") || message.startsWith("/crazylogin password") || message.startsWith("/crazylanguage") || message.startsWith("/language") || message.startsWith("/register"))
 				return;
 			for (String command : plugin.getCommandWhiteList())
 				if (message.startsWith(command))
