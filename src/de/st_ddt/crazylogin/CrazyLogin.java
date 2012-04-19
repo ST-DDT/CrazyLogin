@@ -317,6 +317,8 @@ public class CrazyLogin extends CrazyPlugin
 		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
 		{
+			if (!sender.hasPermission("crazylogin.register"))
+				throw new CrazyCommandPermissionException();
 			data = new LoginPlayerData(player);
 			datas.setDataVia1(player.getName().toLowerCase(), data);
 		}

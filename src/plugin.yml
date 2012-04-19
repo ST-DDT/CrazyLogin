@@ -28,6 +28,7 @@ permissions:
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
       crazylogin.warndatabase: true
+      crazylogin.register: true
   crazyonline.admin:
     description: Allow changing passwords for other players
     default: op
@@ -35,6 +36,10 @@ permissions:
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
       crazylogin.warndatabase: true
+      crazylogin.register: true
+  crazylogin.register:
+    description: Allow players to create a password. (for external registration)
+    default: true
   crazylogin.warnloginfailure:
     description: Get informed if someone fails to login
     default: op
