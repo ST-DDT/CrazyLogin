@@ -48,8 +48,8 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		String colIPs = columnNames[2];
 		this.player = config.getString(colName);
 		this.password = config.getString(colPassword);
-		for (String entry : config.getStringList(colIPs))
-			ips.add(entry);
+		for (String ip : config.getStringList(colIPs))
+			ips.add(ip);
 		online = false;
 	}
 
@@ -159,7 +159,6 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		String[] strings = new String[3];
 		strings[0] = player;
 		strings[1] = password;
-		
 		strings[2] = ChatHelper.listToString(ips, ",");
 		return strings;
 	}
