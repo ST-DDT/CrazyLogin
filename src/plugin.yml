@@ -2,7 +2,7 @@ name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
 #C*=needed core version
-version: C6.2_4.5
+version: C6.2_4.6
 softdepend: [PermissionsBukkit]
 depend: [CrazyCore]
 commands:
@@ -48,6 +48,9 @@ permissions:
     default: op
   crazylogin.warndatabase:
     description: Get informed if database connection fails
+    default: op
+  crazylogin.warnalgorithm:
+    description: Get informed if no algorithm is set.
     default: op
   crazyonline.mode:
     description: Allow changing plugin mode

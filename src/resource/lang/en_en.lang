@@ -11,3 +11,4 @@ CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Password changed!
 CRAZYLOGIN.REGISTER.REQUEST=&Please register! /register <Password>
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Password>
 CRAZYLOGIN.MODE.CHANGE=Mode "$0$"="$1$" set
+CRAZYLOGIN.ALGORITHM.MISSING=Invalid encryption algorithm $0$ (Using default)!

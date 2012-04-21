@@ -11,3 +11,4 @@ CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Passwort geÃ¤ndert!
 CRAZYLOGIN.REGISTER.REQUEST=&CBitte registrieren! /register <Passwort>
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Passwort>
 CRAZYLOGIN.MODE.CHANGE=Modus "$0$"="$1$" gesetzt
+CRAZYLOGIN.ALGORITHM.MISSING=Ungültiger Verschlüsselungslagorithm $0$ (nutzte Standard)!

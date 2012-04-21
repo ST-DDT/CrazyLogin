@@ -4,7 +4,6 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -50,13 +49,13 @@ public class CrazyLogin extends CrazyPlugin
 	protected List<String> commandWhiteList;
 	protected boolean autoKickCommandUsers;
 	protected String uniqueIDKey;
+	protected boolean doNotSpamRequests;
+	protected boolean forceSingleSession;
 	protected Encryptor encryptor;
 	// Database
 	protected String saveType;
 	protected String tableName;
 	protected Database<LoginPlayerData> database;
-	protected boolean doNotSpamRequests;
-	protected boolean forceSingleSession;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -129,11 +128,12 @@ public class CrazyLogin extends CrazyPlugin
 			}
 			catch (NoSuchAlgorithmException e)
 			{
-				sendLocaleMessage("ALGORITHM.MISSING", Bukkit.getConsoleSender(), algorithm);
+				broadcastLocaleMessage(true, false, "crazylogin.warnalgorithm", "ALGORITHM.MISSING", algorithm);
 				encryptor = new CrazyCrypt1();
 			}
 		}
 		setupDatabase();
+		datas.clear();
 		if (database != null)
 			for (LoginPlayerData data : database.getAllEntries())
 				datas.setDataVia1(data.getName().toLowerCase(), data);
@@ -347,8 +347,6 @@ public class CrazyLogin extends CrazyPlugin
 			case 0:
 				throw new CrazyCommandUsageException("/crazylogin admin <Player> <Passwort...>");
 			case 1:
-				if (alwaysNeedPassword)
-					throw new CrazyCommandUsageException("/crazylogin admin <Player> <Passwort...>");
 				OfflinePlayer target = getServer().getPlayerExact(args[0]);
 				if (target == null)
 				{
