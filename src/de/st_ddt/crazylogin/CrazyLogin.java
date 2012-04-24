@@ -304,12 +304,14 @@ public class CrazyLogin extends CrazyPlugin
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
 		Player player = (Player) sender;
+		if (!isLoggedIn(player) && hasAccount(player))
+			throw new CrazyCommandPermissionException();
 		if (args.length == 0)
 		{
 			if (alwaysNeedPassword)
 				throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
 			datas.removeDataVia1(player.getName().toLowerCase());
-			sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
+			sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
 			if (database != null)
 				database.delete(player.getName());
 			return;
@@ -322,8 +324,6 @@ public class CrazyLogin extends CrazyPlugin
 			data = new LoginPlayerData(player);
 			datas.setDataVia1(player.getName().toLowerCase(), data);
 		}
-		else if (!isLoggedIn(player))
-			throw new CrazyCommandPermissionException();
 		String password = ChatHelper.listToString(args);
 		data.setPassword(password);
 		data.login(password);
@@ -357,7 +357,7 @@ public class CrazyLogin extends CrazyPlugin
 				if (target == null)
 					throw new CrazyCommandNoSuchException("Player", args[0]);
 				datas.removeDataVia1(target.getName().toLowerCase());
-				sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
+				sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
 				if (database != null)
 					database.delete(target.getName());
 				return;
@@ -483,12 +483,17 @@ public class CrazyLogin extends CrazyPlugin
 		}
 	}
 
-	public boolean isLoggedIn(final Player player)
+	public boolean isLoggedIn(final OfflinePlayer player)
 	{
 		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
 			return !alwaysNeedPassword;
 		return data.isOnline() && player.isOnline();
+	}
+
+	public boolean hasAccount(final OfflinePlayer player)
+	{
+		return (datas.findDataVia1(player.getName().toLowerCase()) != null);
 	}
 
 	public boolean isAlwaysNeedPassword()

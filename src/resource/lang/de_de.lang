@@ -8,7 +8,8 @@ CRAZYLOGIN.LOGOUT.SUCCESS=&ALogout erfolgreich
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNUNG! Vereiteltes Befehlskommando! $0$ @ $1$: $2$
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CWARNUNG! Datenbank nicht erreichbar!
 CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Passwort geändert!
+CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Passwort gelöscht!
 CRAZYLOGIN.REGISTER.REQUEST=&CBitte registrieren! /register <Passwort>
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Passwort>
 CRAZYLOGIN.MODE.CHANGE=Modus "$0$"="$1$" gesetzt
-CRAZYLOGIN.ALGORITHM.MISSING=Ung�ltiger Verschl�sselungslagorithm $0$ (nutzte Standard)!
+CRAZYLOGIN.ALGORITHM.MISSING=Ungültiger Verschlüsselungslagorithm $0$ (nutzte Standard)!

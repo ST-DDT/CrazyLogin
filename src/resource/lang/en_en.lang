@@ -8,6 +8,7 @@ CRAZYLOGIN.LOGOUT.SUCCESS=&ALogout successful
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNING! Forbidden command execution! $0$ @ $1$: $2$
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CWARNING! Cannot access Datenbase!
 CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Password changed!
+CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Password deleted!
 CRAZYLOGIN.REGISTER.REQUEST=&Please register! /register <Password>
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Password>
 CRAZYLOGIN.MODE.CHANGE=Mode "$0$"="$1$" set
