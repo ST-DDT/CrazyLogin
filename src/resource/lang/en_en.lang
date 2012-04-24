@@ -1,6 +1,7 @@
 ﻿CRAZYLOGIN=CrazyLogin
 CRAZYLOGIN.REGISTER.HEADER=For security reasons you need to specify a personal password!
-CRAZYLOGIN.REGISTER.MESSAGE=Use /crazylogin password <Password...> to change it!
+CRAZYLOGIN.REGISTER.HEADER2=You can create a password if you wish.
+CRAZYLOGIN.REGISTER.MESSAGE=Use /crazylogin password <Password...> to create/change it!
 CRAZYLOGIN.LOGIN.FAILED=&CLOGIN FAILED!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CWARNING! FAILED LOGIN ATTEMPT! $0$ @ $1$
 CRAZYLOGIN.LOGIN.SUCCESS=&ALogin successful

@@ -58,7 +58,10 @@ public class CrazyLoginPlayerListener implements Listener
 		LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
 		if (playerdata == null)
 		{
-			plugin.sendLocaleMessage("REGISTER.HEADER", player);
+			if (plugin.isAlwaysNeedPassword())
+				plugin.sendLocaleMessage("REGISTER.HEADER", player);
+			else
+				plugin.sendLocaleMessage("REGISTER.HEADER2", player);
 			plugin.sendLocaleMessage("REGISTER.MESSAGE", player);
 			return;
 		}
