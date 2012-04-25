@@ -146,9 +146,14 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		super();
 		this.player = rawData[0];
 		this.password = rawData[1];
-		String[] ips = rawData[2].split(",");
-		for (String ip : ips)
-			this.ips.add(ip);
+		try
+		{
+			String[] ips = rawData[2].split(",");
+			for (String ip : ips)
+				this.ips.add(ip);
+		}
+		catch (IndexOutOfBoundsException e)
+		{}
 		online = false;
 	}
 
@@ -160,6 +165,8 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		strings[0] = player;
 		strings[1] = password;
 		strings[2] = ChatHelper.listToString(ips, ",");
+		if (strings[2].equals(""))
+			strings[2] = ".";
 		return strings;
 	}
 
