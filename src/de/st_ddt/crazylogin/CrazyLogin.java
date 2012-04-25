@@ -483,7 +483,7 @@ public class CrazyLogin extends CrazyPlugin
 		}
 	}
 
-	public boolean isLoggedIn(final OfflinePlayer player)
+	public boolean isLoggedIn(final Player player)
 	{
 		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
