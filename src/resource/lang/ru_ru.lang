@@ -1,0 +1,16 @@
+﻿CRAZYLOGIN=CrazyLogin
+CRAZYLOGIN.REGISTER.HEADER=Вы должны выбрать личный пароль для защиты вашего аккаунта!
+CRAZYLOGIN.REGISTER.HEADER2=Вы можете защитить свой аккаунт паролем, если хотите.
+CRAZYLOGIN.REGISTER.MESSAGE=Используйте /crazylogin password <Password...> для его создания/изменения!
+CRAZYLOGIN.LOGIN.FAILED=&CНЕУДАЧНЫЙ ВХОД!
+CRAZYLOGIN.LOGIN.FAILEDWARN=&CВНИМАНИЕ! ОБНАРУЖЕН НЕУДАЧНЫЙ ВХОД! $0$ @ $1$
+CRAZYLOGIN.LOGIN.SUCCESS=&AУспешный вход
+CRAZYLOGIN.LOGOUT.SUCCESS=&AУспешный выход
+CRAZYLOGIN.COMMAND.EXPLOITWARN=&CВНИМАНИЕ! Попытка исполнения запрещенной команды! $0$ @ $1$: $2$
+CRAZYLOGIN.DATABASE.ACCESSWARN=&CВНИМАНИЕ! Нет доступа к базе данных!
+CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Пароль успешно изменен!
+CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Пароль успешно удален!
+CRAZYLOGIN.REGISTER.REQUEST=&CПожалуйста зарегистрируйтесь! /register <Password>
+CRAZYLOGIN.LOGIN.REQUEST=&CПожалуйста войдите! /login <Password>
+CRAZYLOGIN.MODE.CHANGE=Режим "$0$"="$1$" установлен
+CRAZYLOGIN.ALGORITHM.MISSING=Неверный крипто алгоритм $0$ (Использую алгоритм по умолчанию)!
