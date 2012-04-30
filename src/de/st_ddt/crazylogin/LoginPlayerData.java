@@ -6,12 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
+
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyutil.ChatHelper;
+import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.databases.ConfigurationDatabaseEntry;
 import de.st_ddt.crazyutil.databases.FlatDatabaseEntry;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
@@ -24,11 +27,13 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	private String password;
 	private final ArrayList<String> ips = new ArrayList<String>();
 	private boolean online;
+	private Date lastAction;
 
 	public LoginPlayerData(Player player)
 	{
 		this(player.getName(), player.getAddress().getAddress().getHostAddress());
 		online = true;
+		lastAction = new Date();
 	}
 
 	public LoginPlayerData(String player, String ip)
@@ -37,6 +42,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		this.player = player;
 		ips.add(ip);
 		online = false;
+		lastAction = new Date();
 	}
 
 	// aus Config-Datenbank laden
@@ -46,10 +52,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		String colName = columnNames[0];
 		String colPassword = columnNames[1];
 		String colIPs = columnNames[2];
+		String colAction = columnNames[3];
 		this.player = config.getString(colName);
 		this.password = config.getString(colPassword);
 		for (String ip : config.getStringList(colIPs))
 			ips.add(ip);
+		lastAction = ObjectSaveLoadHelper.StringToDate(config.getString(colAction), new Date());
 		online = false;
 	}
 
@@ -60,9 +68,11 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		String colName = columnNames[0];
 		String colPassword = columnNames[1];
 		String colIPs = columnNames[2];
+		String colAction = columnNames[3];
 		config.set(path + colName, this.player);
 		config.set(path + colPassword, this.password);
 		config.set(path + colIPs, this.ips);
+		config.set(path + colAction, lastAction);
 	}
 
 	// aus MySQL-Datenbank laden
@@ -72,6 +82,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		String colName = columnNames[0];
 		String colPassword = columnNames[1];
 		String colIPs = columnNames[2];
+		String colAction = columnNames[3];
 		String name = null;
 		try
 		{
@@ -106,6 +117,14 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		{
 			e.printStackTrace();
 		}
+		try
+		{
+			lastAction = rawData.getDate(colAction);
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
 		online = false;
 	}
 
@@ -117,11 +136,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		String colName = columnNames[0];
 		String colPassword = columnNames[1];
 		String colIPs = columnNames[2];
+		String colAction = columnNames[3];
 		String IPs = ChatHelper.listToString(ips, ",");
 		try
 		{
 			query = connection.getConnection().createStatement();
-			query.executeUpdate("INSERT INTO " + table + " (" + colName + "," + colPassword + "," + colIPs + ") VALUES ('" + player + "','" + password + "','" + IPs + "') " + " ON DUPLICATE KEY UPDATE " + colPassword + "='" + password + "', " + colIPs + "='" + IPs + "'");
+			query.executeUpdate("INSERT INTO " + table + " (" + colName + "," + colPassword + "," + colIPs + "," + colAction + ") VALUES ('" + player + "','" + password + "','" + IPs + "','" + lastAction + "') " + " ON DUPLICATE KEY UPDATE " + colPassword + "='" + password + "', " + colIPs + "='" + IPs + "'," + colAction + "='" + lastAction + "'");
 		}
 		catch (SQLException e)
 		{
@@ -151,9 +171,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 			String[] ips = rawData[2].split(",");
 			for (String ip : ips)
 				this.ips.add(ip);
+			lastAction = ObjectSaveLoadHelper.StringToDate(rawData[3], new Date());
 		}
 		catch (IndexOutOfBoundsException e)
-		{}
+		{
+			lastAction = new Date();
+		}
 		online = false;
 	}
 
@@ -161,12 +184,13 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public String[] saveToFlatDatabase()
 	{
-		String[] strings = new String[3];
+		String[] strings = new String[4];
 		strings[0] = player;
 		strings[1] = password;
 		strings[2] = ChatHelper.listToString(ips, ",");
 		if (strings[2].equals(""))
 			strings[2] = ".";
+		strings[3] = ObjectSaveLoadHelper.DateToString(lastAction);
 		return strings;
 	}
 
@@ -221,6 +245,16 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		return ips.contains(ip);
 	}
 
+	protected void notifyAction()
+	{
+		lastAction = new Date();
+	}
+
+	public Date getLastActionTime()
+	{
+		return lastAction;
+	}
+
 	public boolean isOnline()
 	{
 		return online;
@@ -228,10 +262,10 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 
 	public boolean login(String password)
 	{
-		if (!isPassword(password))
-			return false;
-		this.online = true;
-		return true;
+		this.online = isPassword(password);
+		if (online)
+			lastAction = new Date();
+		return online;
 	}
 
 	public void logout()
@@ -242,6 +276,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	public void logout(boolean removeIPs)
 	{
 		this.online = false;
+		lastAction = new Date();
 		ips.clear();
 	}
 }

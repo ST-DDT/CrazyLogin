@@ -2,7 +2,7 @@ name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
 #C*=needed core version
-version: C6.2_4.7.2
+version: C6.3_4.8
 softdepend: [PermissionsBukkit]
 depend: [CrazyCore]
 commands:
@@ -28,6 +28,7 @@ permissions:
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
       crazylogin.warndatabase: true
+      crazylogin.warndelete: true
       crazylogin.register: true
   crazyonline.admin:
     description: Allow changing passwords for other players
@@ -36,6 +37,7 @@ permissions:
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
       crazylogin.warndatabase: true
+      crazylogin.warndelete: true
       crazylogin.register: true
   crazylogin.register:
     description: Allow players to create a password. (for external registration)
@@ -52,6 +54,14 @@ permissions:
   crazylogin.warnalgorithm:
     description: Get informed if no algorithm is set.
     default: op
+  crazylogin.warndelete:
+    description: Get informed if old accounts are deleted (via admincommands)
+    default: op
+  crazylogin.delete:
+    description: Allow deleting old accounts.
+    default: op
+    children:
+      crazylogin.warndelete: true
   crazyonline.mode:
     description: Allow changing plugin mode
     default: op

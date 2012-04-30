@@ -2,6 +2,7 @@ package de.st_ddt.crazylogin;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 
 import org.bukkit.OfflinePlayer;
@@ -32,6 +33,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
+import de.st_ddt.crazyutil.Pair;
 import de.st_ddt.crazyutil.PairList;
 import de.st_ddt.crazyutil.databases.Database;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
@@ -44,7 +46,7 @@ public class CrazyLogin extends CrazyPlugin
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
 	protected boolean alwaysNeedPassword;
-	protected boolean autoLogout;
+	protected int autoLogout;
 	protected int autoKick;
 	protected List<String> commandWhiteList;
 	protected boolean autoKickCommandUsers;
@@ -56,6 +58,7 @@ public class CrazyLogin extends CrazyPlugin
 	protected String saveType;
 	protected String tableName;
 	protected Database<LoginPlayerData> database;
+	protected int autoDelete;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -84,13 +87,17 @@ public class CrazyLogin extends CrazyPlugin
 	{
 		super.load();
 		FileConfiguration config = getConfig();
-		autoLogout = config.getBoolean("autoLogout", false);
+		if (config.getBoolean("autoLogout", false))
+			autoLogout = 0;
+		else
+			autoLogout = config.getInt("autoLogout", 60 * 60 * 12);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		commandWhiteList = config.getStringList("commandWhitelist");
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
+		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
 		if (commandWhiteList.size() == 0)
 		{
 			commandWhiteList.add("/login");
@@ -128,7 +135,7 @@ public class CrazyLogin extends CrazyPlugin
 			}
 			catch (NoSuchAlgorithmException e)
 			{
-				broadcastLocaleMessage(true, false, "crazylogin.warnalgorithm", "ALGORITHM.MISSING", algorithm);
+				broadcastLocaleMessage(true, "crazylogin.warnalgorithm", "ALGORITHM.MISSING", algorithm);
 				encryptor = new CrazyCrypt1();
 			}
 		}
@@ -151,11 +158,13 @@ public class CrazyLogin extends CrazyPlugin
 		config.set("database.columns.password", colPassword);
 		String colIPs = config.getString("database.columns.ips", "ips");
 		config.set("database.columns.ips", colIPs);
+		String colLastAction = config.getString("database.columns.lastAction", "lastAction");
+		config.set("database.columns.lastAction", colLastAction);
 		try
 		{
 			if (saveType.equals("config"))
 			{
-				database = new CrazyLoginConfigurationDatabase(config, tableName, colName, colPassword, colIPs);
+				database = new CrazyLoginConfigurationDatabase(config, tableName, colName, colPassword, colIPs, colLastAction);
 			}
 			else if (saveType.equals("mysql"))
 			{
@@ -170,12 +179,12 @@ public class CrazyLogin extends CrazyPlugin
 				String password = config.getString("database.password", "");
 				config.set("database.password", password);
 				MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
-				database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs);
+				database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs, colLastAction);
 			}
 			else if (saveType.equals("flat"))
 			{
 				File file = new File(getDataFolder().getPath() + "/" + tableName + ".db");
-				database = new CrazyLoginFlatDatabase(file, colName, colPassword, colIPs);
+				database = new CrazyLoginFlatDatabase(file, colName, colPassword, colIPs, colLastAction);
 			}
 		}
 		catch (Exception e)
@@ -186,7 +195,7 @@ public class CrazyLogin extends CrazyPlugin
 		finally
 		{
 			if (database == null)
-				broadcastLocaleMessage(true, false, "crazylogin.warndatabase", "CRAZYLOGIN.DATABASE.ACCESSWARN", saveType);
+				broadcastLocaleMessage(true, "crazylogin.warndatabase", "CRAZYLOGIN.DATABASE.ACCESSWARN", saveType);
 		}
 	}
 
@@ -196,10 +205,33 @@ public class CrazyLogin extends CrazyPlugin
 		FileConfiguration config = getConfig();
 		config.set("database.saveType", saveType);
 		config.set("database.tableName", tableName);
+		if (autoDelete != -1)
+			dropOldAccounts(autoDelete);
 		if (database != null)
 			database.saveAll(datas.getData2List());
 		saveConfiguration();
 		super.save();
+	}
+
+	protected int dropOldAccounts(int age)
+	{
+		Date compare = new Date();
+		compare.setTime(compare.getTime() - age * 1000 * 60 * 60 * 24);
+		return dropOldAccounts(compare);
+	}
+
+	protected int dropOldAccounts(Date limit)
+	{
+		int amount = 0;
+		for (Pair<String, LoginPlayerData> pair : datas)
+			if (pair.getData2().getLastActionTime().before(limit))
+			{
+				datas.remove(pair);
+				amount++;
+				if (database != null)
+					database.delete(pair.getData2().getName());
+			}
+		return amount;
 	}
 
 	public void saveConfiguration()
@@ -213,6 +245,7 @@ public class CrazyLogin extends CrazyPlugin
 		config.set("autoKickCommandUsers", autoKickCommandUsers);
 		config.set("uniqueIDKey", uniqueIDKey);
 		config.set("algorithm", encryptor.getAlgorithm());
+		config.set("autoDelete", autoDelete);
 	}
 
 	@Override
@@ -254,7 +287,7 @@ public class CrazyLogin extends CrazyPlugin
 		if (!data.login(password))
 		{
 			sendLocaleMessage("LOGIN.FAILED", player);
-			broadcastLocaleMessage(true, false, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
+			broadcastLocaleMessage(true, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			return;
 		}
 		sendLocaleMessage("LOGIN.SUCCESS", player);
@@ -294,6 +327,11 @@ public class CrazyLogin extends CrazyPlugin
 		if (commandLabel.equalsIgnoreCase("mode"))
 		{
 			commandMainMode(sender, args);
+			return true;
+		}
+		if (commandLabel.equalsIgnoreCase("delete"))
+		{
+			commandMainDelete(sender, args);
 			return true;
 		}
 		return false;
@@ -381,6 +419,53 @@ public class CrazyLogin extends CrazyPlugin
 			database.save(data);
 	}
 
+	private void commandMainDelete(CommandSender sender, String[] args) throws CrazyCommandException
+	{
+		if (sender instanceof Player)
+		{
+			Player player = (Player) sender;
+			if (!isLoggedIn(player))
+				throw new CrazyCommandPermissionException();
+		}
+		if (!sender.hasPermission("crazylogin.delete"))
+		{
+			String days = "(-)";
+			if (args.length != 0)
+				days = args[0];
+			broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETEWARN", sender.getName(), days);
+			throw new CrazyCommandPermissionException();
+		}
+		if (args.length < 2)
+			if (sender instanceof ConsoleCommandSender)
+				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> CONSOLE_CONFIRM");
+			else
+				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> <Password>");
+		int days = 0;
+		try
+		{
+			days = Integer.parseInt(args[0]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new CrazyCommandParameterException(0, "Integer");
+		}
+		if (days < 0)
+			return;
+		String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1), " ");
+		if (sender instanceof ConsoleCommandSender)
+		{
+			if (!password.equals("CONSOLE_CONFIRM"))
+				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> CONSOLE_CONFIRM");
+		}
+		else
+		{
+			if (!getPlayerData(sender.getName().toLowerCase()).isPassword(password))
+				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> <Password>");
+		}
+		int amount = dropOldAccounts(days);
+		broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETED", sender.getName(), days, amount);
+	}
+
 	private void commandMainMode(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof Player)
@@ -406,11 +491,19 @@ public class CrazyLogin extends CrazyPlugin
 				}
 				else if (args[0].equalsIgnoreCase("autoLogout"))
 				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
+					int newValue = 0;
+					try
+					{
+						newValue = Integer.parseInt(args[1]);
+						if (newValue < -1)
+							throw new Exception();
+					}
+					catch (Exception e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "0 = instant", "1... time in seconds");
+					}
 					autoLogout = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout ? "True" : "False");
+					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout);
 					saveConfiguration();
 					return;
 				}
@@ -459,7 +552,7 @@ public class CrazyLogin extends CrazyPlugin
 				}
 				else if (args[0].equalsIgnoreCase("autoLogout"))
 				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout ? "True" : "False");
+					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout);
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("autoKick"))
@@ -501,7 +594,7 @@ public class CrazyLogin extends CrazyPlugin
 		return alwaysNeedPassword;
 	}
 
-	public boolean isAutoLogoutEnabled()
+	public int getAutoLogoutTime()
 	{
 		return autoLogout;
 	}
@@ -544,6 +637,16 @@ public class CrazyLogin extends CrazyPlugin
 	public PairList<String, LoginPlayerData> getPlayerData()
 	{
 		return datas;
+	}
+
+	public LoginPlayerData getPlayerData(String name)
+	{
+		return datas.findDataVia1(name);
+	}
+
+	public LoginPlayerData getPlayerData(OfflinePlayer player)
+	{
+		return getPlayerData(player.getName().toLowerCase());
 	}
 
 	public void requestLogin(Player player)

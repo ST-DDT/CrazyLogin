@@ -8,8 +8,8 @@ import de.st_ddt.crazyutil.databases.FlatDatabase;
 public class CrazyLoginFlatDatabase extends FlatDatabase<LoginPlayerData>
 {
 
-	public CrazyLoginFlatDatabase(File file, String colName, String colPassword, String colIPs)
+	public CrazyLoginFlatDatabase(File file, String colName, String colPassword, String colIPs, String colLastAction)
 	{
-		super(LoginPlayerData.class, file, new String[] { colName, colPassword, colIPs });
+		super(LoginPlayerData.class, file, new String[] { colName, colPassword, colIPs, colLastAction });
 	}
 }

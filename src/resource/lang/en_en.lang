@@ -14,3 +14,5 @@ CRAZYLOGIN.REGISTER.REQUEST=&Please register! /register <Password>
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Password>
 CRAZYLOGIN.MODE.CHANGE=Mode "$0$"="$1$" set
 CRAZYLOGIN.ALGORITHM.MISSING=Invalid encryption algorithm $0$ (Using default)!
+CRAZYLOGIN.ACCOUNTS.DELETEWARN=&CWARNING! $0$ tried to delete accounts (at least &E$1$ &Cdays inactive)!
+CRAZYLOGIN.ACCOUNTS.DELETEWARN=&EINFORMATION! $0$ deleted $2$ old accounts (at least &E$1$ &Cdays inactive)!

@@ -8,8 +8,8 @@ import de.st_ddt.crazyutil.databases.ConfigurationDatabase;
 public class CrazyLoginConfigurationDatabase extends ConfigurationDatabase<LoginPlayerData>
 {
 
-	public CrazyLoginConfigurationDatabase(ConfigurationSection config, String table, String colName, String colPassword, String colIPs)
+	public CrazyLoginConfigurationDatabase(ConfigurationSection config, String table, String colName, String colPassword, String colIPs, String colLastAction)
 	{
-		super(LoginPlayerData.class, config, table, new String[] { colName, colPassword, colIPs });
+		super(LoginPlayerData.class, config, table, new String[] { colName, colPassword, colIPs, colLastAction });
 	}
 }

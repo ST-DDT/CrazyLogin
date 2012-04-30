@@ -1,5 +1,7 @@
 package de.st_ddt.crazylogin;
 
+import java.util.Date;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -67,6 +69,8 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 		if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))
 			playerdata.logout();
+		if (plugin.getAutoLogoutTime() * 1000 + playerdata.getLastActionTime().getTime() < new Date().getTime())
+			playerdata.logout();
 		if (plugin.isLoggedIn(player))
 			return;
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
@@ -78,12 +82,14 @@ public class CrazyLoginPlayerListener implements Listener
 	@EventHandler
 	public void PlayerQuit(PlayerQuitEvent event)
 	{
-		if (plugin.isAutoLogoutEnabled())
+		Player player = event.getPlayer();
+		LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
+		if (playerdata != null)
 		{
-			Player player = event.getPlayer();
-			LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
-			if (playerdata != null)
-				playerdata.logout();
+			if (!plugin.isLoggedIn(player))
+				return;
+			playerdata.notifyAction();
+			playerdata.logout();
 		}
 	}
 
@@ -198,7 +204,7 @@ public class CrazyLoginPlayerListener implements Listener
 				if (message.startsWith(command))
 					return;
 			event.setCancelled(true);
-			plugin.broadcastLocaleMessage(true, true, "crazylogin.warncommandexploits", "COMMAND.EXPLOITWARN", player.getName(), player.getAddress().getAddress().getHostAddress(), message);
+			plugin.broadcastLocaleMessage(true, "crazylogin.warncommandexploits", "COMMAND.EXPLOITWARN", player.getName(), player.getAddress().getAddress().getHostAddress(), message);
 			if (plugin.isAutoKickCommandUsers())
 			{
 				player.kickPlayer(plugin.getLocale().getLocaleMessage(player, "LOGIN.REQUEST"));
