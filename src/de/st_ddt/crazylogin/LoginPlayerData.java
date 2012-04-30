@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -119,7 +120,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		}
 		try
 		{
-			lastAction = rawData.getDate(colAction);
+			lastAction = rawData.getTimestamp(colAction);
 		}
 		catch (SQLException e)
 		{
@@ -141,7 +142,8 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		try
 		{
 			query = connection.getConnection().createStatement();
-			query.executeUpdate("INSERT INTO " + table + " (" + colName + "," + colPassword + "," + colIPs + "," + colAction + ") VALUES ('" + player + "','" + password + "','" + IPs + "','" + lastAction + "') " + " ON DUPLICATE KEY UPDATE " + colPassword + "='" + password + "', " + colIPs + "='" + IPs + "'," + colAction + "='" + lastAction + "'");
+			java.sql.Timestamp timestamp=new Timestamp(lastAction.getTime());
+			query.executeUpdate("INSERT INTO " + table + " (" + colName + "," + colPassword + "," + colIPs + "," + colAction + ") VALUES ('" + player + "','" + password + "','" + IPs + "','" + timestamp + "') " + " ON DUPLICATE KEY UPDATE " + colPassword + "='" + password + "', " + colIPs + "='" + IPs + "'," + colAction + "='" + timestamp + "'");
 		}
 		catch (SQLException e)
 		{

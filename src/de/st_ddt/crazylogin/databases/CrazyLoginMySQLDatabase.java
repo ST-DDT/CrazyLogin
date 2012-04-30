@@ -20,7 +20,7 @@ public class CrazyLoginMySQLDatabase extends MySQLDatabase<LoginPlayerData>
 		columns[0] = new MySQLColumn(colName, "CHAR(50)", true, false);
 		columns[1] = new MySQLColumn(colPassword, "CHAR(255)", null, false, false);
 		columns[2] = new MySQLColumn(colIPs, "CHAR(255)", null, false, false);
-		columns[3] = new MySQLColumn(colLastAction, "CHAR(255)", null, false, false);
+		columns[3] = new MySQLColumn(colLastAction, "TIMESTAMP", null, false, false);
 		return columns;
 	}
 }
