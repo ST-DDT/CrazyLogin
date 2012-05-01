@@ -14,9 +14,9 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerPreLoginEvent.Result;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -38,20 +38,17 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerLogin(PlayerPreLoginEvent event)
+	public void PlayerLogin(PlayerLoginEvent event)
 	{
 		if (!plugin.isForceSingleSessionEnabled())
 			return;
-		String name = event.getName();
-		Player player = plugin.getServer().getPlayerExact(name);
-		if (player == null)
-			return;
+		Player player = event.getPlayer();
 		if (!player.isOnline())
 			return;
-		// if (player.getAddress().getAddress().getHostAddress().equals(event.getAddress().getHostAddress()))
-		// return;
 		event.setResult(Result.KICK_OTHER);
-		event.setKickMessage("You are already online! Please wait for client timeout or contact an operator.");
+		event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "SESSION.DUPLICATE"));
+		plugin.broadcastLocaleMessage(true, "crazylogin.warnsession", "SESSION.DUPLICATEWARN", event.getAddress().getHostAddress(), player.getName());
+		plugin.sendLocaleMessage("SESSION.DUPLICATEWARN", player, event.getAddress().getHostAddress(), player.getName());
 	}
 
 	@EventHandler

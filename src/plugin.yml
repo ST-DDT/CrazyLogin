@@ -29,6 +29,7 @@ permissions:
       crazylogin.warncommandexploits: true
       crazylogin.warndatabase: true
       crazylogin.warndelete: true
+      crazylogin.warnsession: true
       crazylogin.register: true
   crazyonline.admin:
     description: Allow changing passwords for other players
@@ -38,6 +39,7 @@ permissions:
       crazylogin.warncommandexploits: true
       crazylogin.warndatabase: true
       crazylogin.warndelete: true
+      crazylogin.warnsession: true
       crazylogin.register: true
   crazylogin.register:
     description: Allow players to create a password. (for external registration)
@@ -53,6 +55,9 @@ permissions:
     default: op
   crazylogin.warnalgorithm:
     description: Get informed if no algorithm is set.
+    default: op
+  crazylogin.warnsession:
+    description: Get informed if somebody tries to login from another location.
     default: op
   crazylogin.warndelete:
     description: Get informed if old accounts are deleted (via admincommands)
