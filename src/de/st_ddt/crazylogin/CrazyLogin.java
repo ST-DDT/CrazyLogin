@@ -23,6 +23,7 @@ import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
 import de.st_ddt.crazylogin.databases.CrazyLoginConfigurationDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginFlatDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginMySQLDatabase;
+import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazyplugin.CrazyPlugin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
@@ -98,6 +99,8 @@ public class CrazyLogin extends CrazyPlugin
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
+		if (autoDelete != -1)
+			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		if (commandWhiteList.size() == 0)
 		{
 			commandWhiteList.add("/login");
@@ -144,6 +147,7 @@ public class CrazyLogin extends CrazyPlugin
 		if (database != null)
 			for (LoginPlayerData data : database.getAllEntries())
 				datas.setDataVia1(data.getName().toLowerCase(), data);
+		dropInactiveAccounts();
 	}
 
 	public void setupDatabase()
@@ -205,22 +209,28 @@ public class CrazyLogin extends CrazyPlugin
 		FileConfiguration config = getConfig();
 		config.set("database.saveType", saveType);
 		config.set("database.tableName", tableName);
-		if (autoDelete != -1)
-			dropOldAccounts(autoDelete);
+		dropInactiveAccounts();
 		if (database != null)
 			database.saveAll(datas.getData2List());
 		saveConfiguration();
 		super.save();
 	}
 
-	protected int dropOldAccounts(int age)
+	public int dropInactiveAccounts()
+	{
+		if (autoDelete != -1)
+			return dropInactiveAccounts(autoDelete);
+		return -1;
+	}
+
+	protected int dropInactiveAccounts(int age)
 	{
 		Date compare = new Date();
 		compare.setTime(compare.getTime() - age * 1000 * 60 * 60 * 24);
-		return dropOldAccounts(compare);
+		return dropInactiveAccounts(compare);
 	}
 
-	protected int dropOldAccounts(Date limit)
+	protected int dropInactiveAccounts(Date limit)
 	{
 		int amount = 0;
 		for (Pair<String, LoginPlayerData> pair : datas)
@@ -462,7 +472,7 @@ public class CrazyLogin extends CrazyPlugin
 			if (!getPlayerData(sender.getName().toLowerCase()).isPassword(password))
 				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> <Password>");
 		}
-		int amount = dropOldAccounts(days);
+		int amount = dropInactiveAccounts(days);
 		broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETED", sender.getName(), days, amount);
 	}
 
@@ -543,6 +553,24 @@ public class CrazyLogin extends CrazyPlugin
 					save();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("autoDelete"))
+				{
+					int time = autoDelete;
+					try
+					{
+						time = Integer.parseInt(args[1]);
+					}
+					catch (NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Days");
+					}
+					autoDelete = time;
+					sendLocaleMessage("MODE.CHANGE", sender, "autoDelete", autoDelete == -1 ? "disabled" : autoKick + " days");
+					saveConfiguration();
+					if (autoDelete != -1)
+						getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
+					return;
+				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			case 1:
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
@@ -568,6 +596,11 @@ public class CrazyLogin extends CrazyPlugin
 				else if (args[0].equalsIgnoreCase("saveType"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "saveType", saveType);
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoDelete"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "autoDelete", autoDelete == -1 ? "disabled" : autoKick + " days");
 					return;
 				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
@@ -632,6 +665,16 @@ public class CrazyLogin extends CrazyPlugin
 	public Encryptor getEncryptor()
 	{
 		return encryptor;
+	}
+
+	public int getAutoDelete()
+	{
+		return autoDelete;
+	}
+
+	public void setAutoDelete(int autoDelete)
+	{
+		this.autoDelete = autoDelete;
 	}
 
 	public PairList<String, LoginPlayerData> getPlayerData()
