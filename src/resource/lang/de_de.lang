@@ -15,4 +15,4 @@ CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Passwort>
 CRAZYLOGIN.MODE.CHANGE=Modus "$0$"="$1$" gesetzt
 CRAZYLOGIN.ALGORITHM.MISSING=Ungültiger Verschlüsselungslagorithm $0$ (nutzte Standard)!
 CRAZYLOGIN.ACCOUNTS.DELETEWARN=&CWARNUNG! $0$ hat versucht Accounts zu löschen (mindestens $1$ Tage inaktiv)!
-CRAZYLOGIN.ACCOUNTS.DELETEWARN=&EHINWEIS! $0$ hat $2$ alte Accounts gelöscht (mindestens $1$ Tage inaktiv)!
+CRAZYLOGIN.ACCOUNTS.DELETED=&EHINWEIS! $0$ hat $2$ alte Accounts gelöscht (mindestens $1$ Tage inaktiv)!
