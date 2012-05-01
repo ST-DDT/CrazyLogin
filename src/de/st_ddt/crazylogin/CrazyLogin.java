@@ -255,6 +255,7 @@ public class CrazyLogin extends CrazyPlugin
 		config.set("uniqueIDKey", uniqueIDKey);
 		config.set("algorithm", encryptor.getAlgorithm());
 		config.set("autoDelete", autoDelete);
+		config.set("forceSingleSession", forceSingleSession);
 	}
 
 	@Override
