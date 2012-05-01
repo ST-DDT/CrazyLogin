@@ -34,7 +34,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
-import de.st_ddt.crazyutil.Pair;
 import de.st_ddt.crazyutil.PairList;
 import de.st_ddt.crazyutil.databases.Database;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
@@ -233,13 +232,13 @@ public class CrazyLogin extends CrazyPlugin
 	protected int dropInactiveAccounts(Date limit)
 	{
 		int amount = 0;
-		for (Pair<String, LoginPlayerData> pair : datas)
-			if (pair.getData2().getLastActionTime().before(limit))
+		for (LoginPlayerData data : datas.getData2List())
+			if (data.getLastActionTime().before(limit))
 			{
-				datas.remove(pair);
+				datas.removeDataVia2(data);
 				amount++;
 				if (database != null)
-					database.delete(pair.getData2().getName());
+					database.delete(data.getName());
 			}
 		return amount;
 	}
