@@ -43,8 +43,10 @@ public class CrazyLoginPlayerListener implements Listener
 		if (!plugin.isForceSingleSessionEnabled())
 			return;
 		String name = event.getName();
-		Player player = plugin.getServer().getPlayer(name);
+		Player player = plugin.getServer().getPlayerExact(name);
 		if (player == null)
+			return;
+		if (!player.isOnline())
 			return;
 		// if (player.getAddress().getAddress().getHostAddress().equals(event.getAddress().getHostAddress()))
 		// return;
