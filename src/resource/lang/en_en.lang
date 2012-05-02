@@ -16,5 +16,5 @@ CRAZYLOGIN.MODE.CHANGE=Mode "$0$"="$1$" set
 CRAZYLOGIN.ALGORITHM.MISSING=Invalid encryption algorithm $0$ (Using default)!
 CRAZYLOGIN.ACCOUNTS.DELETEWARN=&CWARNING! $0$ tried to delete accounts (at least &E$1$ &Cdays inactive)!
 CRAZYLOGIN.ACCOUNTS.DELETED=&EINFORMATION! $0$ deleted $2$ old accounts (at least &E$1$ &Cdays inactive)!
-CRAZYLOGIN.SESSION.DUPLICATE=&CYou are already online! \n&CPlease wait for client timeout or contact an operator.
+CRAZYLOGIN.SESSION.DUPLICATE=&CYou are already online! &CPlease wait for client timeout or contact an operator.
 CRAZYLOGIN.SESSION.DUPLICATEWARN=&E$0$ tried to connect as $1$!
