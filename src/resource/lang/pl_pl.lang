@@ -1,0 +1,20 @@
+﻿CRAZYLOGIN=CrazyLogin
+CRAZYLOGIN.REGISTER.HEADER=Z powodow bezpieczenstwa prosimy ustawic haslo!
+CRAZYLOGIN.REGISTER.HEADER2=Mozesz ustawic haslo (jesli chcesz)
+CRAZYLOGIN.REGISTER.MESSAGE=Wpisz /crazylogin password <Password...> aby utworzyc/zmienic je!
+CRAZYLOGIN.LOGIN.FAILED=&CNIE UDALO SIE ZALOGOWAC!
+CRAZYLOGIN.LOGIN.FAILEDWARN=&CUWAGA! PROBA ZALOGOWANIA NIE UDANA! $0$ @ $1$
+CRAZYLOGIN.LOGIN.SUCCESS=&ALogowanie udane.
+CRAZYLOGIN.LOGOUT.SUCCESS=&AWylogowywanie udane.
+CRAZYLOGIN.COMMAND.EXPLOITWARN=&CUWAGA! ZABRONIONE WYKONYWANIE POLECEN! $0$ @ $1$: $2$
+CRAZYLOGIN.DATABASE.ACCESSWARN=&CUWAGA! NIE MOZNA POLACZYC SIE Z BAZA DANYCH!
+CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Haslo zmienione!
+CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Haslo usuniete!
+CRAZYLOGIN.REGISTER.REQUEST=&CZarejestruj sie uzywajac /register <haslo>
+CRAZYLOGIN.LOGIN.REQUEST=&CZaloguj sie uzywajac /login <haslo>
+CRAZYLOGIN.MODE.CHANGE=Tryb "$0$"="$1$" ustawiony
+CRAZYLOGIN.ALGORITHM.MISSING=Zly algorytm szyfrowania ($0$) Uzywanie zwyczajnego!
+CRAZYLOGIN.ACCOUNTS.DELETEWARN=&CUWAGA! $0$ probowal usunac konta (conajmniej &E$1$ &Cdni nieaktywne)!
+CRAZYLOGIN.ACCOUNTS.DELETED=&EUWAGA! $0$ usunieto $2$ staryck kont(co najmniej &E$1$ &Cdni nieaktywne)!
+CRAZYLOGIN.SESSION.DUPLICATE=&CJestes zalogowany! Poczekaj na wyrzucenie z serwera, badz skontaktuj sie z operatorem serwera.
+CRAZYLOGIN.SESSION.DUPLICATEWARN=&E$0$ probowal sie z nami skontaktowac $1$!
