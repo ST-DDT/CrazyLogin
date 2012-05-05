@@ -142,7 +142,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		try
 		{
 			query = connection.getConnection().createStatement();
-			Timestamp timestamp=new Timestamp(lastAction.getTime());
+			Timestamp timestamp = new Timestamp(lastAction.getTime());
 			query.executeUpdate("INSERT INTO " + table + " (" + colName + "," + colPassword + "," + colIPs + "," + colAction + ") VALUES ('" + player + "','" + password + "','" + IPs + "','" + timestamp + "') " + " ON DUPLICATE KEY UPDATE " + colPassword + "='" + password + "', " + colIPs + "='" + IPs + "'," + colAction + "='" + timestamp + "'");
 		}
 		catch (SQLException e)
@@ -200,6 +200,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	public String getName()
 	{
 		return player;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return player.toLowerCase().hashCode();
 	}
 
 	public void setPassword(String password) throws CrazyCommandException

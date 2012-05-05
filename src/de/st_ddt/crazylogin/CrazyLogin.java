@@ -3,6 +3,7 @@ package de.st_ddt.crazylogin;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.OfflinePlayer;
@@ -34,6 +35,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
+import de.st_ddt.crazyutil.Pair;
 import de.st_ddt.crazyutil.PairList;
 import de.st_ddt.crazyutil.databases.Database;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
@@ -232,14 +234,18 @@ public class CrazyLogin extends CrazyPlugin
 	protected int dropInactiveAccounts(Date limit)
 	{
 		int amount = 0;
-		for (LoginPlayerData data : datas.getData2List())
+		Iterator<Pair<String, LoginPlayerData>> it = datas.iterator();
+		while (it.hasNext())
+		{
+			LoginPlayerData data = it.next().getData2();
 			if (data.getLastActionTime().before(limit))
 			{
-				datas.removeDataVia2(data);
 				amount++;
+				it.remove();
 				if (database != null)
 					database.delete(data.getName());
 			}
+		}
 		return amount;
 	}
 
