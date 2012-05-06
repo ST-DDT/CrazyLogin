@@ -4,6 +4,7 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.OfflinePlayer;
@@ -26,6 +27,7 @@ import de.st_ddt.crazylogin.databases.CrazyLoginFlatDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginMySQLDatabase;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazyplugin.CrazyPlugin;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandExceedingLimitsException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandNoSuchException;
@@ -61,6 +63,7 @@ public class CrazyLogin extends CrazyPlugin
 	protected String tableName;
 	protected Database<LoginPlayerData> database;
 	protected int autoDelete;
+	private int maxRegistrationsPerIP;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -99,6 +102,7 @@ public class CrazyLogin extends CrazyPlugin
 		commandWhiteList = config.getStringList("commandWhitelist");
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
+		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
 		if (autoDelete != -1)
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
@@ -262,6 +266,7 @@ public class CrazyLogin extends CrazyPlugin
 		config.set("algorithm", encryptor.getAlgorithm());
 		config.set("autoDelete", autoDelete);
 		config.set("forceSingleSession", forceSingleSession);
+		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 	}
 
 	@Override
@@ -375,6 +380,11 @@ public class CrazyLogin extends CrazyPlugin
 		{
 			if (!sender.hasPermission("crazylogin.register"))
 				throw new CrazyCommandPermissionException();
+			String ip=player.getAddress().getAddress().getHostAddress();
+			
+			int registrations=getRegistrationsPerIP(ip).size();
+			if (registrations>=maxRegistrationsPerIP)
+				throw new CrazyCommandExceedingLimitsException("Max Registrations per IP",maxRegistrationsPerIP);
 			data = new LoginPlayerData(player);
 			datas.setDataVia1(player.getName().toLowerCase(), data);
 		}
@@ -711,5 +721,14 @@ public class CrazyLogin extends CrazyPlugin
 	public boolean isForceSingleSessionEnabled()
 	{
 		return forceSingleSession;
+	}
+
+	public List<LoginPlayerData> getRegistrationsPerIP(String ip)
+	{
+		List<LoginPlayerData> list = new LinkedList<LoginPlayerData>();
+		for (LoginPlayerData data : datas.getData2List())
+			if (data.hasIP(ip))
+				list.add(data);
+		return list;
 	}
 }

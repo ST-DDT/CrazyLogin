@@ -285,6 +285,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	{
 		this.online = false;
 		lastAction = new Date();
-		ips.clear();
+		if (removeIPs)
+			ips.clear();
 	}
 }
