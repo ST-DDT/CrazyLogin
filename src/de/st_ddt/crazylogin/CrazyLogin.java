@@ -3,6 +3,7 @@ package de.st_ddt.crazylogin;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class CrazyLogin extends CrazyPlugin
 {
 
 	private static CrazyLogin plugin;
+	private final HashMap<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
 	protected final PairList<String, LoginPlayerData> datas = new PairList<String, LoginPlayerData>();
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
@@ -380,11 +382,10 @@ public class CrazyLogin extends CrazyPlugin
 		{
 			if (!sender.hasPermission("crazylogin.register"))
 				throw new CrazyCommandPermissionException();
-			String ip=player.getAddress().getAddress().getHostAddress();
-			
-			int registrations=getRegistrationsPerIP(ip).size();
-			if (registrations>=maxRegistrationsPerIP)
-				throw new CrazyCommandExceedingLimitsException("Max Registrations per IP",maxRegistrationsPerIP);
+			String ip = player.getAddress().getAddress().getHostAddress();
+			int registrations = getRegistrationsPerIP(ip).size();
+			if (registrations >= maxRegistrationsPerIP)
+				throw new CrazyCommandExceedingLimitsException("Max Registrations per IP", maxRegistrationsPerIP);
 			data = new LoginPlayerData(player);
 			datas.setDataVia1(player.getName().toLowerCase(), data);
 		}
@@ -712,6 +713,12 @@ public class CrazyLogin extends CrazyPlugin
 	{
 		if (doNotSpamRequests)
 			return;
+		Date now = new Date();
+		Date date = antiRequestSpamTable.get(player.getName());
+		if (date.after(now))
+			return;
+		now.setTime(now.getTime() + 5000);
+		antiRequestSpamTable.put(player.getName(), new Date());
 		if (datas.findDataVia1(player.getName().toLowerCase()) == null)
 			sendLocaleMessage("REGISTER.REQUEST", player);
 		else
