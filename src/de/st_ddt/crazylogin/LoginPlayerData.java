@@ -230,8 +230,8 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		{
 			long value = Math.round(Math.random() * Long.MAX_VALUE);
 			String seed = String.valueOf(value);
-			if (seed.length() > 10)
-				return seed.substring(0, 9);
+			if (seed.length() > 11)
+				return seed.substring(1, 10);
 		}
 	}
 
