@@ -718,8 +718,8 @@ public class CrazyLogin extends CrazyPlugin
 		if (date != null)
 			if (date.after(now))
 				return;
-		now.setTime(now.getTime() + 5000);
-		antiRequestSpamTable.put(player.getName(), new Date());
+		now.setTime(now.getTime() + 5000L);
+		antiRequestSpamTable.put(player.getName(), now);
 		if (datas.findDataVia1(player.getName().toLowerCase()) == null)
 			sendLocaleMessage("REGISTER.REQUEST", player);
 		else
