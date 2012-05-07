@@ -715,8 +715,9 @@ public class CrazyLogin extends CrazyPlugin
 			return;
 		Date now = new Date();
 		Date date = antiRequestSpamTable.get(player.getName());
-		if (date.after(now))
-			return;
+		if (date != null)
+			if (date.after(now))
+				return;
 		now.setTime(now.getTime() + 5000);
 		antiRequestSpamTable.put(player.getName(), new Date());
 		if (datas.findDataVia1(player.getName().toLowerCase()) == null)
