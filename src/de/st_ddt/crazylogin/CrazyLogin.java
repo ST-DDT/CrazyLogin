@@ -15,6 +15,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.messaging.Messenger;
 
 import de.st_ddt.crazylogin.crypt.AuthMeCrypt;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
@@ -51,6 +52,7 @@ public class CrazyLogin extends CrazyPlugin
 	protected final PairList<String, LoginPlayerData> datas = new PairList<String, LoginPlayerData>();
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
+	private CrazyLoginMessageListener messageListener;
 	protected boolean alwaysNeedPassword;
 	protected int autoLogout;
 	protected int autoKick;
@@ -84,9 +86,13 @@ public class CrazyLogin extends CrazyPlugin
 	{
 		this.playerListener = new CrazyLoginPlayerListener(this);
 		this.vehicleListener = new CrazyLoginVehicleListener(this);
-		PluginManager pm = this.getServer().getPluginManager();
+		final PluginManager pm = this.getServer().getPluginManager();
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(vehicleListener, this);
+		this.messageListener = new CrazyLoginMessageListener(this);
+		final Messenger ms = getServer().getMessenger();
+		ms.registerIncomingPluginChannel(this, "CrazyLogin", messageListener);
+		ms.registerOutgoingPluginChannel(this, "CrazyLogin");
 	}
 
 	@Override
