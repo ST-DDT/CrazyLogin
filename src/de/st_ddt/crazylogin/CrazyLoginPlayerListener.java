@@ -139,7 +139,7 @@ public class CrazyLoginPlayerListener implements Listener
 		Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		if (event.getCause() == TeleportCause.PLUGIN)
+		if (event.getCause() == TeleportCause.PLUGIN || event.getCause() == TeleportCause.UNKNOWN)
 			return;
 		Location target = event.getTo();
 		if (target.distance(target.getWorld().getSpawnLocation()) < 10)
