@@ -103,7 +103,7 @@ public class CrazyLogin extends CrazyPlugin
 		if (config.getBoolean("autoLogout", false))
 			autoLogout = 0;
 		else
-			autoLogout = config.getInt("autoLogout", 60 * 60 * 12);
+			autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
