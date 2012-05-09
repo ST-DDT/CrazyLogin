@@ -655,6 +655,16 @@ public class CrazyLogin extends CrazyPlugin
 		return autoLogout;
 	}
 
+	public boolean isAutoLogoutEnabled()
+	{
+		return autoLogout >= 0;
+	}
+
+	public boolean isInstantAutoLogoutEnabled()
+	{
+		return autoLogout == 0;
+	}
+
 	public int getAutoKick()
 	{
 		return autoKick;
