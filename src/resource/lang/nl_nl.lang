@@ -1,0 +1,20 @@
+﻿CRAZYLOGIN=CrazyLogin
+CRAZYLOGIN.REGISTER.HEADER=Voor veiligheid moet je een wachtwoord opgeven!
+CRAZYLOGIN.REGISTER.HEADER2=Als je het wilt kan je een wachtwoord opgenven..
+CRAZYLOGIN.REGISTER.MESSAGE=Doe /crazylogin wachtwoord <wachtwoord...> om hem te creëren/te veranderen!
+CRAZYLOGIN.LOGIN.FAILED=&CINLOGGEN IS MISLUKT!
+CRAZYLOGIN.LOGIN.FAILEDWARN=&CWAARSCHUWING! GEFAALDE POGING OM IN TE LOGGEN! $0$ @ $1$
+CRAZYLOGIN.LOGIN.SUCCESS=&ASuccesvol ingelogd
+CRAZYLOGIN.LOGOUT.SUCCESS=&AUitloggen succesvol
+CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWAARSCHUWING! Verboden commando uitvoering! $0$ @ $1$: $2$
+CRAZYLOGIN.DATABASE.ACCESSWARN=&CWAARSCHUWING! Kan niet bij database!
+CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Wachtwoord veranderd!
+CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Wachtwoord gedeleted!
+CRAZYLOGIN.REGISTER.REQUEST=&Wilt u zich alstublieft registreren! /register <Wachtwoord>
+CRAZYLOGIN.LOGIN.REQUEST=&CWilt u alstublieft inloggen! /login <Wachtwoord>
+CRAZYLOGIN.MODE.CHANGE=Modus "$0$"="$1$" ingesteld
+CRAZYLOGIN.ALGORITHM.MISSING=Fout encryptie algoritme $0$ (Gebruik nu standaard algoritme)!
+CRAZYLOGIN.ACCOUNTS.DELETEWARN=&CWAARSCHUWING! $0$ probeerde accounts te verwijderen (minstens &E$1$ &Cdagen in creative)!
+CRAZYLOGIN.ACCOUNTS.DELETED=&EINFORMATIE! $0$ verwijderd $2$ oude accounts (minstens &E$1$ &Cdagen in creative)!
+CRAZYLOGIN.SESSION.DUPLICATE=&CJe bent al online! &CAlsjeblieft, wacht voor de client timeout of neem concact op met een operator.
+CRAZYLOGIN.SESSION.DUPLICATEWARN=&E$0$ probeerde te connecteren als $1$!
