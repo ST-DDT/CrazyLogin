@@ -44,7 +44,7 @@ import de.st_ddt.crazyutil.PairList;
 import de.st_ddt.crazyutil.databases.Database;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
 
-public class CrazyLogin extends CrazyPlugin
+public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 {
 
 	private static CrazyLogin plugin;
