@@ -15,8 +15,8 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -30,7 +30,7 @@ public class CrazyLoginPlayerListener implements Listener
 	private final PairList<String, LoginPlayerData> datas;
 	private final PairList<Player, Location> savelogin = new PairList<Player, Location>();
 
-	public CrazyLoginPlayerListener(CrazyLogin plugin)
+	public CrazyLoginPlayerListener(final CrazyLogin plugin)
 	{
 		super();
 		this.plugin = plugin;
@@ -38,11 +38,11 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerLogin(PlayerLoginEvent event)
+	public void PlayerLogin(final PlayerLoginEvent event)
 	{
 		if (!plugin.isForceSingleSessionEnabled())
 			return;
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (!player.isOnline())
 			return;
 		event.setResult(Result.KICK_OTHER);
@@ -52,11 +52,11 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerJoin(PlayerJoinEvent event)
+	public void PlayerJoin(final PlayerJoinEvent event)
 	{
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		savelogin.setDataVia1(player, player.getLocation());
-		LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
+		final LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
 		if (playerdata == null)
 		{
 			if (plugin.isAlwaysNeedPassword())
@@ -73,16 +73,16 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
-		int autoKick = plugin.getAutoKick();
+		final int autoKick = plugin.getAutoKick();
 		if (autoKick >= 10)
 			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST")), autoKick * 20);
 	}
 
 	@EventHandler
-	public void PlayerQuit(PlayerQuitEvent event)
+	public void PlayerQuit(final PlayerQuitEvent event)
 	{
-		Player player = event.getPlayer();
-		LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
+		final Player player = event.getPlayer();
+		final LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
 		if (playerdata != null)
 		{
 			if (!plugin.isLoggedIn(player))
@@ -94,7 +94,7 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerDropItem(PlayerDropItemEvent event)
+	public void PlayerDropItem(final PlayerDropItemEvent event)
 	{
 		if (plugin.isLoggedIn(event.getPlayer()))
 			return;
@@ -103,7 +103,7 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerInteract(PlayerInteractEvent event)
+	public void PlayerInteract(final PlayerInteractEvent event)
 	{
 		if (plugin.isLoggedIn(event.getPlayer()))
 			return;
@@ -112,7 +112,7 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerInteractEntity(PlayerInteractEntityEvent event)
+	public void PlayerInteractEntity(final PlayerInteractEntityEvent event)
 	{
 		if (plugin.isLoggedIn(event.getPlayer()))
 			return;
@@ -121,12 +121,12 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerMove(PlayerMoveEvent event)
+	public void PlayerMove(final PlayerMoveEvent event)
 	{
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		Location current = savelogin.findDataVia1(player);
+		final Location current = savelogin.findDataVia1(player);
 		if (current != null)
 			if (current.getWorld() == event.getTo().getWorld())
 				if (current.distance(event.getTo()) < 5)
@@ -135,14 +135,14 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerTeleport(PlayerTeleportEvent event)
+	public void PlayerTeleport(final PlayerTeleportEvent event)
 	{
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
 		if (event.getCause() == TeleportCause.PLUGIN || event.getCause() == TeleportCause.UNKNOWN)
 			return;
-		Location target = event.getTo();
+		final Location target = event.getTo();
 		if (target.distance(target.getWorld().getSpawnLocation()) < 10)
 		{
 			savelogin.setDataVia1(player, event.getTo());
@@ -160,11 +160,11 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerDamage(EntityDamageByBlockEvent event)
+	public void PlayerDamage(final EntityDamageByBlockEvent event)
 	{
 		if (!(event.getEntity() instanceof Player))
 			return;
-		Player player = (Player) event.getEntity();
+		final Player player = (Player) event.getEntity();
 		if (plugin.isLoggedIn(player))
 			return;
 		Location location = player.getBedSpawnLocation();
@@ -175,11 +175,11 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerDamage(EntityDamageByEntityEvent event)
+	public void PlayerDamage(final EntityDamageByEntityEvent event)
 	{
 		if (!(event.getEntity() instanceof Player))
 			return;
-		Player player = (Player) event.getEntity();
+		final Player player = (Player) event.getEntity();
 		if (plugin.isLoggedIn(player))
 			return;
 		Location location = player.getBedSpawnLocation();
@@ -190,17 +190,17 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerPreCommand(PlayerCommandPreprocessEvent event)
+	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		String message = event.getMessage().toLowerCase();
+		final String message = event.getMessage().toLowerCase();
 		if (message.startsWith("/"))
 		{
 			if (message.startsWith("/login") || message.startsWith("/crazylogin password") || message.startsWith("/crazylanguage") || message.startsWith("/language") || message.startsWith("/register"))
 				return;
-			for (String command : plugin.getCommandWhiteList())
+			for (final String command : plugin.getCommandWhiteList())
 				if (message.startsWith(command))
 					return;
 			event.setCancelled(true);
@@ -216,13 +216,12 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
-	public void PlayerCommand(PlayerChatEvent event)
+	public void PlayerCommand(final PlayerChatEvent event)
 	{
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
-		return;
 	}
 }
