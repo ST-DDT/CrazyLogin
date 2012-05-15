@@ -27,6 +27,12 @@ import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
 import de.st_ddt.crazylogin.databases.CrazyLoginConfigurationDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginFlatDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginMySQLDatabase;
+import de.st_ddt.crazylogin.events.CrazyLoginLoginEvent;
+import de.st_ddt.crazylogin.events.CrazyLoginLoginFailEvent;
+import de.st_ddt.crazylogin.events.CrazyLoginPasswordEvent;
+import de.st_ddt.crazylogin.events.CrazyLoginPreLoginEvent;
+import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
+import de.st_ddt.crazylogin.events.LoginFailReason;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazyplugin.CrazyPlugin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExceedingLimitsException;
@@ -62,12 +68,13 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected boolean doNotSpamRequests;
 	protected boolean forceSingleSession;
 	protected Encryptor encryptor;
+	protected int autoDelete;
+	protected int maxRegistrationsPerIP;
+	protected boolean pluginCommunicationEnabled;
 	// Database
 	protected String saveType;
 	protected String tableName;
 	protected Database<LoginPlayerData> database;
-	protected int autoDelete;
-	private int maxRegistrationsPerIP;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -121,6 +128,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			commandWhiteList.add("/crazylogin password");
 		}
 		uniqueIDKey = config.getString("uniqueIDKey");
+		pluginCommunicationEnabled = config.getBoolean("pluginCommunicationEnabled", false);
 		String algorithm = config.getString("algorithm", "CrazyCrypt1");
 		if (algorithm.equalsIgnoreCase("CrazyCrypt1"))
 		{
@@ -275,6 +283,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("autoDelete", autoDelete);
 		config.set("forceSingleSession", forceSingleSession);
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
+		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
 	}
 
 	@Override
@@ -307,18 +316,29 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		Player player = (Player) sender;
 		String password = ChatHelper.listToString(args);
 		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		CrazyLoginPreLoginEvent event = new CrazyLoginPreLoginEvent(this, player, data);
+		getServer().getPluginManager().callEvent(event);
+		if (event.isCancelled())
+		{
+			getServer().getPluginManager().callEvent(new CrazyLoginLoginFailEvent(this, data, player, LoginFailReason.CANCELLED));
+			sendLocaleMessage("LOGIN.FAILED", player);
+			return;
+		}
 		if (data == null)
 		{
+			getServer().getPluginManager().callEvent(new CrazyLoginLoginFailEvent(this, data, player, LoginFailReason.NO_ACCOUNT));
 			sendLocaleMessage("REGISTER.HEADER", player);
 			sendLocaleMessage("REGISTER.MESSAGE", player);
 			return;
 		}
 		if (!data.login(password))
 		{
+			getServer().getPluginManager().callEvent(new CrazyLoginLoginFailEvent(this, data, player, LoginFailReason.WRONG_PASSWORD));
 			sendLocaleMessage("LOGIN.FAILED", player);
 			broadcastLocaleMessage(true, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			return;
 		}
+		getServer().getPluginManager().callEvent(new CrazyLoginLoginEvent(this, data, player));
 		sendLocaleMessage("LOGIN.SUCCESS", player);
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		if (database != null)
@@ -392,10 +412,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			int registrations = getRegistrationsPerIP(ip).size();
 			if (registrations >= maxRegistrationsPerIP)
 				throw new CrazyCommandExceedingLimitsException("Max Registrations per IP", maxRegistrationsPerIP);
+			CrazyLoginPreRegisterEvent event = new CrazyLoginPreRegisterEvent(this, player, data);
+			getServer().getPluginManager().callEvent(event);
+			if (event.isCancelled())
+				throw new CrazyCommandPermissionException();
 			data = new LoginPlayerData(player);
 			datas.setDataVia1(player.getName().toLowerCase(), data);
 		}
 		String password = ChatHelper.listToString(args);
+		if (pluginCommunicationEnabled)
+			getServer().getPluginManager().callEvent(new CrazyLoginPasswordEvent(this, player, password));
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
