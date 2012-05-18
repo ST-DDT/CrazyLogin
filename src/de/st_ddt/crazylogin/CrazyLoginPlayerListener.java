@@ -69,6 +69,9 @@ public class CrazyLoginPlayerListener implements Listener
 			else
 				plugin.sendLocaleMessage("REGISTER.HEADER2", player);
 			plugin.sendLocaleMessage("REGISTER.MESSAGE", player);
+			final int autoKick = plugin.getAutoKickUnregistered();
+			if (autoKick != -1)
+				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("REGISTER.REQUEST"), true), autoKick * 20);
 			return;
 		}
 		if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))

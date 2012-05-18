@@ -62,6 +62,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected boolean alwaysNeedPassword;
 	protected int autoLogout;
 	protected int autoKick;
+	protected int autoKickUnregistered;
 	protected List<String> commandWhiteList;
 	protected boolean autoKickCommandUsers;
 	protected String uniqueIDKey;
@@ -114,6 +115,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
+		autoKickUnregistered = Math.max(config.getInt("kickUnregistered", -1), -1);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		commandWhiteList = config.getStringList("commandWhitelist");
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
@@ -277,6 +279,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
+		config.set("kickUnregistered", autoKickUnregistered);
 		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("commandWhitelist", commandWhiteList);
 		config.set("autoKickCommandUsers", autoKickCommandUsers);
@@ -588,6 +591,22 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("autoKickUnregistered"))
+				{
+					int time = autoKickUnregistered;
+					try
+					{
+						time = Integer.parseInt(args[1]);
+					}
+					catch (NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds");
+					}
+					autoKickUnregistered = Math.max(time, -1);
+					sendLocaleMessage("MODE.CHANGE", sender, "autoKickUnregistered", autoKickUnregistered == -1 ? "disabled" : autoKickUnregistered + " seconds");
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("saveType"))
 				{
 					String newValue = args[1];
@@ -619,7 +638,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Days");
 					}
-					autoDelete = time;
+					autoDelete = Math.max(time, -1);
 					sendLocaleMessage("MODE.CHANGE", sender, "autoDelete", autoDelete == -1 ? "disabled" : autoKick + " days");
 					saveConfiguration();
 					if (autoDelete != -1)
@@ -657,6 +676,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				else if (args[0].equalsIgnoreCase("autoKick"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKick", autoKick == -1 ? "disabled" : autoKick + " seconds");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoKickUnregistered"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "autoKickUnregistered", autoKickUnregistered == -1 ? "disabled" : autoKickUnregistered + " seconds");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("algorithm"))
@@ -721,6 +745,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public int getAutoKick()
 	{
 		return autoKick;
+	}
+
+	public int getAutoKickUnregistered()
+	{
+		return autoKickUnregistered;
 	}
 
 	public List<String> getCommandWhiteList()
