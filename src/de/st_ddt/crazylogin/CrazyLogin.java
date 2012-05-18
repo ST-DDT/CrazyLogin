@@ -238,7 +238,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		if (database != null)
 			database.saveAll(datas.getData2List());
 		saveConfiguration();
-		super.save();
 	}
 
 	public int dropInactiveAccounts()
@@ -290,6 +289,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
 		config.set("moveRange", moveRange);
+		saveConfig();
 	}
 
 	@Override
