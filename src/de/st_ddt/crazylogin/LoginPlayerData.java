@@ -30,14 +30,14 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	private boolean online;
 	private Date lastAction;
 
-	public LoginPlayerData(Player player)
+	public LoginPlayerData(final Player player)
 	{
 		this(player.getName(), player.getAddress().getAddress().getHostAddress());
 		online = true;
 		lastAction = new Date();
 	}
 
-	public LoginPlayerData(String player, String ip)
+	public LoginPlayerData(final String player, final String ip)
 	{
 		super();
 		this.player = player;
@@ -47,16 +47,16 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	}
 
 	// aus Config-Datenbank laden
-	public LoginPlayerData(ConfigurationSection config, String[] columnNames)
+	public LoginPlayerData(final ConfigurationSection config, final String[] columnNames)
 	{
 		super();
-		String colName = columnNames[0];
-		String colPassword = columnNames[1];
-		String colIPs = columnNames[2];
-		String colAction = columnNames[3];
+		final String colName = columnNames[0];
+		final String colPassword = columnNames[1];
+		final String colIPs = columnNames[2];
+		final String colAction = columnNames[3];
 		this.player = config.getString(colName);
 		this.password = config.getString(colPassword);
-		for (String ip : config.getStringList(colIPs))
+		for (final String ip : config.getStringList(colIPs))
 			ips.add(ip);
 		lastAction = ObjectSaveLoadHelper.StringToDate(config.getString(colAction), new Date());
 		online = false;
@@ -64,12 +64,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 
 	// in Config-Datenbank speichern
 	@Override
-	public void saveToConfigDatabase(ConfigurationSection config, String path, String[] columnNames)
+	public void saveToConfigDatabase(final ConfigurationSection config, final String path, final String[] columnNames)
 	{
-		String colName = columnNames[0];
-		String colPassword = columnNames[1];
-		String colIPs = columnNames[2];
-		String colAction = columnNames[3];
+		final String colName = columnNames[0];
+		final String colPassword = columnNames[1];
+		final String colIPs = columnNames[2];
+		final String colAction = columnNames[3];
 		config.set(path + colName, this.player);
 		config.set(path + colPassword, this.password);
 		config.set(path + colIPs, this.ips);
@@ -77,19 +77,19 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	}
 
 	// aus MySQL-Datenbank laden
-	public LoginPlayerData(ResultSet rawData, String[] columnNames)
+	public LoginPlayerData(final ResultSet rawData, final String[] columnNames)
 	{
 		super();
-		String colName = columnNames[0];
-		String colPassword = columnNames[1];
-		String colIPs = columnNames[2];
-		String colAction = columnNames[3];
+		final String colName = columnNames[0];
+		final String colPassword = columnNames[1];
+		final String colIPs = columnNames[2];
+		final String colAction = columnNames[3];
 		String name = null;
 		try
 		{
 			name = rawData.getString(colName);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			name = "ERROR";
 			e.printStackTrace();
@@ -102,19 +102,19 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		{
 			password = rawData.getString(colPassword);
 		}
-		catch (SQLException e)
+		catch (final SQLException e)
 		{
 			password = "FAILEDLOADING";
 			e.printStackTrace();
 		}
 		try
 		{
-			String ipsString = rawData.getString(colIPs);
-			String[] ips = ipsString.split(",");
-			for (String ip : ips)
+			final String ipsString = rawData.getString(colIPs);
+			final String[] ips = ipsString.split(",");
+			for (final String ip : ips)
 				this.ips.add(ip);
 		}
-		catch (SQLException e)
+		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -122,7 +122,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		{
 			lastAction = rawData.getTimestamp(colAction);
 		}
-		catch (SQLException e)
+		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -131,21 +131,21 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 
 	// in MySQL-Datenbank speichern
 	@Override
-	public void saveToMySQLDatabase(MySQLConnection connection, String table, String[] columnNames)
+	public void saveToMySQLDatabase(final MySQLConnection connection, final String table, final String[] columnNames)
 	{
 		Statement query = null;
-		String colName = columnNames[0];
-		String colPassword = columnNames[1];
-		String colIPs = columnNames[2];
-		String colAction = columnNames[3];
-		String IPs = ChatHelper.listToString(ips, ",");
+		final String colName = columnNames[0];
+		final String colPassword = columnNames[1];
+		final String colIPs = columnNames[2];
+		final String colAction = columnNames[3];
+		final String IPs = ChatHelper.listToString(ips, ",");
 		try
 		{
 			query = connection.getConnection().createStatement();
-			Timestamp timestamp = new Timestamp(lastAction.getTime());
+			final Timestamp timestamp = new Timestamp(lastAction.getTime());
 			query.executeUpdate("INSERT INTO " + table + " (" + colName + "," + colPassword + "," + colIPs + "," + colAction + ") VALUES ('" + player + "','" + password + "','" + IPs + "','" + timestamp + "') " + " ON DUPLICATE KEY UPDATE " + colPassword + "='" + password + "', " + colIPs + "='" + IPs + "'," + colAction + "='" + timestamp + "'");
 		}
-		catch (SQLException e)
+		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -156,26 +156,26 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 				{
 					query.close();
 				}
-				catch (SQLException e)
+				catch (final SQLException e)
 				{}
 			connection.closeConnection();
 		}
 	}
 
 	// aus Flat-Datenbank laden
-	public LoginPlayerData(String[] rawData)
+	public LoginPlayerData(final String[] rawData)
 	{
 		super();
 		this.player = rawData[0];
 		this.password = rawData[1];
 		try
 		{
-			String[] ips = rawData[2].split(",");
-			for (String ip : ips)
+			final String[] ips = rawData[2].split(",");
+			for (final String ip : ips)
 				this.ips.add(ip);
 			lastAction = ObjectSaveLoadHelper.StringToDate(rawData[3], new Date());
 		}
-		catch (IndexOutOfBoundsException e)
+		catch (final IndexOutOfBoundsException e)
 		{
 			lastAction = new Date();
 		}
@@ -186,7 +186,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public String[] saveToFlatDatabase()
 	{
-		String[] strings = new String[4];
+		final String[] strings = new String[4];
 		strings[0] = player;
 		strings[1] = password;
 		strings[2] = ChatHelper.listToString(ips, ",");
@@ -208,17 +208,17 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		return player.toLowerCase().hashCode();
 	}
 
-	public void setPassword(String password) throws CrazyCommandException
+	public void setPassword(final String password) throws CrazyCommandException
 	{
 		try
 		{
 			this.password = CrazyLogin.getPlugin().getEncryptor().encrypt(player, genSeed(), password);
 		}
-		catch (UnsupportedEncodingException e)
+		catch (final UnsupportedEncodingException e)
 		{
 			throw new CrazyCommandErrorException(e);
 		}
-		catch (NoSuchAlgorithmException e)
+		catch (final NoSuchAlgorithmException e)
 		{
 			throw new CrazyCommandErrorException(e);
 		}
@@ -228,19 +228,19 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	{
 		while (true)
 		{
-			long value = Math.round(Math.random() * Long.MAX_VALUE);
-			String seed = String.valueOf(value);
+			final long value = Math.round(Math.random() * Long.MAX_VALUE);
+			final String seed = String.valueOf(value);
 			if (seed.length() > 11)
 				return seed.substring(1, 10);
 		}
 	}
 
-	public boolean isPassword(String password)
+	public boolean isPassword(final String password)
 	{
 		return CrazyLogin.getPlugin().getEncryptor().match(player, password, this.password);
 	}
 
-	public void addIP(String ip)
+	public void addIP(final String ip)
 	{
 		if (!ips.contains(ip))
 			ips.add(0, ip);
@@ -248,7 +248,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 			ips.remove(5);
 	}
 
-	public boolean hasIP(String ip)
+	public boolean hasIP(final String ip)
 	{
 		return ips.contains(ip);
 	}
@@ -268,7 +268,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		return online;
 	}
 
-	public boolean login(String password)
+	public boolean login(final String password)
 	{
 		this.online = isPassword(password);
 		if (online)
@@ -281,7 +281,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		logout(false);
 	}
 
-	public void logout(boolean removeIPs)
+	public void logout(final boolean removeIPs)
 	{
 		this.online = false;
 		lastAction = new Date();

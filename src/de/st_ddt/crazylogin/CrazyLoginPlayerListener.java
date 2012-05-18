@@ -30,7 +30,7 @@ public class CrazyLoginPlayerListener implements Listener
 
 	private final CrazyLogin plugin;
 	private final PairList<String, LoginPlayerData> datas;
-	private final HashMap<Player, Location> savelogin = new HashMap<Player, Location>();
+	private final HashMap<String, Location> savelogin = new HashMap<String, Location>();
 
 	public CrazyLoginPlayerListener(final CrazyLogin plugin)
 	{
@@ -57,10 +57,10 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerJoin(final PlayerJoinEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (savelogin.get(player) == null)
-			savelogin.put(player, player.getLocation());
+		if (savelogin.get(player.getName().toLowerCase()) == null)
+			savelogin.put(player.getName().toLowerCase(), player.getLocation());
 		else
-			player.teleport(savelogin.get(player), TeleportCause.PLUGIN);
+			player.teleport(savelogin.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
 		final LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
 		if (playerdata == null)
 		{
@@ -131,7 +131,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		final Location current = savelogin.get(player);
+		final Location current = savelogin.get(player.getName().toLowerCase());
 		if (current != null)
 			if (current.getWorld() == event.getTo().getWorld())
 				if (current.distance(event.getTo()) < plugin.getMoveRange())
@@ -150,14 +150,14 @@ public class CrazyLoginPlayerListener implements Listener
 		final Location target = event.getTo();
 		if (target.distance(target.getWorld().getSpawnLocation()) < 10)
 		{
-			savelogin.put(player, event.getTo());
+			savelogin.put(player.getName().toLowerCase(), event.getTo());
 			return;
 		}
 		if (player.getBedSpawnLocation() != null)
 			if (target.getWorld() == player.getBedSpawnLocation().getWorld())
 				if (target.distance(player.getBedSpawnLocation()) < 10)
 				{
-					savelogin.put(player, event.getTo());
+					savelogin.put(player.getName().toLowerCase(), event.getTo());
 					return;
 				}
 		event.setCancelled(true);
@@ -243,5 +243,10 @@ public class CrazyLoginPlayerListener implements Listener
 			return;
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
+	}
+
+	public void notifyLogout(Player player)
+	{
+		savelogin.put(player.getName().toLowerCase(), player.getLocation());
 	}
 }

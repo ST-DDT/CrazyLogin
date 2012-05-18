@@ -357,7 +357,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			throw new CrazyCommandPermissionException();
 		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data != null)
+		{
+			playerListener.notifyLogout(player);
 			data.logout();
+		}
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
 		if (database != null)
 			database.save(data);
