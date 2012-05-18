@@ -71,6 +71,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected int autoDelete;
 	protected int maxRegistrationsPerIP;
 	protected boolean pluginCommunicationEnabled;
+	protected int moveRange;
 	// Database
 	protected String saveType;
 	protected String tableName;
@@ -119,6 +120,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
+		moveRange = config.getInt("moveRange", 5);
 		if (autoDelete != -1)
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		if (commandWhiteList.size() == 0)
@@ -284,6 +286,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("forceSingleSession", forceSingleSession);
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
+		config.set("moveRange", moveRange);
 	}
 
 	@Override
@@ -620,6 +623,22 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 						getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("moveRange"))
+				{
+					int range = moveRange;
+					try
+					{
+						range = Integer.parseInt(args[1]);
+					}
+					catch (NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer");
+					}
+					moveRange = Math.max(range, 0);
+					sendLocaleMessage("MODE.CHANGE", sender, "moveRange", moveRange + " blocks");
+					saveConfiguration();
+					return;
+				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			case 1:
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
@@ -650,6 +669,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				else if (args[0].equalsIgnoreCase("autoDelete"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "autoDelete", autoDelete == -1 ? "disabled" : autoKick + " days");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("moveRange"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "moveRange", moveRange + " blocks");
 					return;
 				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
@@ -780,5 +804,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			if (data.hasIP(ip))
 				list.add(data);
 		return list;
+	}
+
+	public int getMoveRange()
+	{
+		return moveRange;
 	}
 }

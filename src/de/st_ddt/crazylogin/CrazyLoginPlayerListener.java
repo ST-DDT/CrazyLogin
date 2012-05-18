@@ -1,6 +1,7 @@
 package de.st_ddt.crazylogin;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -8,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -28,7 +30,7 @@ public class CrazyLoginPlayerListener implements Listener
 
 	private final CrazyLogin plugin;
 	private final PairList<String, LoginPlayerData> datas;
-	private final PairList<Player, Location> savelogin = new PairList<Player, Location>();
+	private final HashMap<Player, Location> savelogin = new HashMap<Player, Location>();
 
 	public CrazyLoginPlayerListener(final CrazyLogin plugin)
 	{
@@ -55,7 +57,8 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerJoin(final PlayerJoinEvent event)
 	{
 		final Player player = event.getPlayer();
-		savelogin.setDataVia1(player, player.getLocation());
+		if (savelogin.get(player) == null)
+			savelogin.put(player, player.getLocation());
 		final LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
 		if (playerdata == null)
 		{
@@ -126,10 +129,10 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		final Location current = savelogin.findDataVia1(player);
+		final Location current = savelogin.get(player);
 		if (current != null)
 			if (current.getWorld() == event.getTo().getWorld())
-				if (current.distance(event.getTo()) < 5)
+				if (current.distance(event.getTo()) < plugin.getMoveRange())
 					return;
 		event.setCancelled(true);
 	}
@@ -145,18 +148,33 @@ public class CrazyLoginPlayerListener implements Listener
 		final Location target = event.getTo();
 		if (target.distance(target.getWorld().getSpawnLocation()) < 10)
 		{
-			savelogin.setDataVia1(player, event.getTo());
+			savelogin.put(player, event.getTo());
 			return;
 		}
 		if (player.getBedSpawnLocation() != null)
 			if (target.getWorld() == player.getBedSpawnLocation().getWorld())
 				if (target.distance(player.getBedSpawnLocation()) < 10)
 				{
-					savelogin.setDataVia1(player, event.getTo());
+					savelogin.put(player, event.getTo());
 					return;
 				}
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
+	}
+
+	@EventHandler
+	public void PlayerDamage(final EntityDamageEvent event)
+	{
+		if (!(event.getEntity() instanceof Player))
+			return;
+		final Player player = (Player) event.getEntity();
+		if (plugin.isLoggedIn(player))
+			return;
+		Location location = player.getBedSpawnLocation();
+		if (location == null)
+			location = player.getWorld().getSpawnLocation();
+		player.teleport(location, TeleportCause.PLUGIN);
+		event.setCancelled(true);
 	}
 
 	@EventHandler
