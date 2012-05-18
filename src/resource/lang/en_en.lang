@@ -10,7 +10,7 @@ CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNING! Forbidden command execution! $0$ @ $1$
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CWARNING! Cannot access Database!
 CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Password changed!
 CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Password deleted!
-CRAZYLOGIN.REGISTER.REQUEST=&Please register! /register <Password>
+CRAZYLOGIN.REGISTER.REQUEST=&EPlease register! /register <Password>
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! /login <Password>
 CRAZYLOGIN.MODE.CHANGE=Mode "$0$"="$1$" set
 CRAZYLOGIN.ALGORITHM.MISSING=Invalid encryption algorithm $0$ (Using default)!
