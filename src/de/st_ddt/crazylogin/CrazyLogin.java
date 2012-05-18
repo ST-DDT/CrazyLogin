@@ -557,21 +557,29 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("forceSingleSession"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					alwaysNeedPassword = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSession", forceSingleSession ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("autoLogout"))
 				{
-					int newValue = 0;
+					int newValue = autoLogout;
 					try
 					{
 						newValue = Integer.parseInt(args[1]);
-						if (newValue < -1)
-							throw new Exception();
 					}
-					catch (Exception e)
+					catch (NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "0 = instant", "1... time in seconds");
 					}
-					autoLogout = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout);
+					autoLogout = Math.max(newValue, -1);
+					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout == -1 ? "disabled" : autoLogout + " seconds");
 					saveConfiguration();
 					return;
 				}
@@ -666,6 +674,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "alwaysNeedPassword", alwaysNeedPassword ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("forceSingleSession"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSession", forceSingleSession ? "True" : "False");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("autoLogout"))
