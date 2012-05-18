@@ -175,10 +175,6 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = (Player) event.getEntity();
 		if (plugin.isLoggedIn(player))
 			return;
-		Location location = player.getBedSpawnLocation();
-		if (location == null)
-			location = player.getWorld().getSpawnLocation();
-		player.teleport(location, TeleportCause.PLUGIN);
 		event.setCancelled(true);
 	}
 
