@@ -59,6 +59,8 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (savelogin.get(player) == null)
 			savelogin.put(player, player.getLocation());
+		else
+			player.teleport(savelogin.get(player), TeleportCause.PLUGIN);
 		final LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
 		if (playerdata == null)
 		{
