@@ -31,7 +31,7 @@ permissions:
       crazylogin.warndelete: true
       crazylogin.warnsession: true
       crazylogin.register: true
-  crazyonline.admin:
+  crazylogin.admin:
     description: Allow changing passwords for other players
     default: op
     children: 
@@ -67,6 +67,6 @@ permissions:
     default: op
     children:
       crazylogin.warndelete: true
-  crazyonline.mode:
+  crazylogin.mode:
     description: Allow changing plugin mode
     default: op

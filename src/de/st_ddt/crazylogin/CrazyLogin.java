@@ -718,7 +718,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			default:
-				throw new CrazyCommandUsageException("/crazylogin mode <Mode> <Value>");
+				throw new CrazyCommandUsageException("/crazylogin mode <Mode> [Value]");
 		}
 	}
 
