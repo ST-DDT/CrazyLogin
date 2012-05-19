@@ -247,7 +247,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return -1;
 	}
 
-	protected int dropInactiveAccounts(int age)
+	protected int dropInactiveAccounts(long age)
 	{
 		Date compare = new Date();
 		compare.setTime(compare.getTime() - age * 1000 * 60 * 60 * 24);
