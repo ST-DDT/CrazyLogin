@@ -345,7 +345,9 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		{
 			getServer().getPluginManager().callEvent(new CrazyLoginLoginFailEvent(this, data, player, LoginFailReason.WRONG_PASSWORD));
 			broadcastLocaleMessage(true, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
-			int fails = loginFailures.get(player.getName().toLowerCase());
+			Integer fails = loginFailures.get(player.getName().toLowerCase());
+			if (fails == null)
+				fails = 0;
 			fails++;
 			if (fails >= autoKickLoginFailer)
 			{
