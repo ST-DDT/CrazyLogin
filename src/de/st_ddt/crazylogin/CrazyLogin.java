@@ -55,6 +55,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 
 	private static CrazyLogin plugin;
 	private final HashMap<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
+	private final HashMap<String, Integer> loginFailures = new HashMap<String, Integer>();
 	protected final PairList<String, LoginPlayerData> datas = new PairList<String, LoginPlayerData>();
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
@@ -63,6 +64,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected int autoLogout;
 	protected int autoKick;
 	protected int autoKickUnregistered;
+	protected int autoKickLoginFailer;
 	protected List<String> commandWhiteList;
 	protected boolean autoKickCommandUsers;
 	protected String uniqueIDKey;
@@ -116,6 +118,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
 		autoKickUnregistered = Math.max(config.getInt("kickUnregistered", -1), -1);
+		autoKickLoginFailer = Math.max(config.getInt("autoKickLoginFailer", 3), -1);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		commandWhiteList = config.getStringList("commandWhitelist");
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
@@ -279,6 +282,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
 		config.set("kickUnregistered", autoKickUnregistered);
+		config.set("autoKickLoginFailer", autoKickLoginFailer);
 		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("commandWhitelist", commandWhiteList);
 		config.set("autoKickCommandUsers", autoKickCommandUsers);
@@ -340,12 +344,22 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		if (!data.login(password))
 		{
 			getServer().getPluginManager().callEvent(new CrazyLoginLoginFailEvent(this, data, player, LoginFailReason.WRONG_PASSWORD));
-			sendLocaleMessage("LOGIN.FAILED", player);
 			broadcastLocaleMessage(true, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
+			int fails = loginFailures.get(player.getName().toLowerCase());
+			fails++;
+			if (fails >= autoKickLoginFailer)
+			{
+				player.kickPlayer(locale.getLocaleMessage(player, "LOGIN.FAILED"));
+				fails = 0;
+			}
+			else
+				sendLocaleMessage("LOGIN.FAILED", player);
+			loginFailures.put(player.getName().toLowerCase(), fails);
 			return;
 		}
 		getServer().getPluginManager().callEvent(new CrazyLoginLoginEvent(this, data, player));
 		sendLocaleMessage("LOGIN.SUCCESS", player);
+		loginFailures.remove(player.getName().toLowerCase());
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		if (database != null)
 			database.save(data);
@@ -612,6 +626,22 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					}
 					autoKickUnregistered = Math.max(time, -1);
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKickUnregistered", autoKickUnregistered == -1 ? "disabled" : autoKickUnregistered + " seconds");
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoKickLoginFailer"))
+				{
+					int tries = autoKickLoginFailer;
+					try
+					{
+						tries = Integer.parseInt(args[1]);
+					}
+					catch (NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "tries");
+					}
+					autoKickLoginFailer = Math.max(tries, -1);
+					sendLocaleMessage("MODE.CHANGE", sender, "autoKickLoginFailer", autoKickLoginFailer == -1 ? "disabled" : autoKickUnregistered + " tries");
 					saveConfiguration();
 					return;
 				}
