@@ -119,6 +119,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
+		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		autoKickUnregistered = Math.max(config.getInt("kickUnregistered", -1), -1);
 		autoKickLoginFailer = Math.max(config.getInt("autoKickLoginFailer", 3), -1);
 		loginFailures.clear();
@@ -130,15 +131,14 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			commandWhiteList.add("/register");
 			commandWhiteList.add("/crazylogin password");
 		}
-		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
+		if (autoDelete != -1)
+			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		moveRange = config.getInt("moveRange", 5);
 		minNameLength = Math.max(config.getInt("minNameLength", 3), 1);
 		maxNameLength = Math.max(config.getInt("maxNameLength", 30), 1);
-		if (autoDelete != -1)
-			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		uniqueIDKey = config.getString("uniqueIDKey");
 		pluginCommunicationEnabled = config.getBoolean("pluginCommunicationEnabled", false);
 		final String algorithm = config.getString("algorithm", "CrazyCrypt1");
