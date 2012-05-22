@@ -75,6 +75,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected int maxRegistrationsPerIP;
 	protected boolean pluginCommunicationEnabled;
 	protected int moveRange;
+	protected int minNameLength;
+	protected int maxNameLength;
 	// Database
 	protected String saveType;
 	protected String tableName;
@@ -121,19 +123,21 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		autoKickLoginFailer = Math.max(config.getInt("autoKickLoginFailer", 3), -1);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		commandWhiteList = config.getStringList("commandWhitelist");
-		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
-		forceSingleSession = config.getBoolean("forceSingleSession", true);
-		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
-		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
-		moveRange = config.getInt("moveRange", 5);
-		if (autoDelete != -1)
-			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		if (commandWhiteList.size() == 0)
 		{
 			commandWhiteList.add("/login");
 			commandWhiteList.add("/register");
 			commandWhiteList.add("/crazylogin password");
 		}
+		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
+		forceSingleSession = config.getBoolean("forceSingleSession", true);
+		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
+		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
+		moveRange = config.getInt("moveRange", 5);
+		minNameLength = Math.max(config.getInt("minNameLength", 3), 1);
+		maxNameLength = Math.max(config.getInt("maxNameLength", 30), 1);
+		if (autoDelete != -1)
+			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		uniqueIDKey = config.getString("uniqueIDKey");
 		pluginCommunicationEnabled = config.getBoolean("pluginCommunicationEnabled", false);
 		String algorithm = config.getString("algorithm", "CrazyCrypt1");
@@ -293,6 +297,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
 		config.set("moveRange", moveRange);
+		config.set("minNameLength", minNameLength);
+		config.set("maxNameLength", maxNameLength);
 		saveConfig();
 	}
 
@@ -406,6 +412,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		if (commandLabel.equalsIgnoreCase("delete"))
 		{
 			commandMainDelete(sender, args);
+			return true;
+		}
+		if (commandLabel.equalsIgnoreCase("commands"))
+		{
+			commandMainCommands(sender, args);
 			return true;
 		}
 		return false;
@@ -701,6 +712,38 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("minNameLength"))
+				{
+					int length = minNameLength;
+					try
+					{
+						length = Integer.parseInt(args[1]);
+					}
+					catch (NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer");
+					}
+					minNameLength = Math.max(length, 1);
+					sendLocaleMessage("MODE.CHANGE", sender, "minNameLength", minNameLength + " characters");
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("maxNameLength"))
+				{
+					int length = maxNameLength;
+					try
+					{
+						length = Integer.parseInt(args[1]);
+					}
+					catch (NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer");
+					}
+					maxNameLength = Math.max(length, 1);
+					sendLocaleMessage("MODE.CHANGE", sender, "maxNameLength", maxNameLength + " characters");
+					saveConfiguration();
+					return;
+				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			case 1:
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
@@ -748,9 +791,68 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					sendLocaleMessage("MODE.CHANGE", sender, "moveRange", moveRange + " blocks");
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("minNameLength"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "minNameLength", minNameLength + " characters");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("maxNameLength"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "maxNameLength", maxNameLength + " characters");
+					return;
+				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			default:
 				throw new CrazyCommandUsageException("/crazylogin mode <Mode> [Value]");
+		}
+	}
+
+	private void commandMainCommands(CommandSender sender, String[] args) throws CrazyCommandException
+	{
+		final int maxPage = (commandWhiteList.size() + 9) / 10;
+		switch (args.length)
+		{
+			case 0:
+				sendLocaleMessage("COMMAND.LISTHEAD", sender, 1, maxPage);
+				sendLocaleMessage("LIST.SEPERATOR", sender);
+				if (commandWhiteList.size() == 0)
+					sendLocaleMessage("LIST.EMPTYPAGE", sender);
+				else
+					for (int i = 0; i < Math.min(10, commandWhiteList.size()); i++)
+						sendLocaleMessage("LIST.ENTRY", sender, i + 1, commandWhiteList.get(i));
+			case 1:
+				int page = 1;
+				try
+				{
+					page = Integer.parseInt(args[0]);
+				}
+				catch (NumberFormatException e)
+				{
+					throw new CrazyCommandParameterException(1, "Integer");
+				}
+				sendLocaleMessage("COMMAND.LISTHEAD", sender, 1, (commandWhiteList.size() + 9) / 10);
+				sendLocaleMessage("LIST.SEPERATOR", sender);
+				if (commandWhiteList.size() <= (page - 1) * 10)
+					sendLocaleMessage("LIST.EMPTYPAGE", sender);
+				else
+					for (int i = (page - 1) * 10; i < Math.min(page * 10, commandWhiteList.size()); i++)
+						sendLocaleMessage("COMMAND.LIST.ENTRY", sender, i + 1, commandWhiteList.get(i));
+			default:
+				String[] newArgs = ChatHelper.shiftArray(args, 1);
+				String command = ChatHelper.listToString(newArgs, " ");
+				if (args[1].equalsIgnoreCase("add") || args[1].equalsIgnoreCase("set"))
+				{
+					if (!commandWhiteList.contains(command))
+						commandWhiteList.add(command);
+					sendLocaleMessage("COMMAND.ADDED", sender);
+					return;
+				}
+				else if (args[1].equalsIgnoreCase("del") || args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("rem") || args[1].equalsIgnoreCase("remove"))
+				{
+					commandWhiteList.remove(command);
+					sendLocaleMessage("COMMAND.REMOVED", sender);
+					return;
+				}
 		}
 	}
 
@@ -886,5 +988,25 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public int getMoveRange()
 	{
 		return moveRange;
+	}
+
+	public int getMinNameLength()
+	{
+		return minNameLength;
+	}
+
+	public int getMaxNameLength()
+	{
+		return maxNameLength;
+	}
+
+	public boolean checkNameLength(String name)
+	{
+		int length = name.length();
+		if (length < minNameLength)
+			return false;
+		if (length > maxNameLength)
+			return false;
+		return true;
 	}
 }

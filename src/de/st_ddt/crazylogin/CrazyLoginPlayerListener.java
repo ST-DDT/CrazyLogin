@@ -42,9 +42,15 @@ public class CrazyLoginPlayerListener implements Listener
 	@EventHandler
 	public void PlayerLogin(final PlayerLoginEvent event)
 	{
+		final Player player = event.getPlayer();
+		if (plugin.checkNameLength(event.getPlayer().getName()))
+		{
+			event.setResult(Result.KICK_OTHER);
+			event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "NAME.INVALIDNAME", plugin.getMinNameLength(), plugin.getMaxNameLength()));
+			return;
+		}
 		if (!plugin.isForceSingleSessionEnabled())
 			return;
-		final Player player = event.getPlayer();
 		if (!player.isOnline())
 			return;
 		event.setResult(Result.KICK_OTHER);
