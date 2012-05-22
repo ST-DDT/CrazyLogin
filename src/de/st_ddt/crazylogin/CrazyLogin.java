@@ -399,6 +399,12 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			commandMainPassword(sender, args);
 			return true;
 		}
+		// Commands which requires login
+		if (sender instanceof Player)
+		{
+			if (!isLoggedIn((Player) sender))
+				throw new CrazyCommandPermissionException();
+		}
 		if (commandLabel.equalsIgnoreCase("admin"))
 		{
 			commandMainAdmin(sender, args);
@@ -467,12 +473,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 
 	private void commandMainAdmin(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
-		if (sender instanceof Player)
-		{
-			final Player player = (Player) sender;
-			if (!isLoggedIn(player))
-				throw new CrazyCommandPermissionException();
-		}
 		if (!sender.hasPermission("crazylogin.admin"))
 			throw new CrazyCommandPermissionException();
 		switch (args.length)
@@ -516,12 +516,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 
 	private void commandMainDelete(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
-		if (sender instanceof Player)
-		{
-			final Player player = (Player) sender;
-			if (!isLoggedIn(player))
-				throw new CrazyCommandPermissionException();
-		}
 		if (!sender.hasPermission("crazylogin.delete"))
 		{
 			String days = "(-)";
@@ -563,12 +557,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 
 	private void commandMainMode(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
-		if (sender instanceof Player)
-		{
-			final Player player = (Player) sender;
-			if (!isLoggedIn(player))
-				throw new CrazyCommandPermissionException();
-		}
 		if (!sender.hasPermission("crazylogin.mode"))
 			throw new CrazyCommandPermissionException();
 		switch (args.length)
@@ -809,11 +797,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 
 	private void commandMainCommands(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
-		if (sender instanceof Player)
-		{
-			if (!isLoggedIn((Player) sender))
-				throw new CrazyCommandPermissionException();
-		}
 		if (!sender.hasPermission("crazylogin.commands"))
 			throw new CrazyCommandPermissionException();
 		final int maxPage = (commandWhiteList.size() + 9) / 10;
