@@ -43,10 +43,10 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerLogin(final PlayerLoginEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.checkNameLength(event.getPlayer().getName()))
+		if (!plugin.checkNameLength(event.getPlayer().getName()))
 		{
 			event.setResult(Result.KICK_OTHER);
-			event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "NAME.INVALIDNAME", plugin.getMinNameLength(), plugin.getMaxNameLength()));
+			event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "NAME.INVALIDLENGTH", plugin.getMinNameLength(), plugin.getMaxNameLength()));
 			return;
 		}
 		if (!plugin.isForceSingleSessionEnabled())

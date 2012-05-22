@@ -112,7 +112,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public void load()
 	{
 		super.load();
-		FileConfiguration config = getConfig();
+		final FileConfiguration config = getConfig();
 		if (config.getBoolean("autoLogout", false))
 			autoLogout = 0;
 		else
@@ -140,7 +140,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		uniqueIDKey = config.getString("uniqueIDKey");
 		pluginCommunicationEnabled = config.getBoolean("pluginCommunicationEnabled", false);
-		String algorithm = config.getString("algorithm", "CrazyCrypt1");
+		final String algorithm = config.getString("algorithm", "CrazyCrypt1");
 		if (algorithm.equalsIgnoreCase("CrazyCrypt1"))
 		{
 			encryptor = new CrazyCrypt1();
@@ -159,7 +159,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		else if (algorithm.equalsIgnoreCase("Custom"))
 		{
-			String encryption = config.getString("customEncryptor.class");
+			final String encryption = config.getString("customEncryptor.class");
 			encryptor = ObjectSaveLoadHelper.load(encryption, CustomEncryptor.class, new Class[0], new Object[0]);
 		}
 		else
@@ -168,7 +168,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			{
 				encryptor = new DefaultCrypt(algorithm);
 			}
-			catch (NoSuchAlgorithmException e)
+			catch (final NoSuchAlgorithmException e)
 			{
 				broadcastLocaleMessage(true, "crazylogin.warnalgorithm", "ALGORITHM.MISSING", algorithm);
 				encryptor = new CrazyCrypt1();
@@ -177,24 +177,24 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		setupDatabase();
 		datas.clear();
 		if (database != null)
-			for (LoginPlayerData data : database.getAllEntries())
+			for (final LoginPlayerData data : database.getAllEntries())
 				datas.setDataVia1(data.getName().toLowerCase(), data);
 		dropInactiveAccounts();
 	}
 
 	public void setupDatabase()
 	{
-		FileConfiguration config = getConfig();
+		final FileConfiguration config = getConfig();
 		saveType = config.getString("database.saveType", "flat").toLowerCase();
 		tableName = config.getString("database.tableName", "players");
 		// Columns
-		String colName = config.getString("database.columns.name", "name");
+		final String colName = config.getString("database.columns.name", "name");
 		config.set("database.columns.name", colName);
-		String colPassword = config.getString("database.columns.password", "password");
+		final String colPassword = config.getString("database.columns.password", "password");
 		config.set("database.columns.password", colPassword);
-		String colIPs = config.getString("database.columns.ips", "ips");
+		final String colIPs = config.getString("database.columns.ips", "ips");
 		config.set("database.columns.ips", colIPs);
-		String colLastAction = config.getString("database.columns.lastAction", "lastAction");
+		final String colLastAction = config.getString("database.columns.lastAction", "lastAction");
 		config.set("database.columns.lastAction", colLastAction);
 		try
 		{
@@ -204,26 +204,26 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			}
 			else if (saveType.equals("mysql"))
 			{
-				String host = config.getString("database.host", "localhost");
+				final String host = config.getString("database.host", "localhost");
 				config.set("database.host", host);
-				String port = config.getString("database.port", "3306");
+				final String port = config.getString("database.port", "3306");
 				config.set("database.port", port);
-				String databasename = config.getString("database.dbname", "Crazy");
+				final String databasename = config.getString("database.dbname", "Crazy");
 				config.set("database.dbname", databasename);
-				String user = config.getString("database.user", "root");
+				final String user = config.getString("database.user", "root");
 				config.set("database.user", user);
-				String password = config.getString("database.password", "");
+				final String password = config.getString("database.password", "");
 				config.set("database.password", password);
-				MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
+				final MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
 				database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs, colLastAction);
 			}
 			else if (saveType.equals("flat"))
 			{
-				File file = new File(getDataFolder().getPath() + "/" + tableName + ".db");
+				final File file = new File(getDataFolder().getPath() + "/" + tableName + ".db");
 				database = new CrazyLoginFlatDatabase(file, colName, colPassword, colIPs, colLastAction);
 			}
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			e.printStackTrace();
 			database = null;
@@ -238,7 +238,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public void save()
 	{
-		FileConfiguration config = getConfig();
+		final FileConfiguration config = getConfig();
 		config.set("database.saveType", saveType);
 		config.set("database.tableName", tableName);
 		dropInactiveAccounts();
@@ -254,20 +254,20 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return -1;
 	}
 
-	protected int dropInactiveAccounts(long age)
+	protected int dropInactiveAccounts(final long age)
 	{
-		Date compare = new Date();
+		final Date compare = new Date();
 		compare.setTime(compare.getTime() - age * 1000 * 60 * 60 * 24);
 		return dropInactiveAccounts(compare);
 	}
 
-	protected int dropInactiveAccounts(Date limit)
+	protected int dropInactiveAccounts(final Date limit)
 	{
 		int amount = 0;
-		Iterator<Pair<String, LoginPlayerData>> it = datas.iterator();
+		final Iterator<Pair<String, LoginPlayerData>> it = datas.iterator();
 		while (it.hasNext())
 		{
-			LoginPlayerData data = it.next().getData2();
+			final LoginPlayerData data = it.next().getData2();
 			if (data.getLastActionTime().before(limit))
 			{
 				amount++;
@@ -281,7 +281,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 
 	public void saveConfiguration()
 	{
-		ConfigurationSection config = getConfig();
+		final ConfigurationSection config = getConfig();
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
@@ -329,10 +329,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			throw new CrazyCommandExecutorException(false);
 		if (args.length == 0)
 			throw new CrazyCommandUsageException("/login <Passwort...>");
-		Player player = (Player) sender;
-		String password = ChatHelper.listToString(args);
-		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
-		CrazyLoginPreLoginEvent event = new CrazyLoginPreLoginEvent(this, player, data);
+		final Player player = (Player) sender;
+		final String password = ChatHelper.listToString(args);
+		final LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		final CrazyLoginPreLoginEvent event = new CrazyLoginPreLoginEvent(this, player, data);
 		getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled())
 		{
@@ -377,10 +377,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
-		Player player = (Player) sender;
+		final Player player = (Player) sender;
 		if (!isLoggedIn(player))
 			throw new CrazyCommandPermissionException();
-		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		final LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data != null)
 		{
 			playerListener.notifyLogout(player);
@@ -426,7 +426,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
-		Player player = (Player) sender;
+		final Player player = (Player) sender;
 		if (!isLoggedIn(player) && hasAccount(player))
 			throw new CrazyCommandPermissionException();
 		if (args.length == 0)
@@ -444,18 +444,18 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		{
 			if (!sender.hasPermission("crazylogin.register"))
 				throw new CrazyCommandPermissionException();
-			String ip = player.getAddress().getAddress().getHostAddress();
-			int registrations = getRegistrationsPerIP(ip).size();
+			final String ip = player.getAddress().getAddress().getHostAddress();
+			final int registrations = getRegistrationsPerIP(ip).size();
 			if (registrations >= maxRegistrationsPerIP)
 				throw new CrazyCommandExceedingLimitsException("Max Registrations per IP", maxRegistrationsPerIP);
-			CrazyLoginPreRegisterEvent event = new CrazyLoginPreRegisterEvent(this, player, data);
+			final CrazyLoginPreRegisterEvent event = new CrazyLoginPreRegisterEvent(this, player, data);
 			getServer().getPluginManager().callEvent(event);
 			if (event.isCancelled())
 				throw new CrazyCommandPermissionException();
 			data = new LoginPlayerData(player);
 			datas.setDataVia1(player.getName().toLowerCase(), data);
 		}
-		String password = ChatHelper.listToString(args);
+		final String password = ChatHelper.listToString(args);
 		if (pluginCommunicationEnabled)
 			getServer().getPluginManager().callEvent(new CrazyLoginPasswordEvent(this, player, password));
 		data.setPassword(password);
@@ -469,7 +469,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		if (sender instanceof Player)
 		{
-			Player player = (Player) sender;
+			final Player player = (Player) sender;
 			if (!isLoggedIn(player))
 				throw new CrazyCommandPermissionException();
 		}
@@ -504,21 +504,21 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		if (target == null)
 			throw new CrazyCommandNoSuchException("Player", args[0]);
-		LoginPlayerData data = datas.findDataVia1(target.getName().toLowerCase());
+		final LoginPlayerData data = datas.findDataVia1(target.getName().toLowerCase());
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player", args[0]);
-		String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1));
+		final String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1));
 		data.setPassword(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
 		if (database != null)
 			database.save(data);
 	}
 
-	private void commandMainDelete(CommandSender sender, String[] args) throws CrazyCommandException
+	private void commandMainDelete(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (sender instanceof Player)
 		{
-			Player player = (Player) sender;
+			final Player player = (Player) sender;
 			if (!isLoggedIn(player))
 				throw new CrazyCommandPermissionException();
 		}
@@ -540,13 +540,13 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		{
 			days = Integer.parseInt(args[0]);
 		}
-		catch (NumberFormatException e)
+		catch (final NumberFormatException e)
 		{
 			throw new CrazyCommandParameterException(0, "Integer");
 		}
 		if (days < 0)
 			return;
-		String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1), " ");
+		final String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1), " ");
 		if (sender instanceof ConsoleCommandSender)
 		{
 			if (!password.equals("CONSOLE_CONFIRM"))
@@ -557,7 +557,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			if (!getPlayerData(sender.getName().toLowerCase()).isPassword(password))
 				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> <Password>");
 		}
-		int amount = dropInactiveAccounts(days);
+		final int amount = dropInactiveAccounts(days);
 		broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETED", sender.getName(), days, amount);
 	}
 
@@ -565,7 +565,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		if (sender instanceof Player)
 		{
-			Player player = (Player) sender;
+			final Player player = (Player) sender;
 			if (!isLoggedIn(player))
 				throw new CrazyCommandPermissionException();
 		}
@@ -601,7 +601,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						newValue = Integer.parseInt(args[1]);
 					}
-					catch (NumberFormatException e)
+					catch (final NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "0 = instant", "1... time in seconds");
 					}
@@ -617,7 +617,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						time = Integer.parseInt(args[1]);
 					}
-					catch (NumberFormatException e)
+					catch (final NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds > 60");
 					}
@@ -633,7 +633,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						time = Integer.parseInt(args[1]);
 					}
-					catch (NumberFormatException e)
+					catch (final NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds");
 					}
@@ -649,7 +649,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						tries = Integer.parseInt(args[1]);
 					}
-					catch (NumberFormatException e)
+					catch (final NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "tries");
 					}
@@ -660,8 +660,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				}
 				else if (args[0].equalsIgnoreCase("saveType"))
 				{
-					String newValue = args[1];
-					boolean changed = saveType.equals(newValue);
+					final String newValue = args[1];
+					final boolean changed = saveType.equals(newValue);
 					if (newValue.equalsIgnoreCase("config"))
 						saveType = "config";
 					else if (newValue.equalsIgnoreCase("mysql"))
@@ -685,7 +685,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						time = Integer.parseInt(args[1]);
 					}
-					catch (NumberFormatException e)
+					catch (final NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Days");
 					}
@@ -703,7 +703,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						range = Integer.parseInt(args[1]);
 					}
-					catch (NumberFormatException e)
+					catch (final NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(1, "Integer");
 					}
@@ -719,7 +719,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						length = Integer.parseInt(args[1]);
 					}
-					catch (NumberFormatException e)
+					catch (final NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(1, "Integer");
 					}
@@ -735,7 +735,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						length = Integer.parseInt(args[1]);
 					}
-					catch (NumberFormatException e)
+					catch (final NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(1, "Integer");
 					}
@@ -807,7 +807,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 	}
 
-	private void commandMainCommands(CommandSender sender, String[] args) throws CrazyCommandException
+	private void commandMainCommands(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		final int maxPage = (commandWhiteList.size() + 9) / 10;
 		switch (args.length)
@@ -820,13 +820,14 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				else
 					for (int i = 0; i < Math.min(10, commandWhiteList.size()); i++)
 						sendLocaleMessage("LIST.ENTRY", sender, i + 1, commandWhiteList.get(i));
+				return;
 			case 1:
 				int page = 1;
 				try
 				{
 					page = Integer.parseInt(args[0]);
 				}
-				catch (NumberFormatException e)
+				catch (final NumberFormatException e)
 				{
 					throw new CrazyCommandParameterException(1, "Integer");
 				}
@@ -836,34 +837,40 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					sendLocaleMessage("LIST.EMPTYPAGE", sender);
 				else
 					for (int i = (page - 1) * 10; i < Math.min(page * 10, commandWhiteList.size()); i++)
-						sendLocaleMessage("COMMAND.LIST.ENTRY", sender, i + 1, commandWhiteList.get(i));
+						sendLocaleMessage("LIST.ENTRY", sender, i + 1, commandWhiteList.get(i));
+				return;
 			default:
-				String[] newArgs = ChatHelper.shiftArray(args, 1);
-				String command = ChatHelper.listToString(newArgs, " ");
-				if (args[1].equalsIgnoreCase("add") || args[1].equalsIgnoreCase("set"))
+				final String[] newArgs = ChatHelper.shiftArray(args, 1);
+				final String command = ChatHelper.listToString(newArgs, " ");
+				if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("set"))
 				{
 					if (!commandWhiteList.contains(command))
 						commandWhiteList.add(command);
 					sendLocaleMessage("COMMAND.ADDED", sender);
+					saveConfiguration();
 					return;
 				}
-				else if (args[1].equalsIgnoreCase("del") || args[1].equalsIgnoreCase("delete") || args[1].equalsIgnoreCase("rem") || args[1].equalsIgnoreCase("remove"))
+				else if (args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("rem") || args[0].equalsIgnoreCase("remove"))
 				{
 					commandWhiteList.remove(command);
 					sendLocaleMessage("COMMAND.REMOVED", sender);
+					saveConfiguration();
 					return;
 				}
+				throw new CrazyCommandUsageException("/crazylogin command [Page]", "/crazylogin command <add/del> command...");
 		}
 	}
 
+	@Override
 	public boolean isLoggedIn(final Player player)
 	{
-		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		final LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		if (data == null)
 			return !alwaysNeedPassword;
 		return data.isOnline() && player.isOnline();
 	}
 
+	@Override
 	public boolean hasAccount(final OfflinePlayer player)
 	{
 		return (datas.findDataVia1(player.getName().toLowerCase()) != null);
@@ -916,7 +923,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			{
 				uniqueIDKey = new CrazyCrypt1().encrypt(getServer().getName(), null, "randomKeyGen" + (Math.random() * Integer.MAX_VALUE) + "V:" + getServer().getBukkitVersion() + "'_+'#");
 			}
-			catch (Exception e)
+			catch (final Exception e)
 			{
 				e.printStackTrace();
 				return null;
@@ -924,6 +931,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return uniqueIDKey;
 	}
 
+	@Override
 	public Encryptor getEncryptor()
 	{
 		return encryptor;
@@ -934,7 +942,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return autoDelete;
 	}
 
-	public void setAutoDelete(int autoDelete)
+	public void setAutoDelete(final int autoDelete)
 	{
 		this.autoDelete = autoDelete;
 	}
@@ -944,22 +952,23 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return datas;
 	}
 
-	public LoginPlayerData getPlayerData(String name)
+	public LoginPlayerData getPlayerData(final String name)
 	{
 		return datas.findDataVia1(name);
 	}
 
-	public LoginPlayerData getPlayerData(OfflinePlayer player)
+	@Override
+	public LoginPlayerData getPlayerData(final OfflinePlayer player)
 	{
 		return getPlayerData(player.getName().toLowerCase());
 	}
 
-	public void requestLogin(Player player)
+	public void requestLogin(final Player player)
 	{
 		if (doNotSpamRequests)
 			return;
-		Date now = new Date();
-		Date date = antiRequestSpamTable.get(player.getName());
+		final Date now = new Date();
+		final Date date = antiRequestSpamTable.get(player.getName());
 		if (date != null)
 			if (date.after(now))
 				return;
@@ -976,10 +985,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return forceSingleSession;
 	}
 
-	public List<LoginPlayerData> getRegistrationsPerIP(String ip)
+	public List<LoginPlayerData> getRegistrationsPerIP(final String ip)
 	{
-		List<LoginPlayerData> list = new LinkedList<LoginPlayerData>();
-		for (LoginPlayerData data : datas.getData2List())
+		final List<LoginPlayerData> list = new LinkedList<LoginPlayerData>();
+		for (final LoginPlayerData data : datas.getData2List())
 			if (data.hasIP(ip))
 				list.add(data);
 		return list;
@@ -1000,9 +1009,9 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return maxNameLength;
 	}
 
-	public boolean checkNameLength(String name)
+	public boolean checkNameLength(final String name)
 	{
-		int length = name.length();
+		final int length = name.length();
 		if (length < minNameLength)
 			return false;
 		if (length > maxNameLength)
