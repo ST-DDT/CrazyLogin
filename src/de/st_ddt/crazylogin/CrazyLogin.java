@@ -121,6 +121,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
 		autoKickUnregistered = Math.max(config.getInt("kickUnregistered", -1), -1);
 		autoKickLoginFailer = Math.max(config.getInt("autoKickLoginFailer", 3), -1);
+		loginFailures.clear();
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		commandWhiteList = config.getStringList("commandWhitelist");
 		if (commandWhiteList.size() == 0)
@@ -176,6 +177,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		setupDatabase();
 		datas.clear();
+		for (Player player : getServer().getOnlinePlayers())
+			requestLogin(player);
 		if (database != null)
 			for (final LoginPlayerData data : database.getAllEntries())
 				datas.setDataVia1(data.getName().toLowerCase(), data);
