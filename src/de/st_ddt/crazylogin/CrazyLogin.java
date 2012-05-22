@@ -809,6 +809,13 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 
 	private void commandMainCommands(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
+		if (sender instanceof Player)
+		{
+			if (!isLoggedIn((Player) sender))
+				throw new CrazyCommandPermissionException();
+		}
+		if (!sender.hasPermission("crazylogin.commands"))
+			throw new CrazyCommandPermissionException();
 		final int maxPage = (commandWhiteList.size() + 9) / 10;
 		switch (args.length)
 		{

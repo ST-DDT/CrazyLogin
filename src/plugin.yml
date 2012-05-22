@@ -31,6 +31,7 @@ permissions:
       crazylogin.warndelete: true
       crazylogin.warnsession: true
       crazylogin.register: true
+      crazylogin.commands: true
   crazylogin.admin:
     description: Allow changing passwords for other players
     default: op
@@ -41,6 +42,7 @@ permissions:
       crazylogin.warndelete: true
       crazylogin.warnsession: true
       crazylogin.register: true
+      crazylogin.commands: true
   crazylogin.register:
     description: Allow players to create a password. (for external registration)
     default: true
@@ -69,4 +71,7 @@ permissions:
       crazylogin.warndelete: true
   crazylogin.mode:
     description: Allow changing plugin mode
+    default: op
+  crazylogin.commands:
+    description: Allow viewing and editing command whitelist.
     default: op
