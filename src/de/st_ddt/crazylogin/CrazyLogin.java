@@ -63,10 +63,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected boolean alwaysNeedPassword;
 	protected int autoLogout;
 	protected int autoKick;
+	protected boolean autoKickCommandUsers;
 	protected int autoKickUnregistered;
 	protected int autoKickLoginFailer;
 	protected List<String> commandWhiteList;
-	protected boolean autoKickCommandUsers;
 	protected String uniqueIDKey;
 	protected boolean doNotSpamRequests;
 	protected boolean forceSingleSession;
@@ -611,6 +611,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					}
 					autoKick = time;
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKick", autoKick == -1 ? "disabled" : autoKick + " seconds");
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoKickCommandUsers"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					autoKickCommandUsers = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "autoKickCommandUsers", autoKickCommandUsers ? "True" : "False");
 					saveConfiguration();
 					return;
 				}
