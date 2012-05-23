@@ -724,7 +724,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						throw new CrazyCommandParameterException(1, "Integer");
 					}
-					minNameLength = Math.max(length, 1);
+					minNameLength = Math.min(Math.max(length, 1), 16);
 					sendLocaleMessage("MODE.CHANGE", sender, "minNameLength", minNameLength + " characters");
 					saveConfiguration();
 					return;
@@ -740,7 +740,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						throw new CrazyCommandParameterException(1, "Integer");
 					}
-					maxNameLength = Math.max(length, 1);
+					maxNameLength = Math.min(Math.max(length, 1), 16);
 					sendLocaleMessage("MODE.CHANGE", sender, "maxNameLength", maxNameLength + " characters");
 					saveConfiguration();
 					return;
