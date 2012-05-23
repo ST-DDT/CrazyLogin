@@ -138,7 +138,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		final String colPassword = columnNames[1];
 		final String colIPs = columnNames[2];
 		final String colAction = columnNames[3];
-		final String IPs = ChatHelper.listToString(ips, ",");
+		final String IPs = ChatHelper.listingString(",", ips);
 		try
 		{
 			query = connection.getConnection().createStatement();
@@ -189,7 +189,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		final String[] strings = new String[4];
 		strings[0] = player;
 		strings[1] = password;
-		strings[2] = ChatHelper.listToString(ips, ",");
+		strings[2] = ChatHelper.listingString(",", ips);
 		if (strings[2].equals(""))
 			strings[2] = ".";
 		strings[3] = ObjectSaveLoadHelper.DateToString(lastAction);

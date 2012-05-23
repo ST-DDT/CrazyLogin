@@ -333,7 +333,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		if (args.length == 0)
 			throw new CrazyCommandUsageException("/login <Passwort...>");
 		final Player player = (Player) sender;
-		final String password = ChatHelper.listToString(args);
+		final String password = ChatHelper.listingString(args);
 		final LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
 		final CrazyLoginPreLoginEvent event = new CrazyLoginPreLoginEvent(this, player, data);
 		getServer().getPluginManager().callEvent(event);
@@ -464,7 +464,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			data = new LoginPlayerData(player);
 			datas.setDataVia1(player.getName().toLowerCase(), data);
 		}
-		final String password = ChatHelper.listToString(args);
+		final String password = ChatHelper.listingString(args);
 		if (pluginCommunicationEnabled)
 			getServer().getPluginManager().callEvent(new CrazyLoginPasswordEvent(this, player, password));
 		data.setPassword(password);
@@ -510,7 +510,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		final LoginPlayerData data = datas.findDataVia1(target.getName().toLowerCase());
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player", args[0]);
-		final String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1));
+		final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
 		data.setPassword(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
 		if (database != null)
@@ -543,7 +543,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		if (days < 0)
 			return;
-		final String password = ChatHelper.listToString(ChatHelper.shiftArray(args, 1), " ");
+		final String password = ChatHelper.listingString(" ", ChatHelper.shiftArray(args, 1));
 		if (sender instanceof ConsoleCommandSender)
 		{
 			if (!password.equals("CONSOLE_CONFIRM"))
@@ -844,7 +844,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				return;
 			default:
 				final String[] newArgs = ChatHelper.shiftArray(args, 1);
-				final String command = ChatHelper.listToString(newArgs, " ");
+				final String command = ChatHelper.listingString(" ", newArgs);
 				if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("set"))
 				{
 					if (!commandWhiteList.contains(command))
