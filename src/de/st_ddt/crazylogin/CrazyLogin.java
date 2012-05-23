@@ -137,8 +137,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		if (autoDelete != -1)
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		moveRange = config.getInt("moveRange", 5);
-		minNameLength = Math.max(config.getInt("minNameLength", 3), 1);
-		maxNameLength = Math.max(config.getInt("maxNameLength", 30), 1);
+		minNameLength = Math.min(Math.max(config.getInt("minNameLength", 3), 1), 16);
+		maxNameLength = Math.min(Math.max(config.getInt("maxNameLength", 16), minNameLength), 16);
 		uniqueIDKey = config.getString("uniqueIDKey");
 		pluginCommunicationEnabled = config.getBoolean("pluginCommunicationEnabled", false);
 		final String algorithm = config.getString("algorithm", "CrazyCrypt1");
@@ -388,10 +388,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		{
 			playerListener.notifyLogout(player);
 			data.logout();
+			if (database != null)
+				database.save(data);
 		}
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
-		if (database != null)
-			database.save(data);
 	}
 
 	@Override
