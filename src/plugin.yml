@@ -32,6 +32,10 @@ permissions:
       crazylogin.warnsession: true
       crazylogin.register: true
       crazylogin.commands: true
+      crazylogin.playerinfo: true
+      crazylogin.playerinfo.self: true
+      crazylogin.playerinfo.other: true
+      crazylogin.playerinfo.extended: true
   crazylogin.admin:
     description: Allow changing passwords for other players
     default: op
@@ -74,4 +78,20 @@ permissions:
     default: op
   crazylogin.commands:
     description: Allow viewing and editing command whitelist.
+    default: op
+  crazylogin.playerinfo:
+    description: Allow viewing playerinfo.
+    default: op
+    children:
+      crazylogin.playerinfo.self: true
+      crazylogin.playerinfo.other: true
+      crazylogin.playerinfo.extended: true
+  crazylogin.playerinfo.self:
+    description: Allow viewing own playerinfo.
+    default: true
+  crazylogin.playerinfo.other:
+    description: Allow viewing playerinfo for other players.
+    default: op
+  crazylogin.playerinfo.extended:
+    description: Show link to detailed playerinfo.
     default: op
