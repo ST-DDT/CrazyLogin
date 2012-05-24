@@ -413,6 +413,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			commandMainAdmin(sender, args);
 			return true;
 		}
+		if (commandLabel.equalsIgnoreCase("player"))
+		{
+			commandMainPlayer(sender, args);
+			return true;
+		}
 		if (commandLabel.equalsIgnoreCase("mode"))
 		{
 			commandMainMode(sender, args);
@@ -556,6 +561,38 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		final int amount = dropInactiveAccounts(days);
 		broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETED", sender.getName(), days, amount);
+	}
+
+	private void commandMainPlayer(CommandSender sender, String[] args) throws CrazyCommandException
+	{
+		Player target = null;
+		switch (args.length)
+		{
+			case 0:
+				if (sender instanceof ConsoleCommandSender)
+					throw new CrazyCommandUsageException("/crazylogin player <Player>");
+				target = (Player) sender;
+				break;
+			case 1:
+				target = getServer().getPlayer(args[0]);
+				if (target == null)
+					throw new CrazyCommandNoSuchException("Player", args[0]);
+				break;
+			default:
+				throw new CrazyCommandUsageException("/crazylogin player [Player]");
+		}
+		if (sender == target)
+			if (!sender.hasPermission("crazylogin.playerinfo.self"))
+				throw new CrazyCommandPermissionException();
+			else if (!sender.hasPermission("crazylogin.playerinfo.other"))
+				throw new CrazyCommandPermissionException();
+		sendLocaleMessage("PLAYERINFO.HEAD", sender, DateFormat.format(new Date()));
+		sendLocaleMessage("PLAYERINFO.USERNAME", sender, target.getName());
+		sendLocaleMessage("PLAYERINFO.DISPLAYNAME", sender, target.getDisplayName());
+		sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, target.getAddress().getAddress().getHostName());
+		sendLocaleMessage("PLAYERINFO.CONNECTION", sender, target.getAddress().getAddress().getHostAddress());
+		if (sender.hasPermission("crazylogin.playerinfo.extended"))
+			sendLocaleMessage("PLAYERINFO.URL", sender, target.getAddress().getAddress().getHostName());
 	}
 
 	private void commandMainMode(final CommandSender sender, final String[] args) throws CrazyCommandException
