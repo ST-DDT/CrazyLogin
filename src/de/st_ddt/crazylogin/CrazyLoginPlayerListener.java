@@ -23,13 +23,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
-import de.st_ddt.crazyutil.PairList;
-
 public class CrazyLoginPlayerListener implements Listener
 {
 
 	private final CrazyLogin plugin;
-	private final PairList<String, LoginPlayerData> datas;
+	private final HashMap<String, LoginPlayerData> datas;
 	private final HashMap<String, Location> savelogin = new HashMap<String, Location>();
 
 	public CrazyLoginPlayerListener(final CrazyLogin plugin)
@@ -39,7 +37,7 @@ public class CrazyLoginPlayerListener implements Listener
 		this.datas = plugin.getPlayerData();
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void PlayerLogin(final PlayerLoginEvent event)
 	{
 		final Player player = event.getPlayer();
@@ -49,14 +47,14 @@ public class CrazyLoginPlayerListener implements Listener
 			event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "NAME.INVALIDLENGTH", plugin.getMinNameLength(), plugin.getMaxNameLength()));
 			return;
 		}
-		if (!plugin.isForceSingleSessionEnabled())
-			return;
-		if (!player.isOnline())
-			return;
-		event.setResult(Result.KICK_OTHER);
-		event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "SESSION.DUPLICATE"));
-		plugin.broadcastLocaleMessage(true, "crazylogin.warnsession", "SESSION.DUPLICATEWARN", event.getAddress().getHostAddress(), player.getName());
-		plugin.sendLocaleMessage("SESSION.DUPLICATEWARN", player, event.getAddress().getHostAddress(), player.getName());
+		if (plugin.isForceSingleSessionEnabled())
+			if (player.isOnline())
+			{
+				event.setResult(Result.KICK_OTHER);
+				event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "SESSION.DUPLICATE"));
+				plugin.broadcastLocaleMessage(true, "crazylogin.warnsession", "SESSION.DUPLICATEWARN", event.getAddress().getHostAddress(), player.getName());
+				plugin.sendLocaleMessage("SESSION.DUPLICATEWARN", player, event.getAddress().getHostAddress(), player.getName());
+			}
 	}
 
 	@EventHandler
@@ -67,7 +65,7 @@ public class CrazyLoginPlayerListener implements Listener
 			savelogin.put(player.getName().toLowerCase(), player.getLocation());
 		else
 			player.teleport(savelogin.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
-		final LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
+		final LoginPlayerData playerdata = datas.get(player.getName().toLowerCase());
 		if (playerdata == null)
 		{
 			if (plugin.isAlwaysNeedPassword())
@@ -82,8 +80,9 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 		if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))
 			playerdata.logout();
-		if (plugin.getAutoLogoutTime() * 1000 + playerdata.getLastActionTime().getTime() < new Date().getTime())
-			playerdata.logout();
+		if (plugin.isAutoLogoutEnabled())
+			if (plugin.getAutoLogoutTime() * 1000 + playerdata.getLastActionTime().getTime() < new Date().getTime())
+				playerdata.logout();
 		if (plugin.isLoggedIn(player))
 			return;
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
@@ -96,7 +95,7 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerQuit(final PlayerQuitEvent event)
 	{
 		final Player player = event.getPlayer();
-		final LoginPlayerData playerdata = datas.findDataVia1(player.getName().toLowerCase());
+		final LoginPlayerData playerdata = datas.get(player.getName().toLowerCase());
 		if (playerdata != null)
 		{
 			if (!plugin.isLoggedIn(player))

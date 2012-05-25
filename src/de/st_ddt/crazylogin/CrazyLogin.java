@@ -45,8 +45,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
-import de.st_ddt.crazyutil.Pair;
-import de.st_ddt.crazyutil.PairList;
 import de.st_ddt.crazyutil.databases.Database;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
 
@@ -56,7 +54,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	private static CrazyLogin plugin;
 	private final HashMap<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
 	private final HashMap<String, Integer> loginFailures = new HashMap<String, Integer>();
-	protected final PairList<String, LoginPlayerData> datas = new PairList<String, LoginPlayerData>();
+	protected final HashMap<String, LoginPlayerData> datas = new HashMap<String, LoginPlayerData>();
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
 	private CrazyLoginMessageListener messageListener;
@@ -181,7 +179,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			requestLogin(player);
 		if (database != null)
 			for (final LoginPlayerData data : database.getAllEntries())
-				datas.setDataVia1(data.getName().toLowerCase(), data);
+				datas.put(data.getName().toLowerCase(), data);
 		dropInactiveAccounts();
 	}
 
@@ -246,7 +244,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("database.tableName", tableName);
 		dropInactiveAccounts();
 		if (database != null)
-			database.saveAll(datas.getData2List());
+			database.saveAll(datas.values());
 		saveConfiguration();
 	}
 
@@ -267,14 +265,14 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected int dropInactiveAccounts(final Date limit)
 	{
 		int amount = 0;
-		final Iterator<Pair<String, LoginPlayerData>> it = datas.iterator();
+		final Iterator<LoginPlayerData> it = datas.values().iterator();
 		while (it.hasNext())
 		{
-			final LoginPlayerData data = it.next().getData2();
+			LoginPlayerData data = it.next();
 			if (data.getLastActionTime().before(limit))
 			{
 				amount++;
-				it.remove();
+				datas.remove(data.getName().toLowerCase());
 				if (database != null)
 					database.delete(data.getName());
 			}
@@ -334,7 +332,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			throw new CrazyCommandUsageException("/login <Passwort...>");
 		final Player player = (Player) sender;
 		final String password = ChatHelper.listingString(args);
-		final LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		final LoginPlayerData data = datas.get(player.getName().toLowerCase());
 		final CrazyLoginPreLoginEvent event = new CrazyLoginPreLoginEvent(this, player, data);
 		getServer().getPluginManager().callEvent(event);
 		if (event.isCancelled())
@@ -383,7 +381,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		final Player player = (Player) sender;
 		if (!isLoggedIn(player))
 			throw new CrazyCommandPermissionException();
-		final LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		final LoginPlayerData data = datas.get(player.getName().toLowerCase());
 		if (data != null)
 		{
 			playerListener.notifyLogout(player);
@@ -447,13 +445,13 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		{
 			if (alwaysNeedPassword)
 				throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
-			datas.removeDataVia1(player.getName().toLowerCase());
+			datas.remove(player.getName().toLowerCase());
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
 			if (database != null)
 				database.delete(player.getName());
 			return;
 		}
-		LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		LoginPlayerData data = datas.get(player.getName().toLowerCase());
 		if (data == null)
 		{
 			if (!sender.hasPermission("crazylogin.register"))
@@ -467,7 +465,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			if (event.isCancelled())
 				throw new CrazyCommandPermissionException();
 			data = new LoginPlayerData(player);
-			datas.setDataVia1(player.getName().toLowerCase(), data);
+			datas.put(player.getName().toLowerCase(), data);
 		}
 		final String password = ChatHelper.listingString(args);
 		if (pluginCommunicationEnabled)
@@ -497,7 +495,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				}
 				if (target == null)
 					throw new CrazyCommandNoSuchException("Player", args[0]);
-				datas.removeDataVia1(target.getName().toLowerCase());
+				datas.remove(target.getName().toLowerCase());
 				sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
 				if (database != null)
 					database.delete(target.getName());
@@ -512,7 +510,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		if (target == null)
 			throw new CrazyCommandNoSuchException("Player", args[0]);
-		final LoginPlayerData data = datas.findDataVia1(target.getName().toLowerCase());
+		final LoginPlayerData data = datas.get(target.getName().toLowerCase());
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player", args[0]);
 		final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
@@ -904,7 +902,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public boolean isLoggedIn(final Player player)
 	{
-		final LoginPlayerData data = datas.findDataVia1(player.getName().toLowerCase());
+		final LoginPlayerData data = datas.get(player.getName().toLowerCase());
 		if (data == null)
 			return !alwaysNeedPassword;
 		return data.isOnline() && player.isOnline();
@@ -913,7 +911,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public boolean hasAccount(final OfflinePlayer player)
 	{
-		return (datas.findDataVia1(player.getName().toLowerCase()) != null);
+		return (datas.get(player.getName().toLowerCase()) != null);
 	}
 
 	public boolean isAlwaysNeedPassword()
@@ -987,14 +985,14 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		this.autoDelete = autoDelete;
 	}
 
-	public PairList<String, LoginPlayerData> getPlayerData()
+	public HashMap<String, LoginPlayerData> getPlayerData()
 	{
 		return datas;
 	}
 
 	public LoginPlayerData getPlayerData(final String name)
 	{
-		return datas.findDataVia1(name);
+		return datas.get(name.toLowerCase());
 	}
 
 	@Override
@@ -1014,7 +1012,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				return;
 		now.setTime(now.getTime() + 5000L);
 		antiRequestSpamTable.put(player.getName(), now);
-		if (datas.findDataVia1(player.getName().toLowerCase()) == null)
+		if (datas.get(player.getName().toLowerCase()) == null)
 			sendLocaleMessage("REGISTER.REQUEST", player);
 		else
 			sendLocaleMessage("LOGIN.REQUEST", player);
@@ -1028,7 +1026,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public List<LoginPlayerData> getRegistrationsPerIP(final String ip)
 	{
 		final List<LoginPlayerData> list = new LinkedList<LoginPlayerData>();
-		for (final LoginPlayerData data : datas.getData2List())
+		for (final LoginPlayerData data : datas.values())
 			if (data.hasIP(ip))
 				list.add(data);
 		return list;
