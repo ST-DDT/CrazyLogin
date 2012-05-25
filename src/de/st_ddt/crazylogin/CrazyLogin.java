@@ -12,7 +12,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.messaging.Messenger;
@@ -109,7 +108,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public void load()
 	{
 		super.load();
-		final FileConfiguration config = getConfig();
+		final ConfigurationSection config = getConfig();
 		if (config.getBoolean("autoLogout", false))
 			autoLogout = 0;
 		else
@@ -184,7 +183,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 
 	public void setupDatabase()
 	{
-		final FileConfiguration config = getConfig();
+		final ConfigurationSection config = getConfig();
 		String saveType = config.getString("database.saveType", "flat").toLowerCase();
 		DatabaseType type = DatabaseType.valueOf(saveType.toUpperCase());
 		final String tableName = config.getString("database.tableName", "players");
@@ -230,7 +229,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public void save()
 	{
-		final FileConfiguration config = getConfig();
+		final ConfigurationSection config = getConfig();
 		if (database != null)
 			config.set("database.saveType", database.getType().toString());
 		dropInactiveAccounts();
