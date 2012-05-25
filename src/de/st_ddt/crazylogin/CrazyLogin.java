@@ -46,6 +46,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.databases.Database;
+import de.st_ddt.crazyutil.databases.DatabaseType;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
 
 public class CrazyLogin extends CrazyPlugin implements LoginPlugin
@@ -76,8 +77,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected int minNameLength;
 	protected int maxNameLength;
 	// Database
-	protected String saveType;
-	protected String tableName;
 	protected Database<LoginPlayerData> database;
 
 	public static CrazyLogin getPlugin()
@@ -186,8 +185,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public void setupDatabase()
 	{
 		final FileConfiguration config = getConfig();
-		saveType = config.getString("database.saveType", "flat").toLowerCase();
-		tableName = config.getString("database.tableName", "players");
+		String saveType = config.getString("database.saveType", "flat").toLowerCase();
+		DatabaseType type = DatabaseType.valueOf(saveType.toUpperCase());
+		final String tableName = config.getString("database.tableName", "players");
+		config.set("database.tableName", tableName);
 		// Columns
 		final String colName = config.getString("database.columns.name", "name");
 		config.set("database.columns.name", colName);
@@ -199,11 +200,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("database.columns.lastAction", colLastAction);
 		try
 		{
-			if (saveType.equals("config"))
+			if (type == DatabaseType.CONFIG)
 			{
 				database = new CrazyLoginConfigurationDatabase(config, tableName, colName, colPassword, colIPs, colLastAction);
 			}
-			else if (saveType.equals("mysql"))
+			else if (type == DatabaseType.MySQL)
 			{
 				final String host = config.getString("database.host", "localhost");
 				config.set("database.host", host);
@@ -218,7 +219,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				final MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
 				database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs, colLastAction);
 			}
-			else if (saveType.equals("flat"))
+			else if (type == DatabaseType.FLAT)
 			{
 				final File file = new File(getDataFolder().getPath() + "/" + tableName + ".db");
 				database = new CrazyLoginFlatDatabase(file, colName, colPassword, colIPs, colLastAction);
@@ -240,8 +241,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public void save()
 	{
 		final FileConfiguration config = getConfig();
-		config.set("database.saveType", saveType);
-		config.set("database.tableName", tableName);
+		if (database != null)
+			config.set("database.saveType", database.getType().toString());
 		dropInactiveAccounts();
 		if (database != null)
 			database.saveAll(datas.values());
@@ -696,20 +697,14 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				}
 				else if (args[0].equalsIgnoreCase("saveType"))
 				{
-					final String newValue = args[1];
-					final boolean changed = saveType.equals(newValue);
-					if (newValue.equalsIgnoreCase("config"))
-						saveType = "config";
-					else if (newValue.equalsIgnoreCase("mysql"))
-						saveType = "mysql";
-					else if (newValue.equalsIgnoreCase("flat"))
-						saveType = "flat";
-					else
-						throw new CrazyCommandNoSuchException("SaveType", newValue);
+					final String saveType = args[1];
+					DatabaseType type = DatabaseType.valueOf(saveType.toUpperCase());
+					if (type == null)
+						throw new CrazyCommandNoSuchException("SaveType", saveType);
 					sendLocaleMessage("MODE.CHANGE", sender, "saveType", saveType);
-					if (changed)
+					if (type == database.getType())
 						return;
-					getConfig().set("database.saveType", saveType);
+					getConfig().set("database.saveType", type.toString());
 					setupDatabase();
 					save();
 					return;
@@ -814,7 +809,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				}
 				else if (args[0].equalsIgnoreCase("saveType"))
 				{
-					sendLocaleMessage("MODE.CHANGE", sender, "saveType", saveType);
+					sendLocaleMessage("MODE.CHANGE", sender, "saveType", database.getType().toString());
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("autoDelete"))
