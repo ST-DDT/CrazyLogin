@@ -206,17 +206,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			}
 			else if (type == DatabaseType.MySQL)
 			{
-				final String host = config.getString("database.host", "localhost");
-				config.set("database.host", host);
-				final String port = config.getString("database.port", "3306");
-				config.set("database.port", port);
-				final String databasename = config.getString("database.dbname", "Crazy");
-				config.set("database.dbname", databasename);
-				final String user = config.getString("database.user", "root");
-				config.set("database.user", user);
-				final String password = config.getString("database.password", "");
-				config.set("database.password", password);
-				final MySQLConnection connection = new MySQLConnection(host, port, databasename, user, password);
+				final MySQLConnection connection = new MySQLConnection(config, "localhost", "3306", "Crazy", "root", "");
 				database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs, colLastAction);
 			}
 			else if (type == DatabaseType.FLAT)
