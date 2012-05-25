@@ -57,6 +57,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected final HashMap<String, LoginPlayerData> datas = new HashMap<String, LoginPlayerData>();
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
+	private CrazyLoginCrazyListener crazylistener;
 	private CrazyLoginMessageListener messageListener;
 	protected boolean alwaysNeedPassword;
 	protected int autoLogout;
@@ -95,9 +96,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		this.playerListener = new CrazyLoginPlayerListener(this);
 		this.vehicleListener = new CrazyLoginVehicleListener(this);
+		this.crazylistener = new CrazyLoginCrazyListener(this);
 		final PluginManager pm = this.getServer().getPluginManager();
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(vehicleListener, this);
+		pm.registerEvents(crazylistener, this);
 		this.messageListener = new CrazyLoginMessageListener(this);
 		final Messenger ms = getServer().getMessenger();
 		ms.registerIncomingPluginChannel(this, "CrazyLogin", messageListener);
@@ -895,7 +898,12 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public boolean hasAccount(final OfflinePlayer player)
 	{
-		return (datas.get(player.getName().toLowerCase()) != null);
+		return hasAccount(player.getName());
+	}
+
+	public boolean hasAccount(final String player)
+	{
+		return (datas.get(player.toLowerCase()) != null);
 	}
 
 	public boolean isAlwaysNeedPassword()
@@ -974,15 +982,25 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return datas;
 	}
 
+	@Override
+	public LoginPlayerData getPlayerData(final OfflinePlayer player)
+	{
+		return getPlayerData(player.getName());
+	}
+
 	public LoginPlayerData getPlayerData(final String name)
 	{
 		return datas.get(name.toLowerCase());
 	}
 
-	@Override
-	public LoginPlayerData getPlayerData(final OfflinePlayer player)
+	public boolean deletePlayerData(final String player)
 	{
-		return getPlayerData(player.getName().toLowerCase());
+		LoginPlayerData data = datas.remove(player.toLowerCase());
+		if (data == null)
+			return false;
+		if (database != null)
+			database.delete(data.getName());
+		return true;
 	}
 
 	public void requestLogin(final Player player)
