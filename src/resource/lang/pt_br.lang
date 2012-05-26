@@ -13,8 +13,15 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Senha deletada!
 CRAZYLOGIN.REGISTER.REQUEST=&Por favor, registre-se! /register <senha>
 CRAZYLOGIN.LOGIN.REQUEST=&CPor favor, logue! /login <senha>
 CRAZYLOGIN.MODE.CHANGE=Modo "$0$"="$1$" definido
-CRAZYLOGIN.ALGORITHM.MISSING=Algoritmo de criptografia inválida $0$ (usando padrão)!
+CRAZYLOGIN.ALGORITHM.MISSING=Algoritmo de criptografia inválida $0$ (utilizando padrão)!
 CRAZYLOGIN.ACCOUNTS.DELETEWARN=&CATENCAO! $0$ Tentando apagar contas (pelo menos &E$1$ &Cdias inativo)!
 CRAZYLOGIN.ACCOUNTS.DELETED=&EINFORMACAO! $0$ deletou $2$ contas antigas (pelo menos &E$1$ &Cdias inativo)!
 CRAZYLOGIN.SESSION.DUPLICATE=&CVoce ja esta online! &CPor favor, espere o timeout ou contate um OP.
 CRAZYLOGIN.SESSION.DUPLICATEWARN=&E$0$ tentou se conectar como $1$!
+CRAZYLOGIN.NAME.INVALIDLENGTH=&NOME DE USUARIO INVALIDO!
+CRAZYLOGIN.COMMAND.LISTHEAD=Comando Whitelist (Page $0$ / $1$)
+CRAZYLOGIN.COMMAND.ADDED=Comando adicionado
+CRAZYLOGIN.COMMAND.REMOVED=Comando removido
+CRAZYLOGIN.LIST.SEPERATOR=--------------------------------------
+CRAZYLOGIN.LIST.EMPTYPAGE=Desculpe, esta pagina esta vazia!
+CRAZYLOGIN.LIST.ENTRY=$0$) $1$
