@@ -187,11 +187,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public void setupDatabase()
 	{
 		final ConfigurationSection config = getConfig();
-		String saveType = config.getString("database.saveType", "flat").toLowerCase();
+		String saveType = config.getString("database.saveType", "FLAT").toUpperCase();
 		DatabaseType type = null;
 		try
 		{
-			type = DatabaseType.valueOf(saveType.toUpperCase());
+			type = DatabaseType.valueOf(saveType);
 		}
 		catch (Exception e)
 		{
