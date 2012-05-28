@@ -110,9 +110,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		try
 		{
 			final String ipsString = rawData.getString(colIPs);
-			final String[] ips = ipsString.split(",");
-			for (final String ip : ips)
-				this.ips.add(ip);
+			if (ipsString != null)
+			{
+				final String[] ips = ipsString.split(",");
+				for (final String ip : ips)
+					this.ips.add(ip);
+			}
 		}
 		catch (final SQLException e)
 		{
