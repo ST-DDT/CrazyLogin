@@ -146,6 +146,7 @@ public class CrazyLoginPlayerListener implements Listener
 				if (current.distance(event.getTo()) < plugin.getMoveRange())
 					return;
 		event.setCancelled(true);
+		plugin.requestLogin(event.getPlayer());
 	}
 
 	@EventHandler
