@@ -188,7 +188,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		final ConfigurationSection config = getConfig();
 		String saveType = config.getString("database.saveType", "flat").toLowerCase();
-		DatabaseType type = DatabaseType.valueOf(saveType.toUpperCase());
+		DatabaseType type = null;
+		try
+		{
+			type = DatabaseType.valueOf(saveType.toUpperCase());
+		}
+		catch (Exception e)
+		{
+			System.out.println("NO SUCH SAVETYPE " + saveType);
+			type = null;
+		}
 		final String tableName = config.getString("database.tableName", "players");
 		config.set("database.tableName", tableName);
 		// Columns
@@ -206,7 +215,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			{
 				database = new CrazyLoginConfigurationDatabase(config, tableName, colName, colPassword, colIPs, colLastAction);
 			}
-			else if (type == DatabaseType.MySQL)
+			else if (type == DatabaseType.MYSQL)
 			{
 				final MySQLConnection connection = new MySQLConnection(config, "localhost", "3306", "Crazy", "root", "");
 				database = new CrazyLoginMySQLDatabase(connection, tableName, colName, colPassword, colIPs, colLastAction);
@@ -690,7 +699,15 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				else if (args[0].equalsIgnoreCase("saveType"))
 				{
 					final String saveType = args[1];
-					DatabaseType type = DatabaseType.valueOf(saveType.toUpperCase());
+					DatabaseType type = null;
+					try
+					{
+						type = DatabaseType.valueOf(saveType.toUpperCase());
+					}
+					catch (Exception e)
+					{
+						type = null;
+					}
 					if (type == null)
 						throw new CrazyCommandNoSuchException("SaveType", saveType);
 					sendLocaleMessage("MODE.CHANGE", sender, "saveType", saveType);
