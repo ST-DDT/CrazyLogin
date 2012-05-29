@@ -128,6 +128,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		catch (final SQLException e)
 		{
 			e.printStackTrace();
+			lastAction = new Timestamp(new Date().getTime());
 		}
 		online = false;
 	}
