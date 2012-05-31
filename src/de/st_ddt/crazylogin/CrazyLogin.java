@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.messaging.Messenger;
 
+import de.st_ddt.crazylogin.LoginPlugin;
 import de.st_ddt.crazylogin.crypt.AuthMeCrypt;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
 import de.st_ddt.crazylogin.crypt.CustomEncryptor;
@@ -254,6 +255,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		saveConfiguration();
 	}
 
+	@Override
 	public int dropInactiveAccounts()
 	{
 		if (autoDelete != -1)
@@ -949,16 +951,19 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return hasAccount(player.getName());
 	}
 
+	@Override
 	public boolean hasAccount(final String player)
 	{
 		return (datas.get(player.toLowerCase()) != null);
 	}
 
+	@Override
 	public boolean isAlwaysNeedPassword()
 	{
 		return alwaysNeedPassword;
 	}
 
+	@Override
 	public int getAutoLogoutTime()
 	{
 		return autoLogout;
@@ -969,36 +974,43 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return autoLogout >= 0;
 	}
 
+	@Override
 	public boolean isInstantAutoLogoutEnabled()
 	{
 		return autoLogout == 0;
 	}
 
+	@Override
 	public int getAutoKick()
 	{
 		return autoKick;
 	}
 
+	@Override
 	public int getAutoKickUnregistered()
 	{
 		return autoKickUnregistered;
 	}
 
+	@Override
 	public List<String> getCommandWhiteList()
 	{
 		return commandWhiteList;
 	}
 
+	@Override
 	public boolean isAutoKickCommandUsers()
 	{
 		return autoKickCommandUsers;
 	}
 
+	@Override
 	public boolean isBlockingGuestCommandsEnabled()
 	{
 		return blockGuestCommands;
 	}
 
+	@Override
 	public String getUniqueIDKey()
 	{
 		if (uniqueIDKey == null)
@@ -1030,9 +1042,12 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		this.autoDelete = autoDelete;
 	}
 
-	public HashMap<String, LoginPlayerData> getPlayerData()
+	@Override
+	public HashMap<String, LoginData> getPlayerData()
 	{
-		return datas;
+		HashMap<String, LoginData> res = new HashMap<String, LoginData>();
+		res.putAll(datas);
+		return res;
 	}
 
 	@Override
@@ -1041,11 +1056,13 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return getPlayerData(player.getName());
 	}
 
+	@Override
 	public LoginPlayerData getPlayerData(final String name)
 	{
 		return datas.get(name.toLowerCase());
 	}
 
+	@Override
 	public boolean deletePlayerData(final String player)
 	{
 		LoginPlayerData data = datas.remove(player.toLowerCase());
@@ -1073,6 +1090,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			sendLocaleMessage("LOGIN.REQUEST", player);
 	}
 
+	@Override
 	public boolean isForceSingleSessionEnabled()
 	{
 		return forceSingleSession;
@@ -1097,16 +1115,19 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return moveRange;
 	}
 
+	@Override
 	public int getMinNameLength()
 	{
 		return minNameLength;
 	}
 
+	@Override
 	public int getMaxNameLength()
 	{
 		return maxNameLength;
 	}
 
+	@Override
 	public boolean checkNameLength(final String name)
 	{
 		final int length = name.length();

@@ -27,7 +27,7 @@ public class CrazyLoginPlayerListener implements Listener
 {
 
 	private final CrazyLogin plugin;
-	private final HashMap<String, LoginPlayerData> datas;
+	private final HashMap<String, LoginData> datas;
 	private final HashMap<String, Location> savelogin = new HashMap<String, Location>();
 
 	public CrazyLoginPlayerListener(final CrazyLogin plugin)
@@ -69,7 +69,7 @@ public class CrazyLoginPlayerListener implements Listener
 			savelogin.put(player.getName().toLowerCase(), player.getLocation());
 		else
 			player.teleport(savelogin.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
-		final LoginPlayerData playerdata = datas.get(player.getName().toLowerCase());
+		final LoginData playerdata = datas.get(player.getName().toLowerCase());
 		if (playerdata == null)
 		{
 			if (plugin.isAlwaysNeedPassword())
@@ -99,7 +99,7 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerQuit(final PlayerQuitEvent event)
 	{
 		final Player player = event.getPlayer();
-		final LoginPlayerData playerdata = datas.get(player.getName().toLowerCase());
+		final LoginData playerdata = datas.get(player.getName().toLowerCase());
 		if (playerdata != null)
 		{
 			if (!plugin.isLoggedIn(player))

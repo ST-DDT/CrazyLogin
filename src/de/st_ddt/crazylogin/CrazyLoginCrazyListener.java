@@ -16,7 +16,7 @@ public class CrazyLoginCrazyListener implements Listener
 		this.plugin = plugin;
 	}
 
-	public CrazyLogin getPlugin()
+	public LoginPlugin getPlugin()
 	{
 		return plugin;
 	}

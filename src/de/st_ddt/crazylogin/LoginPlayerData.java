@@ -21,7 +21,7 @@ import de.st_ddt.crazyutil.databases.FlatDatabaseEntry;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
 import de.st_ddt.crazyutil.databases.MySQLDatabaseEntry;
 
-public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabaseEntry, FlatDatabaseEntry
+public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabaseEntry, FlatDatabaseEntry, LoginData
 {
 
 	private final String player;
@@ -212,6 +212,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		return player.toLowerCase().hashCode();
 	}
 
+	@Override
 	public void setPassword(final String password) throws CrazyCommandException
 	{
 		try
@@ -239,11 +240,13 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		}
 	}
 
+	@Override
 	public boolean isPassword(final String password)
 	{
 		return CrazyLogin.getPlugin().getEncryptor().match(player, password, this.password);
 	}
 
+	@Override
 	public void addIP(final String ip)
 	{
 		if (!ips.contains(ip))
@@ -252,26 +255,31 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 			ips.remove(5);
 	}
 
+	@Override
 	public boolean hasIP(final String ip)
 	{
 		return ips.contains(ip);
 	}
 
-	protected void notifyAction()
+	@Override
+	public void notifyAction()
 	{
 		lastAction = new Date();
 	}
 
+	@Override
 	public Date getLastActionTime()
 	{
 		return lastAction;
 	}
 
+	@Override
 	public boolean isOnline()
 	{
 		return online;
 	}
 
+	@Override
 	public boolean login(final String password)
 	{
 		this.online = isPassword(password);
@@ -280,11 +288,13 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		return online;
 	}
 
+	@Override
 	public void logout()
 	{
 		logout(false);
 	}
 
+	@Override
 	public void logout(final boolean removeIPs)
 	{
 		this.online = false;
