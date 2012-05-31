@@ -27,14 +27,12 @@ public class CrazyLoginPlayerListener implements Listener
 {
 
 	private final CrazyLogin plugin;
-	private final HashMap<String, LoginData> datas;
 	private final HashMap<String, Location> savelogin = new HashMap<String, Location>();
 
 	public CrazyLoginPlayerListener(final CrazyLogin plugin)
 	{
 		super();
 		this.plugin = plugin;
-		this.datas = plugin.getPlayerData();
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -51,9 +49,10 @@ public class CrazyLoginPlayerListener implements Listener
 			if (player.isOnline())
 			{
 				if (plugin.isForceSingleSessionSameIPBypassEnabled())
-					if (event.getAddress().getHostAddress().equals(player.getAddress().getAddress().getHostAddress()))
-						if (event.getAddress().getHostName().equals(player.getAddress().getAddress().getHostName()))
-							return;
+					if (player.getAddress() != null)
+						if (event.getAddress().getHostAddress().equals(player.getAddress().getAddress().getHostAddress()))
+							if (event.getAddress().getHostName().equals(player.getAddress().getAddress().getHostName()))
+								return;
 				event.setResult(Result.KICK_OTHER);
 				event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "SESSION.DUPLICATE"));
 				plugin.broadcastLocaleMessage(true, "crazylogin.warnsession", "SESSION.DUPLICATEWARN", event.getAddress().getHostAddress(), player.getName());
@@ -69,9 +68,9 @@ public class CrazyLoginPlayerListener implements Listener
 			savelogin.put(player.getName().toLowerCase(), player.getLocation());
 		else
 			player.teleport(savelogin.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
-		final LoginData playerdata = datas.get(player.getName().toLowerCase());
-		if (playerdata == null)
+		if (!plugin.hasAccount(player))
 		{
+			System.out.println("NOACC");
 			if (plugin.isAlwaysNeedPassword())
 				plugin.sendLocaleMessage("REGISTER.HEADER", player);
 			else
@@ -82,6 +81,7 @@ public class CrazyLoginPlayerListener implements Listener
 				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("REGISTER.REQUEST"), true), autoKick * 20);
 			return;
 		}
+		final LoginData playerdata = plugin.getPlayerData(player);
 		if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))
 			playerdata.logout();
 		if (plugin.isAutoLogoutEnabled())
@@ -99,7 +99,7 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerQuit(final PlayerQuitEvent event)
 	{
 		final Player player = event.getPlayer();
-		final LoginData playerdata = datas.get(player.getName().toLowerCase());
+		final LoginData playerdata = plugin.getPlayerData(player);
 		if (playerdata != null)
 		{
 			if (!plugin.isLoggedIn(player))
