@@ -620,8 +620,18 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					boolean newValue = false;
 					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
 						newValue = true;
-					alwaysNeedPassword = newValue;
+					forceSingleSession = newValue;
 					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSession", forceSingleSession ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("forceSingleSessionSameIPBypass"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					forceSingleSessionSameIPBypass = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass ? "True" : "False");
 					saveConfiguration();
 					return;
 				}
@@ -797,6 +807,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				else if (args[0].equalsIgnoreCase("forceSingleSession"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSession", forceSingleSession ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("forceSingleSessionSameIPBypass"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass ? "True" : "False");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("autoLogout"))
