@@ -223,8 +223,9 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.isLoggedIn(player))
-			return;
+		if (!plugin.isBlockingGuestCommandsEnabled() || plugin.hasAccount(player))
+			if (plugin.isLoggedIn(player))
+				return;
 		final String message = event.getMessage().toLowerCase();
 		if (message.startsWith("/"))
 		{

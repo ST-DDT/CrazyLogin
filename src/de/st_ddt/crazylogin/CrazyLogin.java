@@ -62,9 +62,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected boolean alwaysNeedPassword;
 	protected int autoLogout;
 	protected int autoKick;
-	protected boolean autoKickCommandUsers;
 	protected int autoKickUnregistered;
 	protected int autoKickLoginFailer;
+	protected boolean autoKickCommandUsers;
+	protected boolean blockGuestCommands;
 	protected List<String> commandWhiteList;
 	protected String uniqueIDKey;
 	protected boolean doNotSpamRequests;
@@ -119,9 +120,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
-		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		autoKickUnregistered = Math.max(config.getInt("kickUnregistered", -1), -1);
 		autoKickLoginFailer = Math.max(config.getInt("autoKickLoginFailer", 3), -1);
+		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
+		blockGuestCommands = config.getBoolean("blockGuestCommands", false);
 		loginFailures.clear();
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		commandWhiteList = config.getStringList("commandWhitelist");
@@ -292,9 +294,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("autoKick", autoKick);
 		config.set("kickUnregistered", autoKickUnregistered);
 		config.set("autoKickLoginFailer", autoKickLoginFailer);
+		config.set("autoKickCommandUsers", autoKickCommandUsers);
+		config.set("blockGuestCommands", blockGuestCommands);
 		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("commandWhitelist", commandWhiteList);
-		config.set("autoKickCommandUsers", autoKickCommandUsers);
 		config.set("uniqueIDKey", uniqueIDKey);
 		config.set("algorithm", encryptor.getAlgorithm());
 		config.set("autoDelete", autoDelete);
@@ -667,16 +670,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
-				else if (args[0].equalsIgnoreCase("autoKickCommandUsers"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					autoKickCommandUsers = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "autoKickCommandUsers", autoKickCommandUsers ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
 				else if (args[0].equalsIgnoreCase("autoKickUnregistered"))
 				{
 					int time = autoKickUnregistered;
@@ -706,6 +699,26 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					}
 					autoKickLoginFailer = Math.max(tries, -1);
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKickLoginFailer", autoKickLoginFailer == -1 ? "disabled" : autoKickUnregistered + " tries");
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoKickCommandUsers"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					autoKickCommandUsers = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "autoKickCommandUsers", autoKickCommandUsers ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("blockGuestCommands"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					blockGuestCommands = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestCommands", blockGuestCommands ? "True" : "False");
 					saveConfiguration();
 					return;
 				}
@@ -979,6 +992,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public boolean isAutoKickCommandUsers()
 	{
 		return autoKickCommandUsers;
+	}
+
+	public boolean isBlockingGuestCommandsEnabled()
+	{
+		return blockGuestCommands;
 	}
 
 	public String getUniqueIDKey()
