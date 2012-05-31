@@ -69,6 +69,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected String uniqueIDKey;
 	protected boolean doNotSpamRequests;
 	protected boolean forceSingleSession;
+	protected boolean forceSingleSessionSameIPBypass;
 	protected Encryptor encryptor;
 	protected int autoDelete;
 	protected int maxRegistrationsPerIP;
@@ -131,6 +132,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			commandWhiteList.add("/crazylogin password");
 		}
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
+		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
 		if (autoDelete != -1)
@@ -297,6 +299,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("algorithm", encryptor.getAlgorithm());
 		config.set("autoDelete", autoDelete);
 		config.set("forceSingleSession", forceSingleSession);
+		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
 		config.set("moveRange", moveRange);
@@ -1040,6 +1043,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public boolean isForceSingleSessionEnabled()
 	{
 		return forceSingleSession;
+	}
+
+	public boolean isForceSingleSessionSameIPBypassEnabled()
+	{
+		return forceSingleSessionSameIPBypass;
 	}
 
 	public List<LoginPlayerData> getRegistrationsPerIP(final String ip)

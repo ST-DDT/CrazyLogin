@@ -50,6 +50,10 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isForceSingleSessionEnabled())
 			if (player.isOnline())
 			{
+				if (plugin.isForceSingleSessionSameIPBypassEnabled())
+					if (event.getAddress().getHostAddress().equals(player.getAddress().getAddress().getHostAddress()))
+						if (event.getAddress().getHostName().equals(player.getAddress().getAddress().getHostName()))
+							return;
 				event.setResult(Result.KICK_OTHER);
 				event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "SESSION.DUPLICATE"));
 				plugin.broadcastLocaleMessage(true, "crazylogin.warnsession", "SESSION.DUPLICATEWARN", event.getAddress().getHostAddress(), player.getName());
