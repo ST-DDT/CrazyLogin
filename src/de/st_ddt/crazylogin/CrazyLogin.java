@@ -239,7 +239,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		finally
 		{
 			if (database == null)
-				broadcastLocaleMessage(true, "crazylogin.warndatabase", "CRAZYLOGIN.DATABASE.ACCESSWARN", saveType);
+				broadcastLocaleMessage(true, "crazylogin.warndatabase", "DATABASE.ACCESSWARN", saveType);
 		}
 	}
 
