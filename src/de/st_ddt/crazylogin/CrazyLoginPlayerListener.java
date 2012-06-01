@@ -70,7 +70,6 @@ public class CrazyLoginPlayerListener implements Listener
 			player.teleport(savelogin.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
 		if (!plugin.hasAccount(player))
 		{
-			System.out.println("NOACC");
 			if (plugin.isAlwaysNeedPassword())
 				plugin.sendLocaleMessage("REGISTER.HEADER", player);
 			else
