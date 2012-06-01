@@ -64,9 +64,7 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerJoin(final PlayerJoinEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (savelogin.get(player.getName().toLowerCase()) == null)
-			savelogin.put(player.getName().toLowerCase(), player.getLocation());
-		else
+		if (savelogin.get(player.getName().toLowerCase()) != null)
 			player.teleport(savelogin.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
 		if (!plugin.hasAccount(player))
 		{
@@ -76,6 +74,8 @@ public class CrazyLoginPlayerListener implements Listener
 				plugin.sendLocaleMessage("REGISTER.HEADER2", player);
 			plugin.sendLocaleMessage("REGISTER.MESSAGE", player);
 			final int autoKick = plugin.getAutoKickUnregistered();
+			if (plugin.isAlwaysNeedPassword() || autoKick != -1)
+				savelogin.put(player.getName().toLowerCase(), player.getLocation());
 			if (autoKick != -1)
 				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("REGISTER.REQUEST"), true), autoKick * 20);
 			return;
@@ -88,6 +88,7 @@ public class CrazyLoginPlayerListener implements Listener
 				playerdata.logout();
 		if (plugin.isLoggedIn(player))
 			return;
+		savelogin.put(player.getName().toLowerCase(), player.getLocation());
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
 		final int autoKick = plugin.getAutoKick();
 		if (autoKick >= 10)

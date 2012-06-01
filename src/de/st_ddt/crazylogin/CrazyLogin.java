@@ -483,6 +483,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
+		playerListener.notifyLogin(player);
 		if (database != null)
 			database.save(data);
 	}
