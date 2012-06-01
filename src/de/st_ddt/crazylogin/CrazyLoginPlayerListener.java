@@ -88,7 +88,8 @@ public class CrazyLoginPlayerListener implements Listener
 				playerdata.logout();
 		if (plugin.isLoggedIn(player))
 			return;
-		savelogin.put(player.getName().toLowerCase(), player.getLocation());
+		if (savelogin.get(player.getName().toLowerCase()) == null)
+			savelogin.put(player.getName().toLowerCase(), player.getLocation());
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
 		final int autoKick = plugin.getAutoKick();
 		if (autoKick >= 10)
