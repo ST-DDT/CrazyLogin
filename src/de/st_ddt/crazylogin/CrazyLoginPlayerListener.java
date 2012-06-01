@@ -104,7 +104,6 @@ public class CrazyLoginPlayerListener implements Listener
 		{
 			if (!plugin.isLoggedIn(player))
 				return;
-			savelogin.put(player.getName().toLowerCase(), player.getLocation());
 			playerdata.notifyAction();
 			if (plugin.isInstantAutoLogoutEnabled())
 				playerdata.logout();
@@ -256,8 +255,8 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	public void notifyLogout(Player player)
+	public void notifyLogin(Player player)
 	{
-		savelogin.put(player.getName().toLowerCase(), player.getLocation());
+		savelogin.remove(player.getName().toLowerCase());
 	}
 }

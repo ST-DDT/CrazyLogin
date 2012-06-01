@@ -378,6 +378,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		getServer().getPluginManager().callEvent(new CrazyLoginLoginEvent(this, data, player));
 		sendLocaleMessage("LOGIN.SUCCESS", player);
+		playerListener.notifyLogin(player);
 		loginFailures.remove(player.getName().toLowerCase());
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		if (database != null)
@@ -394,7 +395,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		final LoginPlayerData data = datas.get(player.getName().toLowerCase());
 		if (data != null)
 		{
-			playerListener.notifyLogout(player);
 			data.logout();
 			if (database != null)
 				database.save(data);
