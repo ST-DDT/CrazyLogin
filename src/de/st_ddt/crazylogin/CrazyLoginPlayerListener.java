@@ -75,7 +75,8 @@ public class CrazyLoginPlayerListener implements Listener
 			plugin.sendLocaleMessage("REGISTER.MESSAGE", player);
 			final int autoKick = plugin.getAutoKickUnregistered();
 			if (plugin.isAlwaysNeedPassword() || autoKick != -1)
-				savelogin.put(player.getName().toLowerCase(), player.getLocation());
+				if (savelogin.get(player.getName().toLowerCase()) == null)
+					savelogin.put(player.getName().toLowerCase(), player.getLocation());
 			if (autoKick != -1)
 				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("REGISTER.REQUEST"), true), autoKick * 20);
 			return;
