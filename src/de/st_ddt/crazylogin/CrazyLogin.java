@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.messaging.Messenger;
 
-import de.st_ddt.crazylogin.LoginPlugin;
 import de.st_ddt.crazylogin.crypt.AuthMeCrypt;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
 import de.st_ddt.crazylogin.crypt.CustomEncryptor;
@@ -67,6 +66,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected int autoKickLoginFailer;
 	protected boolean autoKickCommandUsers;
 	protected boolean blockGuestCommands;
+	protected boolean resetGuestLocations;
 	protected List<String> commandWhiteList;
 	protected String uniqueIDKey;
 	protected boolean doNotSpamRequests;
@@ -125,6 +125,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		autoKickLoginFailer = Math.max(config.getInt("autoKickLoginFailer", 3), -1);
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		blockGuestCommands = config.getBoolean("blockGuestCommands", false);
+		resetGuestLocations = config.getBoolean("resetGuestLocations", true);
 		loginFailures.clear();
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		commandWhiteList = config.getStringList("commandWhitelist");
@@ -185,20 +186,20 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			for (final LoginPlayerData data : database.getAllEntries())
 				datas.put(data.getName().toLowerCase(), data);
 		dropInactiveAccounts();
-		for (Player player : getServer().getOnlinePlayers())
+		for (final Player player : getServer().getOnlinePlayers())
 			requestLogin(player);
 	}
 
 	public void setupDatabase()
 	{
 		final ConfigurationSection config = getConfig();
-		String saveType = config.getString("database.saveType", "FLAT").toUpperCase();
+		final String saveType = config.getString("database.saveType", "FLAT").toUpperCase();
 		DatabaseType type = null;
 		try
 		{
 			type = DatabaseType.valueOf(saveType);
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			System.out.println("NO SUCH SAVETYPE " + saveType);
 			type = null;
@@ -276,7 +277,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		final Iterator<LoginPlayerData> it = datas.values().iterator();
 		while (it.hasNext())
 		{
-			LoginPlayerData data = it.next();
+			final LoginPlayerData data = it.next();
 			if (data.getLastActionTime().before(limit))
 			{
 				amount++;
@@ -298,6 +299,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("autoKickLoginFailer", autoKickLoginFailer);
 		config.set("autoKickCommandUsers", autoKickCommandUsers);
 		config.set("blockGuestCommands", blockGuestCommands);
+		config.set("resetGuestLocations", resetGuestLocations);
 		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("commandWhitelist", commandWhiteList);
 		config.set("uniqueIDKey", uniqueIDKey);
@@ -572,7 +574,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETED", sender.getName(), days, amount);
 	}
 
-	private void commandMainPlayer(CommandSender sender, String[] args) throws CrazyCommandException
+	private void commandMainPlayer(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		Player target = null;
 		switch (args.length)
@@ -725,6 +727,18 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("resetGuestLocations"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					resetGuestLocations = newValue;
+					if (resetGuestLocations)
+						playerListener.clearSaveLogin(true);
+					sendLocaleMessage("MODE.CHANGE", sender, "resetGuestLocations", resetGuestLocations ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("saveType"))
 				{
 					final String saveType = args[1];
@@ -733,7 +747,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					{
 						type = DatabaseType.valueOf(saveType.toUpperCase());
 					}
-					catch (Exception e)
+					catch (final Exception e)
 					{
 						type = null;
 					}
@@ -832,7 +846,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				}
 				else if (args[0].equalsIgnoreCase("autoLogout"))
 				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout);
+					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout == -1 ? "disabled" : autoLogout + " seconds");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("autoKick"))
@@ -845,9 +859,24 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKickUnregistered", autoKickUnregistered == -1 ? "disabled" : autoKickUnregistered + " seconds");
 					return;
 				}
-				else if (args[0].equalsIgnoreCase("algorithm"))
+				else if (args[0].equalsIgnoreCase("autoKickLoginFailer"))
 				{
-					sendLocaleMessage("MODE.CHANGE", sender, "algorithm", encryptor.getAlgorithm());
+					sendLocaleMessage("MODE.CHANGE", sender, "autoKickLoginFailer", autoKickLoginFailer == -1 ? "disabled" : autoKickUnregistered + " tries");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoKickCommandUsers"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "autoKickCommandUsers", autoKickCommandUsers ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("blockGuestCommands"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestCommands", blockGuestCommands ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("resetGuestLocations"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "resetGuestLocations", resetGuestLocations ? "True" : "False");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("saveType"))
@@ -873,6 +902,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				else if (args[0].equalsIgnoreCase("maxNameLength"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "maxNameLength", maxNameLength + " characters");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("algorithm"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "algorithm", encryptor.getAlgorithm());
 					return;
 				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
@@ -1012,6 +1046,12 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	}
 
 	@Override
+	public boolean isResettingGuestLocationsEnabled()
+	{
+		return resetGuestLocations;
+	}
+
+	@Override
 	public String getUniqueIDKey()
 	{
 		if (uniqueIDKey == null)
@@ -1046,7 +1086,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public HashMap<String, LoginData> getPlayerData()
 	{
-		HashMap<String, LoginData> res = new HashMap<String, LoginData>();
+		final HashMap<String, LoginData> res = new HashMap<String, LoginData>();
 		res.putAll(datas);
 		return res;
 	}
@@ -1066,7 +1106,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public boolean deletePlayerData(final String player)
 	{
-		LoginPlayerData data = datas.remove(player.toLowerCase());
+		final LoginPlayerData data = datas.remove(player.toLowerCase());
 		if (data == null)
 			return false;
 		if (database != null)
