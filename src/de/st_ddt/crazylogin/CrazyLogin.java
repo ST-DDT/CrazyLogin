@@ -1177,7 +1177,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public boolean isTempBanned(final String IP)
 	{
-		return tempBans.containsKey(IP);
+		Date date = tempBans.get(IP);
+		if (date == null)
+			return false;
+		return new Date().before(date);
 	}
 
 	@Override
@@ -1189,7 +1192,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public String getTempBannedString(final String IP)
 	{
-		return DateFormat.format(tempBans.get(IP));
+		Date date = getTempBanned(IP);
+		if (date == null)
+			return DateFormat.format(new Date(0));
+		return DateFormat.format(date);
 	}
 
 	public void setTempBanned(final Player player, final long duration)

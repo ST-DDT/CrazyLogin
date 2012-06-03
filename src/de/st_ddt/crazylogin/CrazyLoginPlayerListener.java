@@ -49,7 +49,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isTempBanned(event.getAddress().getHostAddress()))
 		{
 			event.setResult(Result.KICK_OTHER);
-			event.setKickMessage(ChatColor.RED + "Banned until : " + ChatColor.YELLOW + plugin.getTempBannedString(player.getAddress().getAddress().getHostAddress()));
+			event.setKickMessage(ChatColor.RED + "Banned until : " + ChatColor.YELLOW + plugin.getTempBannedString(event.getAddress().getHostAddress()));
 			return;
 		}
 		if (plugin.isForceSingleSessionEnabled())
