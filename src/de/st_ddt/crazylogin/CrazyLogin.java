@@ -685,6 +685,22 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("autoTempBan"))
+				{
+					long time = autoTempBan;
+					try
+					{
+						time = Long.parseLong(args[1]);
+					}
+					catch (final NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds > 60");
+					}
+					autoTempBan = time;
+					sendLocaleMessage("MODE.CHANGE", sender, "autoTempBan", autoTempBan == -1 ? "disabled" : autoTempBan + " seconds");
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("autoKickUnregistered"))
 				{
 					int time = autoKickUnregistered;
@@ -714,6 +730,22 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					}
 					autoKickLoginFailer = Math.max(tries, -1);
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKickLoginFailer", autoKickLoginFailer == -1 ? "disabled" : autoKickUnregistered + " tries");
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoTempBanLoginFailer"))
+				{
+					long time = autoTempBanLoginFailer;
+					try
+					{
+						time = Long.parseLong(args[1]);
+					}
+					catch (final NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds > 60");
+					}
+					autoTempBanLoginFailer = time;
+					sendLocaleMessage("MODE.CHANGE", sender, "autoTempBanLoginFailer", autoTempBanLoginFailer == -1 ? "disabled" : autoTempBanLoginFailer + " seconds");
 					saveConfiguration();
 					return;
 				}
@@ -864,6 +896,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKick", autoKick == -1 ? "disabled" : autoKick + " seconds");
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("autoTempBan"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "autoTempBan", autoTempBan == -1 ? "disabled" : autoTempBan + " seconds");
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("autoKickUnregistered"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKickUnregistered", autoKickUnregistered == -1 ? "disabled" : autoKickUnregistered + " seconds");
@@ -872,6 +909,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				else if (args[0].equalsIgnoreCase("autoKickLoginFailer"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "autoKickLoginFailer", autoKickLoginFailer == -1 ? "disabled" : autoKickUnregistered + " tries");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("autoTempBanLoginFailer"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "autoTempBanLoginFailer", autoTempBanLoginFailer == -1 ? "disabled" : autoTempBanLoginFailer + " seconds");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("autoKickCommandUsers"))
