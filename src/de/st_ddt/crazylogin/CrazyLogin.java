@@ -54,6 +54,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	private static CrazyLogin plugin;
 	private final HashMap<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
 	private final HashMap<String, Integer> loginFailures = new HashMap<String, Integer>();
+	private final HashMap<String, Date> tempBans = new HashMap<String, Date>();
 	protected final HashMap<String, LoginPlayerData> datas = new HashMap<String, LoginPlayerData>();
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
@@ -62,8 +63,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected boolean alwaysNeedPassword;
 	protected int autoLogout;
 	protected int autoKick;
+	protected long autoTempBan;
 	protected int autoKickUnregistered;
 	protected int autoKickLoginFailer;
+	protected long autoTempBanLoginFailer;
 	protected boolean autoKickCommandUsers;
 	protected boolean blockGuestCommands;
 	protected boolean resetGuestLocations;
@@ -115,19 +118,20 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		super.load();
 		final ConfigurationSection config = getConfig();
-		if (config.getBoolean("autoLogout", false))
-			autoLogout = 0;
-		else
-			autoLogout = config.getInt("autoLogout", 60 * 60);
+		autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
-		autoKickUnregistered = Math.max(config.getInt("kickUnregistered", -1), -1);
+		autoTempBan = Math.max(config.getInt("autoTempBan", -1), -1);
+		tempBans.clear();
+		autoKickUnregistered = Math.max(config.getInt("autoKickUnregistered", config.getInt("kickUnregistered", -1)), -1);
 		autoKickLoginFailer = Math.max(config.getInt("autoKickLoginFailer", 3), -1);
+		autoTempBanLoginFailer = Math.max(config.getInt("autoTempBanLoginFailer", -1), -1);
+		loginFailures.clear();
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		blockGuestCommands = config.getBoolean("blockGuestCommands", false);
 		resetGuestLocations = config.getBoolean("resetGuestLocations", true);
-		loginFailures.clear();
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
+		antiRequestSpamTable.clear();
 		commandWhiteList = config.getStringList("commandWhitelist");
 		if (commandWhiteList.size() == 0)
 		{
@@ -295,8 +299,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
-		config.set("kickUnregistered", autoKickUnregistered);
+		config.set("autoTempBan", autoTempBan);
+		config.set("autoKickUnregistered", autoKickUnregistered);
 		config.set("autoKickLoginFailer", autoKickLoginFailer);
+		config.set("autoTempBanLoginFailer", autoTempBanLoginFailer);
 		config.set("autoKickCommandUsers", autoKickCommandUsers);
 		config.set("blockGuestCommands", blockGuestCommands);
 		config.set("resetGuestLocations", resetGuestLocations);
@@ -371,6 +377,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			if (fails >= autoKickLoginFailer)
 			{
 				player.kickPlayer(locale.getLocaleMessage(player, "LOGIN.FAILED"));
+				if (autoTempBanLoginFailer > 0)
+					setTempBanned(player, autoTempBanLoginFailer);
 				fails = 0;
 			}
 			else
@@ -382,6 +390,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		sendLocaleMessage("LOGIN.SUCCESS", player);
 		playerListener.notifyLogin(player);
 		loginFailures.remove(player.getName().toLowerCase());
+		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		if (database != null)
 			database.save(data);
@@ -478,6 +487,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				throw new CrazyCommandPermissionException();
 			data = new LoginPlayerData(player);
 			datas.put(player.getName().toLowerCase(), data);
+			tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		}
 		final String password = ChatHelper.listingString(args);
 		if (pluginCommunicationEnabled)
@@ -993,97 +1003,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	}
 
 	@Override
-	public boolean isAlwaysNeedPassword()
-	{
-		return alwaysNeedPassword;
-	}
-
-	@Override
-	public int getAutoLogoutTime()
-	{
-		return autoLogout;
-	}
-
-	public boolean isAutoLogoutEnabled()
-	{
-		return autoLogout >= 0;
-	}
-
-	@Override
-	public boolean isInstantAutoLogoutEnabled()
-	{
-		return autoLogout == 0;
-	}
-
-	@Override
-	public int getAutoKick()
-	{
-		return autoKick;
-	}
-
-	@Override
-	public int getAutoKickUnregistered()
-	{
-		return autoKickUnregistered;
-	}
-
-	@Override
-	public List<String> getCommandWhiteList()
-	{
-		return commandWhiteList;
-	}
-
-	@Override
-	public boolean isAutoKickCommandUsers()
-	{
-		return autoKickCommandUsers;
-	}
-
-	@Override
-	public boolean isBlockingGuestCommandsEnabled()
-	{
-		return blockGuestCommands;
-	}
-
-	@Override
-	public boolean isResettingGuestLocationsEnabled()
-	{
-		return resetGuestLocations;
-	}
-
-	@Override
-	public String getUniqueIDKey()
-	{
-		if (uniqueIDKey == null)
-			try
-			{
-				uniqueIDKey = new CrazyCrypt1().encrypt(getServer().getName(), null, "randomKeyGen" + (Math.random() * Integer.MAX_VALUE) + "V:" + getServer().getBukkitVersion() + "'_+'#");
-			}
-			catch (final Exception e)
-			{
-				e.printStackTrace();
-				return null;
-			}
-		return uniqueIDKey;
-	}
-
-	@Override
-	public Encryptor getEncryptor()
-	{
-		return encryptor;
-	}
-
-	public int getAutoDelete()
-	{
-		return autoDelete;
-	}
-
-	public void setAutoDelete(final int autoDelete)
-	{
-		this.autoDelete = autoDelete;
-	}
-
-	@Override
 	public HashMap<String, LoginData> getPlayerData()
 	{
 		final HashMap<String, LoginData> res = new HashMap<String, LoginData>();
@@ -1132,25 +1051,158 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	}
 
 	@Override
-	public boolean isForceSingleSessionEnabled()
+	public List<LoginData> getRegistrationsPerIP(final String ip)
 	{
-		return forceSingleSession;
-	}
-
-	public boolean isForceSingleSessionSameIPBypassEnabled()
-	{
-		return forceSingleSessionSameIPBypass;
-	}
-
-	public List<LoginPlayerData> getRegistrationsPerIP(final String ip)
-	{
-		final List<LoginPlayerData> list = new LinkedList<LoginPlayerData>();
+		final List<LoginData> list = new LinkedList<LoginData>();
 		for (final LoginPlayerData data : datas.values())
 			if (data.hasIP(ip))
 				list.add(data);
 		return list;
 	}
 
+	@Override
+	public boolean isAlwaysNeedPassword()
+	{
+		return alwaysNeedPassword;
+	}
+
+	@Override
+	public boolean isAutoLogoutEnabled()
+	{
+		return autoLogout != -1;
+	}
+
+	@Override
+	public boolean isInstantAutoLogoutEnabled()
+	{
+		return autoLogout == 0;
+	}
+
+	@Override
+	public int getAutoLogoutTime()
+	{
+		return autoLogout;
+	}
+
+	@Override
+	public int getAutoKick()
+	{
+		return autoKick;
+	}
+
+	@Override
+	public long getAutoTempBan()
+	{
+		return autoTempBan;
+	}
+
+	@Override
+	public int getAutoKickUnregistered()
+	{
+		return autoKickUnregistered;
+	}
+
+	@Override
+	public int getAutoKickLoginFailer()
+	{
+		return autoKickLoginFailer;
+	}
+
+	@Override
+	public long getAutoTempBanLoginFailer()
+	{
+		return autoTempBanLoginFailer;
+	}
+
+	@Override
+	public boolean isAutoKickCommandUsers()
+	{
+		return autoKickCommandUsers;
+	}
+
+	@Override
+	public boolean isBlockingGuestCommandsEnabled()
+	{
+		return blockGuestCommands;
+	}
+
+	@Override
+	public boolean isResettingGuestLocationsEnabled()
+	{
+		return resetGuestLocations;
+	}
+
+	@Override
+	public boolean isTempBanned(final String IP)
+	{
+		return tempBans.containsKey(IP);
+	}
+
+	@Override
+	public Date getTempBanned(final String IP)
+	{
+		return tempBans.get(IP);
+	}
+
+	public void setTempBanned(final Player player, final long duration)
+	{
+		setTempBanned(player.getAddress().getAddress().getHostAddress(), duration * 1000);
+	}
+
+	public void setTempBanned(final String IP, final long duration)
+	{
+		final Date until = new Date();
+		until.setTime(until.getTime() + autoTempBan * 1000);
+		tempBans.put(IP, until);
+	}
+
+	@Override
+	public List<String> getCommandWhiteList()
+	{
+		return commandWhiteList;
+	}
+
+	public boolean isAvoidingSpammedRequestsEnabled()
+	{
+		return doNotSpamRequests;
+	}
+
+	@Override
+	public boolean isForceSingleSessionEnabled()
+	{
+		return forceSingleSession;
+	}
+
+	@Override
+	public boolean isForceSingleSessionSameIPBypassEnabled()
+	{
+		return forceSingleSessionSameIPBypass;
+	}
+
+	@Override
+	public Encryptor getEncryptor()
+	{
+		return encryptor;
+	}
+
+	@Override
+	public int getAutoDelete()
+	{
+		return autoDelete;
+	}
+
+	@Override
+	public int getMaxRegistrationsPerIP()
+	{
+		return maxRegistrationsPerIP;
+	}
+
+	public boolean isPluginCommunicationEnabled()
+	{
+		return pluginCommunicationEnabled;
+	}
+
+	@Override
 	public int getMoveRange()
 	{
 		return moveRange;
@@ -1177,5 +1229,21 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		if (length > maxNameLength)
 			return false;
 		return true;
+	}
+
+	@Override
+	public String getUniqueIDKey()
+	{
+		if (uniqueIDKey == null)
+			try
+			{
+				uniqueIDKey = new CrazyCrypt1().encrypt(getServer().getName(), null, "randomKeyGen" + (Math.random() * Integer.MAX_VALUE) + "V:" + getServer().getBukkitVersion() + "'_+'#");
+			}
+			catch (final Exception e)
+			{
+				e.printStackTrace();
+				return null;
+			}
+		return uniqueIDKey;
 	}
 }

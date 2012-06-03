@@ -94,7 +94,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
 		final int autoKick = plugin.getAutoKick();
 		if (autoKick >= 10)
-			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST")), autoKick * 20);
+			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST"), plugin.getAutoTempBan()), autoKick * 20);
 	}
 
 	@EventHandler
@@ -262,16 +262,16 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	public void notifyLogin(Player player)
+	public void notifyLogin(final Player player)
 	{
 		savelogin.remove(player.getName().toLowerCase());
 	}
 
-	public void clearSaveLogin(boolean guestsOnly)
+	public void clearSaveLogin(final boolean guestsOnly)
 	{
 		if (guestsOnly)
 		{
-			for (String name : savelogin.keySet())
+			for (final String name : savelogin.keySet())
 				if (!plugin.hasAccount(name))
 					savelogin.remove(name);
 		}
