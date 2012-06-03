@@ -3,6 +3,7 @@ package de.st_ddt.crazylogin;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,6 +44,12 @@ public class CrazyLoginPlayerListener implements Listener
 		{
 			event.setResult(Result.KICK_OTHER);
 			event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "NAME.INVALIDLENGTH", plugin.getMinNameLength(), plugin.getMaxNameLength()));
+			return;
+		}
+		if (plugin.isTempBanned(event.getAddress().getHostAddress()))
+		{
+			event.setResult(Result.KICK_OTHER);
+			event.setKickMessage(ChatColor.RED + "Banned until : " + ChatColor.YELLOW + plugin.getTempBannedString(player.getAddress().getAddress().getHostAddress()));
 			return;
 		}
 		if (plugin.isForceSingleSessionEnabled())

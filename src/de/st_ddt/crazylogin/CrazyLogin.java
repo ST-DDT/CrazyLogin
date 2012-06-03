@@ -1144,6 +1144,12 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return tempBans.get(IP);
 	}
 
+	@Override
+	public String getTempBannedString(final String IP)
+	{
+		return DateFormat.format(tempBans.get(IP));
+	}
+
 	public void setTempBanned(final Player player, final long duration)
 	{
 		setTempBanned(player.getAddress().getAddress().getHostAddress(), duration * 1000);
