@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -270,7 +271,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	public boolean removeFromSaveLogin(final Player player)
+	public boolean removeFromSaveLogin(final OfflinePlayer player)
 	{
 		return removeFromSaveLogin(player.getName());
 	}
