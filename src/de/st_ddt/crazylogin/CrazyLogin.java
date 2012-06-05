@@ -56,10 +56,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	private final HashMap<String, Integer> loginFailures = new HashMap<String, Integer>();
 	private final HashMap<String, Date> tempBans = new HashMap<String, Date>();
 	protected final HashMap<String, LoginPlayerData> datas = new HashMap<String, LoginPlayerData>();
-	private CrazyLoginPlayerListener playerListener;
-	private CrazyLoginVehicleListener vehicleListener;
-	private CrazyLoginCrazyListener crazylistener;
-	private CrazyLoginMessageListener messageListener;
+	protected CrazyLoginPlayerListener playerListener;
+	protected CrazyLoginVehicleListener vehicleListener;
+	protected CrazyLoginCrazyListener crazylistener;
+	protected CrazyLoginMessageListener messageListener;
 	protected boolean alwaysNeedPassword;
 	protected int autoLogout;
 	protected int autoKick;
@@ -388,7 +388,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		getServer().getPluginManager().callEvent(new CrazyLoginLoginEvent(this, data, player));
 		sendLocaleMessage("LOGIN.SUCCESS", player);
-		playerListener.notifyLogin(player);
+		playerListener.removeFromSaveLogin(player);
 		loginFailures.remove(player.getName().toLowerCase());
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		data.addIP(player.getAddress().getAddress().getHostAddress());
@@ -495,7 +495,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
-		playerListener.notifyLogin(player);
+		playerListener.removeFromSaveLogin(player);
 		if (database != null)
 			database.save(data);
 	}

@@ -269,9 +269,14 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	public void notifyLogin(final Player player)
+	public boolean removeFromSaveLogin(final Player player)
 	{
-		savelogin.remove(player.getName().toLowerCase());
+		return removeFromSaveLogin(player.getName());
+	}
+
+	public boolean removeFromSaveLogin(final String player)
+	{
+		return savelogin.remove(player.toLowerCase()) != null;
 	}
 
 	public void clearSaveLogin(final boolean guestsOnly)

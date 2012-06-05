@@ -26,5 +26,7 @@ public class CrazyLoginCrazyListener implements Listener
 	{
 		if (plugin.deletePlayerData(event.getPlayer()))
 			event.markDeletion(plugin);
+		if (plugin.playerListener.removeFromSaveLogin(event.getPlayer()))
+			event.markDeletion(plugin);
 	}
 }
