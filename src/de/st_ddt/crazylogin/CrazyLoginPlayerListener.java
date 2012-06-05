@@ -153,10 +153,11 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		final Location current = savelogin.get(player.getName().toLowerCase());
-		if (current != null)
-			if (current.getWorld() == event.getTo().getWorld())
-				if (current.distance(event.getTo()) < plugin.getMoveRange())
-					return;
+		if (current == null)
+			return;
+		if (current.getWorld() == event.getTo().getWorld())
+			if (current.distance(event.getTo()) < plugin.getMoveRange())
+				return;
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
 	}
