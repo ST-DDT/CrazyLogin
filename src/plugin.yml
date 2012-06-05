@@ -7,10 +7,10 @@ softdepend: [PermissionsBukkit]
 depend: [CrazyCore]
 commands:
   login:
-    description: Show information about player
-    usage: /<command> <Player>
+    description: Login using a password
+    usage: /<command> <Password...>
   logout:
-    description: Show information about online player
+    description: Logout and leave server
     usage: /<command>
   register:
     description: Create/Change password
