@@ -468,6 +468,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			if (alwaysNeedPassword)
 				throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
 			datas.remove(player.getName().toLowerCase());
+			playerListener.removeFromSaveLogin(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
 			if (database != null)
 				database.delete(player.getName());
@@ -520,28 +521,31 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				if (target == null)
 					throw new CrazyCommandNoSuchException("Player", args[0]);
 				datas.remove(target.getName().toLowerCase());
+				playerListener.removeFromSaveLogin(target);
 				sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
 				if (database != null)
 					database.delete(target.getName());
 				return;
+			default:
+				target = getServer().getPlayerExact(args[0]);
+				if (target == null)
+				{
+					target = getServer().getPlayer(args[0]);
+					if (target == null)
+						target = getServer().getOfflinePlayer(args[0]);
+				}
+				if (target == null)
+					throw new CrazyCommandNoSuchException("Player", args[0]);
+				final LoginPlayerData data = datas.get(target.getName().toLowerCase());
+				if (data == null)
+					throw new CrazyCommandNoSuchException("Player", args[0]);
+				final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
+				data.setPassword(password);
+				sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
+				if (database != null)
+					database.save(data);
+				return;
 		}
-		OfflinePlayer target = getServer().getPlayerExact(args[0]);
-		if (target == null)
-		{
-			target = getServer().getPlayer(args[0]);
-			if (target == null)
-				target = getServer().getOfflinePlayer(args[0]);
-		}
-		if (target == null)
-			throw new CrazyCommandNoSuchException("Player", args[0]);
-		final LoginPlayerData data = datas.get(target.getName().toLowerCase());
-		if (data == null)
-			throw new CrazyCommandNoSuchException("Player", args[0]);
-		final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
-		data.setPassword(password);
-		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
-		if (database != null)
-			database.save(data);
 	}
 
 	private void commandMainDelete(final CommandSender sender, final String[] args) throws CrazyCommandException
