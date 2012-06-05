@@ -192,7 +192,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				datas.put(data.getName().toLowerCase(), data);
 		dropInactiveAccounts();
 		for (final Player player : getServer().getOnlinePlayers())
+		{
 			requestLogin(player);
+			playerListener.addToSaveLogin(player);
+		}
 	}
 
 	public void setupDatabase()

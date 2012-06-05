@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -21,6 +22,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -118,6 +120,28 @@ public class CrazyLoginPlayerListener implements Listener
 			if (plugin.isInstantAutoLogoutEnabled())
 				playerdata.logout();
 		}
+	}
+
+	@EventHandler
+	public void PlayerInventoryOpen(final InventoryOpenEvent event)
+	{
+		System.out.println("OPEN");
+		if (!(event.getPlayer() instanceof Player))
+			return;
+		Player player = (Player) event.getPlayer();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+		plugin.requestLogin(player);
+	}
+
+	@EventHandler
+	public void PlayerPickupItem(final PlayerPickupItemEvent event)
+	{
+		if (plugin.isLoggedIn(event.getPlayer()))
+			return;
+		event.setCancelled(true);
+		plugin.requestLogin(event.getPlayer());
 	}
 
 	@EventHandler
@@ -269,6 +293,16 @@ public class CrazyLoginPlayerListener implements Listener
 			return;
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
+	}
+
+	public void addToSaveLogin(final Player player)
+	{
+		addToSaveLogin(player.getName(), player.getLocation());
+	}
+
+	public void addToSaveLogin(final String player, Location location)
+	{
+		savelogin.put(player.toLowerCase(), location);
 	}
 
 	public boolean removeFromSaveLogin(final OfflinePlayer player)
