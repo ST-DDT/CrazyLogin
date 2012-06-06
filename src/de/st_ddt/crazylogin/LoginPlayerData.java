@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -301,5 +302,13 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		lastAction = new Date();
 		if (removeIPs)
 			ips.clear();
+	}
+
+	@Override
+	public String toString()
+	{
+		if (ips.size() == 0)
+			return ChatColor.WHITE + getName() + " " + CrazyLogin.DateFormat.format(lastAction);
+		return (online ? ChatColor.GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyLogin.DateFormat.format(lastAction) + " @" + ips.get(0);
 	}
 }

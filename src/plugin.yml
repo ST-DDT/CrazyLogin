@@ -36,6 +36,7 @@ permissions:
       crazylogin.playerinfo.self: true
       crazylogin.playerinfo.other: true
       crazylogin.playerinfo.extended: true
+      crazylogin.list: true
   crazylogin.admin:
     description: Allow changing passwords for other players
     default: op
@@ -47,6 +48,7 @@ permissions:
       crazylogin.warnsession: true
       crazylogin.register: true
       crazylogin.commands: true
+      crazylogin.list: true
   crazylogin.register:
     description: Allow players to create a password. (for external registration)
     default: true
@@ -94,4 +96,7 @@ permissions:
     default: op
   crazylogin.playerinfo.extended:
     description: Show link to detailed playerinfo.
+    default: op
+  crazylogin.list:
+    description: List all player accounts.
     default: op

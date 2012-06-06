@@ -2,6 +2,7 @@ package de.st_ddt.crazylogin;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,6 +45,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
+import de.st_ddt.crazyutil.ToStringDataGetter;
 import de.st_ddt.crazyutil.databases.Database;
 import de.st_ddt.crazyutil.databases.DatabaseType;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
@@ -138,6 +140,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			commandWhiteList.add("/login");
 			commandWhiteList.add("/register");
 			commandWhiteList.add("/crazylogin password");
+			commandWhiteList.add("/worldedit cui");
 		}
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
@@ -441,6 +444,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			commandMainPlayer(sender, args);
 			return true;
 		}
+		if (commandLabel.equalsIgnoreCase("list") || commandLabel.equalsIgnoreCase("accounts"))
+		{
+			commandMainList(sender, args);
+			return true;
+		}
 		if (commandLabel.equalsIgnoreCase("mode"))
 		{
 			commandMainMode(sender, args);
@@ -549,6 +557,34 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					database.save(data);
 				return;
 		}
+	}
+
+	private void commandMainList(CommandSender sender, String[] args) throws CrazyCommandException
+	{
+		if (!sender.hasPermission("crazylogin.list"))
+			throw new CrazyCommandPermissionException();
+		int page;
+		switch (args.length)
+		{
+			case 0:
+				page = 1;
+				break;
+			case 1:
+				try
+				{
+					page = Integer.parseInt(args[0]);
+				}
+				catch (final NumberFormatException e)
+				{
+					throw new CrazyCommandParameterException(1, "Integer");
+				}
+				break;
+			default:
+				throw new CrazyCommandUsageException("/crazylogin list [Page]");
+		}
+		ArrayList<LoginPlayerData> dataList = new ArrayList<LoginPlayerData>();
+		dataList.addAll(datas.values());
+		sendListMessage(sender, "PLAYERDATA.LIST.HEAD", page, dataList, new ToStringDataGetter());
 	}
 
 	private void commandMainDelete(final CommandSender sender, final String[] args) throws CrazyCommandException
@@ -979,20 +1015,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		if (!sender.hasPermission("crazylogin.commands"))
 			throw new CrazyCommandPermissionException();
-		final int maxPage = (commandWhiteList.size() + 9) / 10;
+		int page = 1;
 		switch (args.length)
 		{
-			case 0:
-				sendLocaleMessage("COMMAND.LISTHEAD", sender, 1, maxPage);
-				sendLocaleMessage("LIST.SEPERATOR", sender);
-				if (commandWhiteList.size() == 0)
-					sendLocaleMessage("LIST.EMPTYPAGE", sender);
-				else
-					for (int i = 0; i < Math.min(10, commandWhiteList.size()); i++)
-						sendLocaleMessage("LIST.ENTRY", sender, i + 1, commandWhiteList.get(i));
-				return;
 			case 1:
-				int page = 1;
+				page = 1;
 				try
 				{
 					page = Integer.parseInt(args[0]);
@@ -1001,13 +1028,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				{
 					throw new CrazyCommandParameterException(1, "Integer");
 				}
-				sendLocaleMessage("COMMAND.LISTHEAD", sender, 1, (commandWhiteList.size() + 9) / 10);
-				sendLocaleMessage("LIST.SEPERATOR", sender);
-				if (commandWhiteList.size() <= (page - 1) * 10)
-					sendLocaleMessage("LIST.EMPTYPAGE", sender);
-				else
-					for (int i = (page - 1) * 10; i < Math.min(page * 10, commandWhiteList.size()); i++)
-						sendLocaleMessage("LIST.ENTRY", sender, i + 1, commandWhiteList.get(i));
+			case 0:
+				sendListMessage(sender, "COMMAND.LIST.HEAD", page, commandWhiteList, new ToStringDataGetter());
 				return;
 			default:
 				final String[] newArgs = ChatHelper.shiftArray(args, 1);
