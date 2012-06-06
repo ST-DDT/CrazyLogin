@@ -444,6 +444,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			commandMainPlayer(sender, args);
 			return true;
 		}
+		if (commandLabel.equalsIgnoreCase("ip") || commandLabel.equalsIgnoreCase("ips"))
+		{
+			commandMainIPs(sender, args);
+			return true;
+		}
 		if (commandLabel.equalsIgnoreCase("list") || commandLabel.equalsIgnoreCase("accounts"))
 		{
 			commandMainList(sender, args);
@@ -559,6 +564,31 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 	}
 
+	private void commandMainIPs(CommandSender sender, String[] args) throws CrazyCommandException
+	{
+		if (!sender.hasPermission("crazylogin.ips"))
+			throw new CrazyCommandPermissionException();
+		int page = 1;
+		switch (args.length)
+		{
+			case 2:
+				try
+				{
+					page = Integer.parseInt(args[0]);
+				}
+				catch (final NumberFormatException e)
+				{
+					throw new CrazyCommandParameterException(1, "Integer");
+				}
+			case 1:
+				break;
+			default:
+				throw new CrazyCommandUsageException("/crazylogin ip <IP> [Page]");
+		}
+		String IP = args[0];
+		sendListMessage(sender, "IPS.LISTHEAD", page, getRegistrationsPerIP(IP), new ToStringDataGetter());
+	}
+
 	private void commandMainList(CommandSender sender, String[] args) throws CrazyCommandException
 	{
 		if (!sender.hasPermission("crazylogin.list"))
@@ -584,7 +614,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		ArrayList<LoginPlayerData> dataList = new ArrayList<LoginPlayerData>();
 		dataList.addAll(datas.values());
-		sendListMessage(sender, "PLAYERDATA.LIST.HEAD", page, dataList, new ToStringDataGetter());
+		sendListMessage(sender, "PLAYERDATA.LISTHEAD", page, dataList, new ToStringDataGetter());
 	}
 
 	private void commandMainDelete(final CommandSender sender, final String[] args) throws CrazyCommandException
@@ -1029,7 +1059,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					throw new CrazyCommandParameterException(1, "Integer");
 				}
 			case 0:
-				sendListMessage(sender, "COMMAND.LIST.HEAD", page, commandWhiteList, new ToStringDataGetter());
+				sendListMessage(sender, "COMMAND.LISTHEAD", page, commandWhiteList, new ToStringDataGetter());
 				return;
 			default:
 				final String[] newArgs = ChatHelper.shiftArray(args, 1);
