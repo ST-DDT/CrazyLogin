@@ -125,7 +125,6 @@ public class CrazyLoginPlayerListener implements Listener
 	@EventHandler
 	public void PlayerInventoryOpen(final InventoryOpenEvent event)
 	{
-		System.out.println("OPEN");
 		if (!(event.getPlayer() instanceof Player))
 			return;
 		Player player = (Player) event.getPlayer();
