@@ -3,6 +3,7 @@ package de.st_ddt.crazylogin;
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,6 +45,8 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
+import de.st_ddt.crazyutil.Named;
+import de.st_ddt.crazyutil.NamedComparator;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.ToStringDataGetter;
 import de.st_ddt.crazyutil.databases.Database;
@@ -586,7 +589,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				throw new CrazyCommandUsageException("/crazylogin ip <IP> [Page]");
 		}
 		String IP = args[0];
-		sendListMessage(sender, "IPS.LISTHEAD", page, getRegistrationsPerIP(IP), new ToStringDataGetter());
+		ArrayList<Named> dataList = new ArrayList<Named>();
+		dataList.addAll(getRegistrationsPerIP(IP));
+		Collections.sort(dataList, new NamedComparator());
+		sendListMessage(sender, "IPS.LISTHEAD", page, dataList, new ToStringDataGetter());
 	}
 
 	private void commandMainList(CommandSender sender, String[] args) throws CrazyCommandException
@@ -612,8 +618,9 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			default:
 				throw new CrazyCommandUsageException("/crazylogin list [Page]");
 		}
-		ArrayList<LoginPlayerData> dataList = new ArrayList<LoginPlayerData>();
+		ArrayList<Named> dataList = new ArrayList<Named>();
 		dataList.addAll(datas.values());
+		Collections.sort(dataList, new NamedComparator());
 		sendListMessage(sender, "PLAYERDATA.LISTHEAD", page, dataList, new ToStringDataGetter());
 	}
 
@@ -1105,9 +1112,9 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	}
 
 	@Override
-	public HashMap<String, LoginData> getPlayerData()
+	public HashMap<String, LoginPlayerData> getPlayerData()
 	{
-		final HashMap<String, LoginData> res = new HashMap<String, LoginData>();
+		final HashMap<String, LoginPlayerData> res = new HashMap<String, LoginPlayerData>();
 		res.putAll(datas);
 		return res;
 	}
@@ -1153,9 +1160,9 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	}
 
 	@Override
-	public List<LoginData> getRegistrationsPerIP(final String ip)
+	public List<LoginPlayerData> getRegistrationsPerIP(final String ip)
 	{
-		final List<LoginData> list = new LinkedList<LoginData>();
+		final List<LoginPlayerData> list = new LinkedList<LoginPlayerData>();
 		for (final LoginPlayerData data : datas.values())
 			if (data.hasIP(ip))
 				list.add(data);
