@@ -250,8 +250,8 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public void addIP(final String ip)
 	{
-		if (!ips.contains(ip))
-			ips.add(0, ip);
+		ips.remove(ip);
+		ips.add(0, ip);
 		while (ips.size() > 5)
 			ips.remove(5);
 	}
@@ -260,6 +260,14 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	public boolean hasIP(final String ip)
 	{
 		return ips.contains(ip);
+	}
+
+	@Override
+	public String getLatestIP()
+	{
+		if (ips.isEmpty())
+			return "";
+		return ips.get(0);
 	}
 
 	@Override

@@ -45,8 +45,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
-import de.st_ddt.crazyutil.Named;
-import de.st_ddt.crazyutil.NamedComparator;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.ToStringDataGetter;
 import de.st_ddt.crazyutil.databases.Database;
@@ -572,56 +570,126 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		if (!sender.hasPermission("crazylogin.ips"))
 			throw new CrazyCommandPermissionException();
 		int page = 1;
-		switch (args.length)
+		int amount = 10;
+		int length = args.length;
+		LoginPlayerDataComparator comparator = new LoginPlayerDataNameComparator();
+		if (length == 0)
+			throw new CrazyCommandUsageException("/crazylogin ip <IP> [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
+		String IP = args[0];
+		for (int i = 1; i < length; i++)
 		{
-			case 2:
+			if (args[i].toLowerCase().startsWith("page:"))
 				try
 				{
-					page = Integer.parseInt(args[0]);
+					page = Integer.parseInt(args[i].substring(5));
 				}
-				catch (final NumberFormatException e)
+				catch (NumberFormatException e)
 				{
-					throw new CrazyCommandParameterException(1, "Integer");
+					throw new CrazyCommandParameterException(i, "page:Integer");
 				}
-			case 1:
-				break;
-			default:
-				throw new CrazyCommandUsageException("/crazylogin ip <IP> [Page]");
+			else if (args[i].toLowerCase().startsWith("amount:"))
+			{
+				if (args[i].substring(7).equals("*"))
+					amount = -1;
+				else
+					try
+					{
+						amount = Integer.parseInt(args[i].substring(7));
+					}
+					catch (NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(i, "amount:Integer");
+					}
+			}
+			else if (args[i].toLowerCase().startsWith("sort:"))
+			{
+				String temp = args[i].substring(5);
+				if (temp.equalsIgnoreCase("name"))
+					comparator = new LoginPlayerDataNameComparator();
+				else if (temp.equalsIgnoreCase("ip"))
+					comparator = new LoginPlayerDataIPComparator();
+				else if (temp.equalsIgnoreCase("date"))
+					comparator = new LoginPlayerDataLastActionComparator();
+				else
+					throw new CrazyCommandParameterException(i, "sortType", "sort:Name/IP/Date");
+			}
+			else
+				try
+				{
+					page = Integer.parseInt(args[i]);
+				}
+				catch (NumberFormatException e)
+				{
+					throw new CrazyCommandUsageException("/crazylogin ip <IP> [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
+				}
 		}
-		String IP = args[0];
-		ArrayList<Named> dataList = new ArrayList<Named>();
+		ArrayList<LoginPlayerData> dataList = new ArrayList<LoginPlayerData>();
 		dataList.addAll(getRegistrationsPerIP(IP));
-		Collections.sort(dataList, new NamedComparator());
-		sendListMessage(sender, "IPS.LISTHEAD", page, dataList, new ToStringDataGetter());
+		Collections.sort(dataList, comparator);
+		sendListMessage(sender, "IPS.LISTHEAD", amount, page, dataList, new ToStringDataGetter());
 	}
 
 	private void commandMainList(CommandSender sender, String[] args) throws CrazyCommandException
 	{
 		if (!sender.hasPermission("crazylogin.list"))
 			throw new CrazyCommandPermissionException();
-		int page;
-		switch (args.length)
+		int page = 1;
+		int amount = 10;
+		int length = args.length;
+		LoginPlayerDataComparator comparator = new LoginPlayerDataNameComparator();
+		if (length == 0)
+			throw new CrazyCommandUsageException("/crazylogin list [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
+		for (int i = 1; i < length; i++)
 		{
-			case 0:
-				page = 1;
-				break;
-			case 1:
+			if (args[i].toLowerCase().startsWith("page:"))
 				try
 				{
-					page = Integer.parseInt(args[0]);
+					page = Integer.parseInt(args[i].substring(5));
 				}
-				catch (final NumberFormatException e)
+				catch (NumberFormatException e)
 				{
-					throw new CrazyCommandParameterException(1, "Integer");
+					throw new CrazyCommandParameterException(i, "page:Integer");
 				}
-				break;
-			default:
-				throw new CrazyCommandUsageException("/crazylogin list [Page]");
+			else if (args[i].toLowerCase().startsWith("amount:"))
+			{
+				if (args[i].substring(7).equals("*"))
+					amount = -1;
+				else
+					try
+					{
+						amount = Integer.parseInt(args[i].substring(7));
+					}
+					catch (NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(i, "amount:Integer");
+					}
+			}
+			else if (args[i].toLowerCase().startsWith("sort:"))
+			{
+				String temp = args[i].substring(5);
+				if (temp.equalsIgnoreCase("name"))
+					comparator = new LoginPlayerDataNameComparator();
+				else if (temp.equalsIgnoreCase("ip"))
+					comparator = new LoginPlayerDataIPComparator();
+				else if (temp.equalsIgnoreCase("date"))
+					comparator = new LoginPlayerDataLastActionComparator();
+				else
+					throw new CrazyCommandParameterException(i, "sortType", "sort:Name/IP/Date");
+			}
+			else
+				try
+				{
+					page = Integer.parseInt(args[i]);
+				}
+				catch (NumberFormatException e)
+				{
+					throw new CrazyCommandUsageException("/crazylogin list [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
+				}
 		}
-		ArrayList<Named> dataList = new ArrayList<Named>();
+		ArrayList<LoginPlayerData> dataList = new ArrayList<LoginPlayerData>();
 		dataList.addAll(datas.values());
-		Collections.sort(dataList, new NamedComparator());
-		sendListMessage(sender, "PLAYERDATA.LISTHEAD", page, dataList, new ToStringDataGetter());
+		Collections.sort(dataList, comparator);
+		sendListMessage(sender, "PLAYERDATA.LISTHEAD", amount, page, dataList, new ToStringDataGetter());
 	}
 
 	private void commandMainDelete(final CommandSender sender, final String[] args) throws CrazyCommandException
@@ -1066,7 +1134,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					throw new CrazyCommandParameterException(1, "Integer");
 				}
 			case 0:
-				sendListMessage(sender, "COMMAND.LISTHEAD", page, commandWhiteList, new ToStringDataGetter());
+				sendListMessage(sender, "COMMAND.LISTHEAD", 10, page, commandWhiteList, new ToStringDataGetter());
 				return;
 			default:
 				final String[] newArgs = ChatHelper.shiftArray(args, 1);
