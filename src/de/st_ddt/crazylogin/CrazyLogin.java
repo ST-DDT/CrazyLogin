@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -36,6 +38,7 @@ import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
 import de.st_ddt.crazylogin.events.LoginFailReason;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazyplugin.CrazyPlugin;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExceedingLimitsException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
@@ -442,12 +445,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		if (commandLabel.equalsIgnoreCase("player") || commandLabel.equalsIgnoreCase("playerinfo"))
 		{
-			commandMainPlayer(sender, args);
-			return true;
-		}
-		if (commandLabel.equalsIgnoreCase("ip") || commandLabel.equalsIgnoreCase("ips"))
-		{
-			commandMainIPs(sender, args);
+			commandMainPlayerInfo(sender, args);
 			return true;
 		}
 		if (commandLabel.equalsIgnoreCase("list") || commandLabel.equalsIgnoreCase("accounts"))
@@ -565,113 +563,64 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 	}
 
-	private void commandMainIPs(CommandSender sender, String[] args) throws CrazyCommandException
-	{
-		if (!sender.hasPermission("crazylogin.ips"))
-			throw new CrazyCommandPermissionException();
-		int page = 1;
-		int amount = 10;
-		int length = args.length;
-		LoginPlayerDataComparator comparator = new LoginPlayerDataNameComparator();
-		if (length == 0)
-			throw new CrazyCommandUsageException("/crazylogin ip <IP> [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
-		String IP = args[0];
-		for (int i = 1; i < length; i++)
-		{
-			if (args[i].toLowerCase().startsWith("page:"))
-				try
-				{
-					page = Integer.parseInt(args[i].substring(5));
-				}
-				catch (NumberFormatException e)
-				{
-					throw new CrazyCommandParameterException(i, "page:Integer");
-				}
-			else if (args[i].toLowerCase().startsWith("amount:"))
-			{
-				if (args[i].substring(7).equals("*"))
-					amount = -1;
-				else
-					try
-					{
-						amount = Integer.parseInt(args[i].substring(7));
-					}
-					catch (NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(i, "amount:Integer");
-					}
-			}
-			else if (args[i].toLowerCase().startsWith("sort:"))
-			{
-				String temp = args[i].substring(5);
-				if (temp.equalsIgnoreCase("name"))
-					comparator = new LoginPlayerDataNameComparator();
-				else if (temp.equalsIgnoreCase("ip"))
-					comparator = new LoginPlayerDataIPComparator();
-				else if (temp.equalsIgnoreCase("date") || temp.equalsIgnoreCase("time"))
-					comparator = new LoginPlayerDataLastActionComparator();
-				else
-					throw new CrazyCommandParameterException(i, "sortType", "sort:Name/IP/Date");
-			}
-			else
-				try
-				{
-					page = Integer.parseInt(args[i]);
-				}
-				catch (NumberFormatException e)
-				{
-					throw new CrazyCommandUsageException("/crazylogin ip <IP> [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
-				}
-		}
-		ArrayList<LoginPlayerData> dataList = new ArrayList<LoginPlayerData>();
-		dataList.addAll(getRegistrationsPerIP(IP));
-		Collections.sort(dataList, comparator);
-		sendListMessage(sender, "IPS.LISTHEAD", amount, page, dataList, new ToStringDataGetter());
-	}
-
-	private void commandMainList(CommandSender sender, String[] args) throws CrazyCommandException
+	private void commandMainList(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		if (!sender.hasPermission("crazylogin.list"))
 			throw new CrazyCommandPermissionException();
 		int page = 1;
 		int amount = 10;
-		int length = args.length;
+		final int length = args.length;
+		String nameFilter = null;
+		String IPFilter = null;
 		LoginPlayerDataComparator comparator = new LoginPlayerDataNameComparator();
-		if (length == 0)
-			throw new CrazyCommandUsageException("/crazylogin list [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
-		for (int i = 1; i < length; i++)
+		for (int i = 0; i < length; i++)
 		{
-			if (args[i].toLowerCase().startsWith("page:"))
+			final String arg = args[i].toLowerCase();
+			if (arg.startsWith("page:"))
 				try
 				{
-					page = Integer.parseInt(args[i].substring(5));
+					page = Integer.parseInt(arg.substring(5));
 				}
-				catch (NumberFormatException e)
+				catch (final NumberFormatException e)
 				{
 					throw new CrazyCommandParameterException(i, "page:Integer");
 				}
-			else if (args[i].toLowerCase().startsWith("amount:"))
+			else if (arg.startsWith("amount:"))
 			{
-				if (args[i].substring(7).equals("*"))
+				if (arg.substring(7).equals("*"))
 					amount = -1;
 				else
 					try
 					{
-						amount = Integer.parseInt(args[i].substring(7));
+						amount = Integer.parseInt(arg.substring(7));
 					}
-					catch (NumberFormatException e)
+					catch (final NumberFormatException e)
 					{
 						throw new CrazyCommandParameterException(i, "amount:Integer");
 					}
 			}
-			else if (args[i].toLowerCase().startsWith("sort:"))
+			else if (arg.startsWith("name:"))
 			{
-				String temp = args[i].substring(5);
-				if (temp.equalsIgnoreCase("name"))
+				if (arg.substring(5).equals("*"))
+					nameFilter = null;
+				else
+					nameFilter = arg.substring(5).toLowerCase();
+			}
+			else if (arg.startsWith("ip:"))
+			{
+				if (arg.substring(3).equals("*"))
+					IPFilter = null;
+				else
+					IPFilter = arg.substring(3);
+			}
+			else if (arg.startsWith("sort:"))
+			{
+				final String temp = arg.substring(5);
+				if (temp.equals("name"))
 					comparator = new LoginPlayerDataNameComparator();
-				else if (temp.equalsIgnoreCase("ip"))
+				else if (temp.equals("ip"))
 					comparator = new LoginPlayerDataIPComparator();
-				else if (temp.equalsIgnoreCase("date") || temp.equalsIgnoreCase("time"))
+				else if (temp.equals("date") || temp.equals("time"))
 					comparator = new LoginPlayerDataLastActionComparator();
 				else
 					throw new CrazyCommandParameterException(i, "sortType", "sort:Name/IP/Date");
@@ -679,15 +628,34 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			else
 				try
 				{
-					page = Integer.parseInt(args[i]);
+					page = Integer.parseInt(arg);
 				}
-				catch (NumberFormatException e)
+				catch (final NumberFormatException e)
 				{
-					throw new CrazyCommandUsageException("/crazylogin list [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
+					throw new CrazyCommandUsageException("/crazylogin list [name:Player] [ip:IP] [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
 				}
 		}
-		ArrayList<LoginPlayerData> dataList = new ArrayList<LoginPlayerData>();
-		dataList.addAll(datas.values());
+		final ArrayList<LoginPlayerData> dataList = new ArrayList<LoginPlayerData>();
+		if (IPFilter == null)
+			dataList.addAll(datas.values());
+		else
+			dataList.addAll(getRegistrationsPerIP(IPFilter));
+		if (nameFilter != null)
+		{
+			Pattern pattern = null;
+			try
+			{
+				pattern = Pattern.compile(nameFilter);
+			}
+			catch (PatternSyntaxException e)
+			{
+				throw new CrazyCommandErrorException(e);
+			}
+			Iterator<LoginPlayerData> it = dataList.iterator();
+			while (it.hasNext())
+				if (!pattern.matcher(it.next().getName().toLowerCase()).matches())
+					it.remove();
+		}
 		Collections.sort(dataList, comparator);
 		sendListMessage(sender, "PLAYERDATA.LISTHEAD", amount, page, dataList, new ToStringDataGetter());
 	}
@@ -733,7 +701,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETED", sender.getName(), days, amount);
 	}
 
-	private void commandMainPlayer(final CommandSender sender, final String[] args) throws CrazyCommandException
+	private void commandMainPlayerInfo(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
 		Player target = null;
 		switch (args.length)
@@ -1312,7 +1280,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public boolean isTempBanned(final String IP)
 	{
-		Date date = tempBans.get(IP);
+		final Date date = tempBans.get(IP);
 		if (date == null)
 			return false;
 		return new Date().before(date);
@@ -1327,7 +1295,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public String getTempBannedString(final String IP)
 	{
-		Date date = getTempBanned(IP);
+		final Date date = getTempBanned(IP);
 		if (date == null)
 			return DateFormat.format(new Date(0));
 		return DateFormat.format(date);
