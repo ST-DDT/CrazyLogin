@@ -727,10 +727,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		sendLocaleMessage("PLAYERINFO.HEAD", sender, DateFormat.format(new Date()));
 		sendLocaleMessage("PLAYERINFO.USERNAME", sender, target.getName());
 		sendLocaleMessage("PLAYERINFO.DISPLAYNAME", sender, target.getDisplayName());
-		sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, target.getAddress().getAddress().getHostName());
+		sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, target.getAddress().getAddress().getHostAddress());
 		sendLocaleMessage("PLAYERINFO.CONNECTION", sender, target.getAddress().getHostName());
 		if (sender.hasPermission("crazylogin.playerinfo.extended"))
-			sendLocaleMessage("PLAYERINFO.URL", sender, target.getAddress().getAddress().getHostName());
+			sendLocaleMessage("PLAYERINFO.URL", sender, target.getAddress().getAddress().getHostAddress());
 	}
 
 	private void commandMainMode(final CommandSender sender, final String[] args) throws CrazyCommandException
