@@ -608,7 +608,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					comparator = new LoginPlayerDataNameComparator();
 				else if (temp.equalsIgnoreCase("ip"))
 					comparator = new LoginPlayerDataIPComparator();
-				else if (temp.equalsIgnoreCase("date"))
+				else if (temp.equalsIgnoreCase("date") || temp.equalsIgnoreCase("time"))
 					comparator = new LoginPlayerDataLastActionComparator();
 				else
 					throw new CrazyCommandParameterException(i, "sortType", "sort:Name/IP/Date");
@@ -671,7 +671,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					comparator = new LoginPlayerDataNameComparator();
 				else if (temp.equalsIgnoreCase("ip"))
 					comparator = new LoginPlayerDataIPComparator();
-				else if (temp.equalsIgnoreCase("date"))
+				else if (temp.equalsIgnoreCase("date") || temp.equalsIgnoreCase("time"))
 					comparator = new LoginPlayerDataLastActionComparator();
 				else
 					throw new CrazyCommandParameterException(i, "sortType", "sort:Name/IP/Date");
