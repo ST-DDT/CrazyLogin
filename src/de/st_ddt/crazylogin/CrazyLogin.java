@@ -572,6 +572,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		final int length = args.length;
 		String nameFilter = null;
 		String IPFilter = null;
+		Boolean onlineFilter = null;
 		LoginPlayerDataComparator comparator = new LoginPlayerDataNameComparator();
 		for (int i = 0; i < length; i++)
 		{
@@ -612,6 +613,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					IPFilter = null;
 				else
 					IPFilter = arg.substring(3);
+			}
+			else if (arg.startsWith("online:"))
+			{
+				final String temp = arg.substring(7);
+				if (temp.equals("*"))
+					onlineFilter = null;
+				else if (temp.equalsIgnoreCase("true") || temp.equals("1"))
+					onlineFilter = true;
+				else
+					onlineFilter = false;
 			}
 			else if (arg.startsWith("sort:"))
 			{
@@ -654,6 +665,13 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			Iterator<LoginPlayerData> it = dataList.iterator();
 			while (it.hasNext())
 				if (!pattern.matcher(it.next().getName().toLowerCase()).matches())
+					it.remove();
+		}
+		if (onlineFilter != null)
+		{
+			Iterator<LoginPlayerData> it = dataList.iterator();
+			while (it.hasNext())
+				if (!onlineFilter.equals(it.next().isOnline()))
 					it.remove();
 		}
 		Collections.sort(dataList, comparator);
