@@ -178,7 +178,9 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		else if (algorithm.equalsIgnoreCase("Custom"))
 		{
 			final String encryption = config.getString("customEncryptor.class");
-			encryptor = ObjectSaveLoadHelper.load(encryption, CustomEncryptor.class, new Class[0], new Object[0]);
+			if (config.getConfigurationSection("customEncryptor") == null)
+				config.createSection("customEncryptor");
+			encryptor = ObjectSaveLoadHelper.load(encryption, CustomEncryptor.class, new Class[] { LoginPlugin.class, ConfigurationSection.class }, new Object[] { this, config.getConfigurationSection("customEncryptor") });
 		}
 		else
 		{
