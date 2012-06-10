@@ -4,7 +4,7 @@ public class LoginPlayerDataIPComparator implements LoginPlayerDataComparator
 {
 
 	@Override
-	public int compare(LoginPlayerData o1, LoginPlayerData o2)
+	public int compare(final LoginPlayerData o1, final LoginPlayerData o2)
 	{
 		return o1.getLatestIP().compareTo(o2.getLatestIP());
 	}

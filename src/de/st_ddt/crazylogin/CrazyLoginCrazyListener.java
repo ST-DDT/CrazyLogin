@@ -10,7 +10,7 @@ public class CrazyLoginCrazyListener implements Listener
 
 	protected final CrazyLogin plugin;
 
-	public CrazyLoginCrazyListener(CrazyLogin plugin)
+	public CrazyLoginCrazyListener(final CrazyLogin plugin)
 	{
 		super();
 		this.plugin = plugin;
@@ -22,7 +22,7 @@ public class CrazyLoginCrazyListener implements Listener
 	}
 
 	@EventHandler
-	public void CrazyPlayerRemoveEvent(CrazyPlayerRemoveEvent event)
+	public void CrazyPlayerRemoveEvent(final CrazyPlayerRemoveEvent event)
 	{
 		if (plugin.deletePlayerData(event.getPlayer()))
 			event.markDeletion(plugin);

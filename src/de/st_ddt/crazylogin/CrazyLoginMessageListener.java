@@ -1,6 +1,7 @@
 package de.st_ddt.crazylogin;
 
 import org.bukkit.entity.Player;
+
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
 import de.st_ddt.crazyplugin.CrazyPluginMessageListener;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
@@ -18,7 +19,7 @@ public class CrazyLoginMessageListener extends CrazyPluginMessageListener
 	}
 
 	@Override
-	public void pluginMessageRecieved(String channel, Player player, String message)
+	public void pluginMessageRecieved(final String channel, final Player player, String message)
 	{
 		if (message.equals("Q_sAuth"))
 		{
@@ -42,7 +43,7 @@ public class CrazyLoginMessageListener extends CrazyPluginMessageListener
 			{
 				plugin.command(player, "login", message.split(" "));
 			}
-			catch (CrazyException e)
+			catch (final CrazyException e)
 			{
 				e.print(player, plugin.getChatHeader());
 			}
@@ -55,7 +56,7 @@ public class CrazyLoginMessageListener extends CrazyPluginMessageListener
 			{
 				plugin.commandMain(player, "password", message.split(" "));
 			}
-			catch (CrazyException e)
+			catch (final CrazyException e)
 			{
 				e.print(player, plugin.getChatHeader());
 			}
@@ -67,7 +68,7 @@ public class CrazyLoginMessageListener extends CrazyPluginMessageListener
 			{
 				plugin.command(player, "logout", null);
 			}
-			catch (CrazyException e)
+			catch (final CrazyException e)
 			{
 				e.print(player, plugin.getChatHeader());
 			}
@@ -81,7 +82,7 @@ public class CrazyLoginMessageListener extends CrazyPluginMessageListener
 		{
 			return encryptor.encrypt(player.getName() + " " + player.getAddress().getAddress().getHostAddress(), null, plugin.getUniqueIDKey());
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			return "";
 		}

@@ -9,10 +9,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import de.st_ddt.crazyplugin.CrazyPluginInterface;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyutil.ChatHelper;
@@ -208,6 +211,18 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	}
 
 	@Override
+	public Player getPlayer()
+	{
+		return Bukkit.getPlayer(player);
+	}
+
+	@Override
+	public OfflinePlayer getOfflinePlayer()
+	{
+		return Bukkit.getOfflinePlayer(player);
+	}
+
+	@Override
 	public int hashCode()
 	{
 		return player.toLowerCase().hashCode();
@@ -289,6 +304,15 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	}
 
 	@Override
+	public boolean isPlayerOnline()
+	{
+		final Player player = getPlayer();
+		if (player == null)
+			return false;
+		return player.isOnline();
+	}
+
+	@Override
 	public boolean login(final String password)
 	{
 		this.online = isPassword(password);
@@ -316,7 +340,22 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	public String toString()
 	{
 		if (ips.size() == 0)
-			return ChatColor.WHITE + getName() + " " + CrazyLogin.DateFormat.format(lastAction);
-		return (online ? ChatColor.GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyLogin.DateFormat.format(lastAction) + " @" + ips.get(0);
+			return ChatColor.WHITE + getName() + " " + CrazyPluginInterface.DateFormat.format(lastAction);
+		return (online ? ChatColor.GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(lastAction) + " @" + ips.get(0);
+	}
+
+	public void checkTimeOut(final CrazyLogin plugin)
+	{
+		final Date timeOut = new Date();
+		timeOut.setTime(timeOut.getTime() - plugin.getAutoLogoutTime() * 1000);
+		checkTimeOut(plugin, timeOut);
+	}
+
+	public void checkTimeOut(final CrazyLogin plugin, final Date timeOut)
+	{
+		if (isPlayerOnline())
+			return;
+		if (timeOut.after(lastAction))
+			this.online = false;
 	}
 }

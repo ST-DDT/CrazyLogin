@@ -1,6 +1,5 @@
 package de.st_ddt.crazylogin;
 
-import java.util.Date;
 import java.util.HashMap;
 
 import org.bukkit.ChatColor;
@@ -93,12 +92,10 @@ public class CrazyLoginPlayerListener implements Listener
 				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("REGISTER.REQUEST"), true), autoKick * 20);
 			return;
 		}
-		final LoginData playerdata = plugin.getPlayerData(player);
+		final LoginPlayerData playerdata = plugin.getPlayerData(player);
 		if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))
 			playerdata.logout();
-		if (plugin.isAutoLogoutEnabled())
-			if (plugin.getAutoLogoutTime() * 1000 + playerdata.getLastActionTime().getTime() < new Date().getTime())
-				playerdata.logout();
+		playerdata.checkTimeOut(plugin);
 		if (plugin.isLoggedIn(player))
 			return;
 		Location location = player.getLocation();
@@ -137,7 +134,7 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		if (!(event.getPlayer() instanceof Player))
 			return;
-		Player player = (Player) event.getPlayer();
+		final Player player = (Player) event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
@@ -232,8 +229,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = (Player) event.getEntity();
 		if (plugin.isLoggedIn(player))
 			return;
-		Location location = player.getWorld().getSpawnLocation();
-		player.teleport(location, TeleportCause.PLUGIN);
+		player.teleport(player.getWorld().getSpawnLocation(), TeleportCause.PLUGIN);
 		event.setCancelled(true);
 	}
 
@@ -245,8 +241,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = (Player) event.getEntity();
 		if (plugin.isLoggedIn(player))
 			return;
-		Location location = player.getWorld().getSpawnLocation();
-		player.teleport(location, TeleportCause.PLUGIN);
+		player.teleport(player.getWorld().getSpawnLocation(), TeleportCause.PLUGIN);
 		event.setCancelled(true);
 	}
 
@@ -292,7 +287,7 @@ public class CrazyLoginPlayerListener implements Listener
 		addToMovementBlocker(player.getName(), player.getLocation());
 	}
 
-	public void addToMovementBlocker(final String player, Location location)
+	public void addToMovementBlocker(final String player, final Location location)
 	{
 		movementBlocker.put(player.toLowerCase(), location);
 	}
@@ -319,15 +314,15 @@ public class CrazyLoginPlayerListener implements Listener
 			movementBlocker.clear();
 	}
 
-	public void disableSaveLogin(Player player)
+	public void disableSaveLogin(final Player player)
 	{
-		Location location = savelogin.remove(player.getName().toLowerCase());
+		final Location location = savelogin.remove(player.getName().toLowerCase());
 		if (location == null)
 			return;
 		player.teleport(location, TeleportCause.PLUGIN);
 	}
 
-	public boolean dropSaveLogin(String player)
+	public boolean dropSaveLogin(final String player)
 	{
 		return savelogin.remove(player.toLowerCase()) != null;
 	}

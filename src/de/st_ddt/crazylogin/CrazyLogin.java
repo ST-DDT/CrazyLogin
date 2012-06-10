@@ -102,6 +102,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		plugin = this;
 		registerHooks();
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new ScheduledCheckTask(this), 30 * 60 * 20, 15 * 60 * 20);
 		super.onEnable();
 	}
 
@@ -664,18 +665,18 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			{
 				pattern = Pattern.compile(nameFilter);
 			}
-			catch (PatternSyntaxException e)
+			catch (final PatternSyntaxException e)
 			{
 				throw new CrazyCommandErrorException(e);
 			}
-			Iterator<LoginPlayerData> it = dataList.iterator();
+			final Iterator<LoginPlayerData> it = dataList.iterator();
 			while (it.hasNext())
 				if (!pattern.matcher(it.next().getName().toLowerCase()).matches())
 					it.remove();
 		}
 		if (onlineFilter != null)
 		{
-			Iterator<LoginPlayerData> it = dataList.iterator();
+			final Iterator<LoginPlayerData> it = dataList.iterator();
 			while (it.hasNext())
 				if (!onlineFilter.equals(it.next().isOnline()))
 					it.remove();
@@ -1266,6 +1267,17 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public int getAutoLogoutTime()
 	{
 		return autoLogout;
+	}
+
+	public void checkTimeOuts()
+	{
+		if (autoLogout > 0)
+		{
+			final Date timeOut = new Date();
+			timeOut.setTime(timeOut.getTime() - plugin.getAutoLogoutTime() * 1000);
+			for (final LoginPlayerData data : plugin.getPlayerData().values())
+				data.checkTimeOut(this, timeOut);
+		}
 	}
 
 	@Override
