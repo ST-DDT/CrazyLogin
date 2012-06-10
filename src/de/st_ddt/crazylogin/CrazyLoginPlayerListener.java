@@ -101,9 +101,8 @@ public class CrazyLoginPlayerListener implements Listener
 		Location location = player.getLocation();
 		if (plugin.isForceSaveLoginEnabled())
 		{
-			savelogin.put(player.getName().toLowerCase(), location);
+			triggerSaveLogin(player);
 			location = player.getWorld().getSpawnLocation();
-			player.teleport(location, TeleportCause.PLUGIN);
 		}
 		if (movementBlocker.get(player.getName().toLowerCase()) == null)
 			movementBlocker.put(player.getName().toLowerCase(), location);
@@ -229,7 +228,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = (Player) event.getEntity();
 		if (plugin.isLoggedIn(player))
 			return;
-		player.teleport(player.getWorld().getSpawnLocation(), TeleportCause.PLUGIN);
+		triggerSaveLogin(player);
 		event.setCancelled(true);
 	}
 
@@ -241,7 +240,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = (Player) event.getEntity();
 		if (plugin.isLoggedIn(player))
 			return;
-		player.teleport(player.getWorld().getSpawnLocation(), TeleportCause.PLUGIN);
+		triggerSaveLogin(player);
 		event.setCancelled(true);
 	}
 
@@ -312,6 +311,13 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 		else
 			movementBlocker.clear();
+	}
+
+	public void triggerSaveLogin(Player player)
+	{
+		if (savelogin.get(player.getName().toLowerCase()) == null)
+			savelogin.put(player.getName().toLowerCase(), player.getLocation());
+		player.teleport(player.getWorld().getSpawnLocation(), TeleportCause.PLUGIN);
 	}
 
 	public void disableSaveLogin(final Player player)
