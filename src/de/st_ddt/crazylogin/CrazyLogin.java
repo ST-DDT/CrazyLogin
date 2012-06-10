@@ -81,6 +81,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected boolean doNotSpamRequests;
 	protected boolean forceSingleSession;
 	protected boolean forceSingleSessionSameIPBypass;
+	protected boolean forceSaveLogin;
 	protected Encryptor encryptor;
 	protected int autoDelete;
 	protected int maxRegistrationsPerIP;
@@ -148,12 +149,13 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
+		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
 		if (autoDelete != -1)
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		moveRange = config.getInt("moveRange", 5);
-		playerListener.clearSaveLogin(false);
+		playerListener.clearMovementBlocker(false);
 		minNameLength = Math.min(Math.max(config.getInt("minNameLength", 3), 1), 16);
 		maxNameLength = Math.min(Math.max(config.getInt("maxNameLength", 16), minNameLength), 16);
 		uniqueIDKey = config.getString("uniqueIDKey");
@@ -203,7 +205,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		for (final Player player : getServer().getOnlinePlayers())
 		{
 			requestLogin(player);
-			playerListener.addToSaveLogin(player);
+			playerListener.addToMovementBlocker(player);
 		}
 	}
 
@@ -326,6 +328,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("autoDelete", autoDelete);
 		config.set("forceSingleSession", forceSingleSession);
 		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
+		config.set("forceSaveLogin", forceSaveLogin);
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
 		config.set("moveRange", moveRange);
@@ -401,7 +404,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		getServer().getPluginManager().callEvent(new CrazyLoginLoginEvent(this, data, player));
 		sendLocaleMessage("LOGIN.SUCCESS", player);
-		playerListener.removeFromSaveLogin(player);
+		playerListener.removeFromMovementBlocker(player);
+		playerListener.disableSaveLogin(player);
 		loginFailures.remove(player.getName().toLowerCase());
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		data.addIP(player.getAddress().getAddress().getHostAddress());
@@ -485,7 +489,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			if (alwaysNeedPassword)
 				throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
 			datas.remove(player.getName().toLowerCase());
-			playerListener.removeFromSaveLogin(player);
+			playerListener.removeFromMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
 			if (database != null)
 				database.delete(player.getName());
@@ -514,7 +518,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
-		playerListener.removeFromSaveLogin(player);
+		playerListener.removeFromMovementBlocker(player);
 		if (database != null)
 			database.save(data);
 	}
@@ -538,7 +542,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				if (target == null)
 					throw new CrazyCommandNoSuchException("Player", args[0]);
 				datas.remove(target.getName().toLowerCase());
-				playerListener.removeFromSaveLogin(target);
+				playerListener.removeFromMovementBlocker(target);
 				sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
 				if (database != null)
 					database.delete(target.getName());
@@ -770,6 +774,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("forceSaveLogin"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					forceSaveLogin = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "forceSaveLogin", forceSaveLogin ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("forceSingleSession"))
 				{
 					boolean newValue = false;
@@ -913,7 +927,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 						newValue = true;
 					resetGuestLocations = newValue;
 					if (resetGuestLocations)
-						playerListener.clearSaveLogin(true);
+						playerListener.clearMovementBlocker(true);
 					sendLocaleMessage("MODE.CHANGE", sender, "resetGuestLocations", resetGuestLocations ? "True" : "False");
 					saveConfiguration();
 					return;
@@ -1011,6 +1025,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "alwaysNeedPassword", alwaysNeedPassword ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("forceSaveLogin"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "forceSaveLogin", forceSaveLogin ? "True" : "False");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("forceSingleSession"))
@@ -1354,6 +1373,12 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public boolean isForceSingleSessionSameIPBypassEnabled()
 	{
 		return forceSingleSessionSameIPBypass;
+	}
+
+	@Override
+	public boolean isForceSaveLoginEnabled()
+	{
+		return forceSaveLogin;
 	}
 
 	@Override

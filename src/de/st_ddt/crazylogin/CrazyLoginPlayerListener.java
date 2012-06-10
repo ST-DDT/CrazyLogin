@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -31,6 +32,7 @@ public class CrazyLoginPlayerListener implements Listener
 {
 
 	private final CrazyLogin plugin;
+	private final HashMap<String, Location> movementBlocker = new HashMap<String, Location>();
 	private final HashMap<String, Location> savelogin = new HashMap<String, Location>();
 
 	public CrazyLoginPlayerListener(final CrazyLogin plugin)
@@ -39,7 +41,7 @@ public class CrazyLoginPlayerListener implements Listener
 		this.plugin = plugin;
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void PlayerLogin(final PlayerLoginEvent event)
 	{
 		final Player player = event.getPlayer();
@@ -70,17 +72,17 @@ public class CrazyLoginPlayerListener implements Listener
 			}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void PlayerJoin(final PlayerJoinEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (savelogin.get(player.getName().toLowerCase()) != null)
-			player.teleport(savelogin.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
+		if (movementBlocker.get(player.getName().toLowerCase()) != null)
+			player.teleport(movementBlocker.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
 		if (!plugin.hasAccount(player))
 		{
 			if (plugin.isResettingGuestLocationsEnabled())
-				if (savelogin.get(player.getName().toLowerCase()) == null)
-					savelogin.put(player.getName().toLowerCase(), player.getLocation());
+				if (movementBlocker.get(player.getName().toLowerCase()) == null)
+					movementBlocker.put(player.getName().toLowerCase(), player.getLocation());
 			if (plugin.isAlwaysNeedPassword())
 				plugin.sendLocaleMessage("REGISTER.HEADER", player);
 			else
@@ -99,8 +101,15 @@ public class CrazyLoginPlayerListener implements Listener
 				playerdata.logout();
 		if (plugin.isLoggedIn(player))
 			return;
-		if (savelogin.get(player.getName().toLowerCase()) == null)
-			savelogin.put(player.getName().toLowerCase(), player.getLocation());
+		Location location = player.getLocation();
+		if (plugin.isForceSaveLoginEnabled())
+		{
+			savelogin.put(player.getName().toLowerCase(), location);
+			location = player.getWorld().getSpawnLocation();
+			player.teleport(location, TeleportCause.PLUGIN);
+		}
+		if (movementBlocker.get(player.getName().toLowerCase()) == null)
+			movementBlocker.put(player.getName().toLowerCase(), location);
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
 		final int autoKick = plugin.getAutoKick();
 		if (autoKick >= 10)
@@ -112,6 +121,7 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		final Player player = event.getPlayer();
 		final LoginData playerdata = plugin.getPlayerData(player);
+		disableSaveLogin(player);
 		if (playerdata != null)
 		{
 			if (!plugin.isLoggedIn(player))
@@ -176,7 +186,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		final Location current = savelogin.get(player.getName().toLowerCase());
+		final Location current = movementBlocker.get(player.getName().toLowerCase());
 		if (current == null)
 			return;
 		if (current.getWorld() == event.getTo().getWorld())
@@ -192,26 +202,13 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		if (savelogin.get(player.getName().toLowerCase()) == null)
+		if (movementBlocker.get(player.getName().toLowerCase()) == null)
 			return;
 		if (event.getCause() == TeleportCause.PLUGIN || event.getCause() == TeleportCause.UNKNOWN)
 		{
-			savelogin.put(player.getName().toLowerCase(), event.getTo());
+			movementBlocker.put(player.getName().toLowerCase(), event.getTo());
 			return;
 		}
-		final Location target = event.getTo();
-		if (target.distance(target.getWorld().getSpawnLocation()) < 10)
-		{
-			savelogin.put(player.getName().toLowerCase(), event.getTo());
-			return;
-		}
-		if (player.getBedSpawnLocation() != null)
-			if (target.getWorld() == player.getBedSpawnLocation().getWorld())
-				if (target.distance(player.getBedSpawnLocation()) < 10)
-				{
-					savelogin.put(player.getName().toLowerCase(), event.getTo());
-					return;
-				}
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
 	}
@@ -235,9 +232,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = (Player) event.getEntity();
 		if (plugin.isLoggedIn(player))
 			return;
-		Location location = player.getBedSpawnLocation();
-		if (location == null)
-			location = player.getWorld().getSpawnLocation();
+		Location location = player.getWorld().getSpawnLocation();
 		player.teleport(location, TeleportCause.PLUGIN);
 		event.setCancelled(true);
 	}
@@ -250,9 +245,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = (Player) event.getEntity();
 		if (plugin.isLoggedIn(player))
 			return;
-		Location location = player.getBedSpawnLocation();
-		if (location == null)
-			location = player.getWorld().getSpawnLocation();
+		Location location = player.getWorld().getSpawnLocation();
 		player.teleport(location, TeleportCause.PLUGIN);
 		event.setCancelled(true);
 	}
@@ -294,35 +287,48 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	public void addToSaveLogin(final Player player)
+	public void addToMovementBlocker(final Player player)
 	{
-		addToSaveLogin(player.getName(), player.getLocation());
+		addToMovementBlocker(player.getName(), player.getLocation());
 	}
 
-	public void addToSaveLogin(final String player, Location location)
+	public void addToMovementBlocker(final String player, Location location)
 	{
-		savelogin.put(player.toLowerCase(), location);
+		movementBlocker.put(player.toLowerCase(), location);
 	}
 
-	public boolean removeFromSaveLogin(final OfflinePlayer player)
+	public boolean removeFromMovementBlocker(final OfflinePlayer player)
 	{
-		return removeFromSaveLogin(player.getName());
+		return removeFromMovementBlocker(player.getName());
 	}
 
-	public boolean removeFromSaveLogin(final String player)
+	public boolean removeFromMovementBlocker(final String player)
 	{
-		return savelogin.remove(player.toLowerCase()) != null;
+		return movementBlocker.remove(player.toLowerCase()) != null;
 	}
 
-	public void clearSaveLogin(final boolean guestsOnly)
+	public void clearMovementBlocker(final boolean guestsOnly)
 	{
 		if (guestsOnly)
 		{
-			for (final String name : savelogin.keySet())
+			for (final String name : movementBlocker.keySet())
 				if (!plugin.hasAccount(name))
-					savelogin.remove(name);
+					movementBlocker.remove(name);
 		}
 		else
-			savelogin.clear();
+			movementBlocker.clear();
+	}
+
+	public void disableSaveLogin(Player player)
+	{
+		Location location = savelogin.remove(player.getName().toLowerCase());
+		if (location == null)
+			return;
+		player.teleport(location, TeleportCause.PLUGIN);
+	}
+
+	public boolean dropSaveLogin(String player)
+	{
+		return savelogin.remove(player.toLowerCase()) != null;
 	}
 }
