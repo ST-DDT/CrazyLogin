@@ -95,7 +95,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
 		if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))
 			playerdata.logout();
-		playerdata.checkTimeOut(plugin);
+		playerdata.checkTimeOut(plugin, false);
 		if (plugin.isLoggedIn(player))
 			return;
 		Location location = player.getLocation();

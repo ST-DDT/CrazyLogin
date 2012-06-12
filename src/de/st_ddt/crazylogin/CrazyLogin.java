@@ -1276,7 +1276,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			final Date timeOut = new Date();
 			timeOut.setTime(timeOut.getTime() - plugin.getAutoLogoutTime() * 1000);
 			for (final LoginPlayerData data : plugin.getPlayerData().values())
-				data.checkTimeOut(this, timeOut);
+				data.checkTimeOut(this, timeOut, true);
 		}
 	}
 

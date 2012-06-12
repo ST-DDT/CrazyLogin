@@ -344,17 +344,18 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		return (online ? ChatColor.GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(lastAction) + " @" + ips.get(0);
 	}
 
-	public void checkTimeOut(final CrazyLogin plugin)
+	public void checkTimeOut(final CrazyLogin plugin, boolean ignoreIfOnline)
 	{
 		final Date timeOut = new Date();
 		timeOut.setTime(timeOut.getTime() - plugin.getAutoLogoutTime() * 1000);
-		checkTimeOut(plugin, timeOut);
+		checkTimeOut(plugin, timeOut, ignoreIfOnline);
 	}
 
-	public void checkTimeOut(final CrazyLogin plugin, final Date timeOut)
+	public void checkTimeOut(final CrazyLogin plugin, final Date timeOut, boolean ignoreIfOnline)
 	{
-		if (isPlayerOnline())
-			return;
+		if (ignoreIfOnline)
+			if (isPlayerOnline())
+				return;
 		if (timeOut.after(lastAction))
 			this.online = false;
 	}
