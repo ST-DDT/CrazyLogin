@@ -32,6 +32,8 @@ permissions:
       crazylogin.warndelete: true
       crazylogin.warnsession: true
       crazylogin.register: true
+      crazylogin.create: true
+      crazylogin.delete: true
       crazylogin.commands: true
       crazylogin.playerinfo: true
       crazylogin.playerinfo.self: true
@@ -48,6 +50,8 @@ permissions:
       crazylogin.warndelete: true
       crazylogin.warnsession: true
       crazylogin.register: true
+      crazylogin.create: true
+      crazylogin.delete: true
       crazylogin.commands: true
       crazylogin.list: true
   crazylogin.register:
