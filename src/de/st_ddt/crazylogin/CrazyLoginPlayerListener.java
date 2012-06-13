@@ -186,7 +186,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (current == null)
 			return;
 		double dist = Double.MAX_VALUE;
-		double moveRange = plugin.getMoveRange();
+		final double moveRange = plugin.getMoveRange();
 		if (current.getWorld() == event.getTo().getWorld())
 			dist = current.distance(event.getTo());
 		if (dist >= moveRange)
