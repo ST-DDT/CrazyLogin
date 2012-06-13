@@ -182,9 +182,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		this.password = rawData[1];
 		try
 		{
-			final String[] ips = rawData[2].split(",");
-			for (final String ip : ips)
-				this.ips.add(ip);
+			if (!rawData[2].equals("."))
+			{
+				final String[] ips = rawData[2].split(",");
+				for (final String ip : ips)
+					this.ips.add(ip);
+			}
 			lastAction = ObjectSaveLoadHelper.StringToDate(rawData[3], new Date());
 		}
 		catch (final IndexOutOfBoundsException e)
