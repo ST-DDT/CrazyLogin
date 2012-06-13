@@ -34,20 +34,24 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	private boolean online;
 	private Date lastAction;
 
+	public LoginPlayerData(final String name)
+	{
+		super();
+		this.player = name;
+		online = false;
+		lastAction = new Date();
+	}
+
+	public LoginPlayerData(final String name, final String ip)
+	{
+		this(name);
+		ips.add(ip);
+	}
+
 	public LoginPlayerData(final Player player)
 	{
 		this(player.getName(), player.getAddress().getAddress().getHostAddress());
 		online = true;
-		lastAction = new Date();
-	}
-
-	public LoginPlayerData(final String player, final String ip)
-	{
-		super();
-		this.player = player;
-		ips.add(ip);
-		online = false;
-		lastAction = new Date();
 	}
 
 	// aus Config-Datenbank laden
@@ -213,7 +217,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public Player getPlayer()
 	{
-		return Bukkit.getPlayer(player);
+		return Bukkit.getPlayerExact(player);
+	}
+
+	protected String getPassword()
+	{
+		return password;
 	}
 
 	@Override
@@ -223,9 +232,23 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	}
 
 	@Override
+	public boolean equals(final Object obj)
+	{
+		if (obj instanceof LoginData)
+			return equals((LoginData) obj);
+		return false;
+	}
+
+	@Override
+	public boolean equals(final LoginData data)
+	{
+		return getName().equals(data.getName()) && data.isPasswordHash(password);
+	}
+
+	@Override
 	public int hashCode()
 	{
-		return player.toLowerCase().hashCode();
+		return player.toLowerCase().hashCode() + password.hashCode();
 	}
 
 	@Override
@@ -260,6 +283,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	public boolean isPassword(final String password)
 	{
 		return CrazyLogin.getPlugin().getEncryptor().match(player, password, this.password);
+	}
+
+	@Override
+	public boolean isPasswordHash(final String hashedPassword)
+	{
+		return password.equals(hashedPassword);
 	}
 
 	@Override
@@ -339,19 +368,20 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public String toString()
 	{
-		if (ips.size() == 0)
-			return ChatColor.WHITE + getName() + " " + CrazyPluginInterface.DateFormat.format(lastAction);
-		return (online ? ChatColor.GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(lastAction) + " @" + ips.get(0);
+		String IP = getLatestIP();
+		if (!IP.equals(""))
+			IP = " @" + IP;
+		return (online ? ChatColor.GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(lastAction) + IP;
 	}
 
-	public void checkTimeOut(final CrazyLogin plugin, boolean ignoreIfOnline)
+	public void checkTimeOut(final CrazyLogin plugin, final boolean ignoreIfOnline)
 	{
 		final Date timeOut = new Date();
 		timeOut.setTime(timeOut.getTime() - plugin.getAutoLogoutTime() * 1000);
 		checkTimeOut(plugin, timeOut, ignoreIfOnline);
 	}
 
-	public void checkTimeOut(final CrazyLogin plugin, final Date timeOut, boolean ignoreIfOnline)
+	public void checkTimeOut(final CrazyLogin plugin, final Date timeOut, final boolean ignoreIfOnline)
 	{
 		if (ignoreIfOnline)
 			if (isPlayerOnline())

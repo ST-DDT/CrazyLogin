@@ -38,6 +38,7 @@ import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
 import de.st_ddt.crazylogin.events.LoginFailReason;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazyplugin.CrazyPlugin;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandAlreadyExistsException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExceedingLimitsException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
@@ -86,7 +87,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected int autoDelete;
 	protected int maxRegistrationsPerIP;
 	protected boolean pluginCommunicationEnabled;
-	protected int moveRange;
+	protected double moveRange;
 	protected int minNameLength;
 	protected int maxNameLength;
 	// Database
@@ -155,7 +156,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
 		if (autoDelete != -1)
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
-		moveRange = config.getInt("moveRange", 5);
+		moveRange = config.getDouble("moveRange", 5);
 		playerListener.clearMovementBlocker(false);
 		minNameLength = Math.min(Math.max(config.getInt("minNameLength", 3), 1), 16);
 		maxNameLength = Math.min(Math.max(config.getInt("maxNameLength", 16), minNameLength), 16);
@@ -465,6 +466,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			commandMainMode(sender, args);
 			return true;
 		}
+		if (commandLabel.equalsIgnoreCase("create"))
+		{
+			commandMainCreate(sender, args);
+			return true;
+		}
 		if (commandLabel.equalsIgnoreCase("delete"))
 		{
 			commandMainDelete(sender, args);
@@ -579,8 +585,9 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		final int length = args.length;
 		String nameFilter = null;
 		String IPFilter = null;
+		Boolean registeredFilter = true;
 		Boolean onlineFilter = null;
-		LoginPlayerDataComparator comparator = new LoginPlayerDataNameComparator();
+		LoginDataComparator comparator = new LoginDataNameComparator();
 		for (int i = 0; i < length; i++)
 		{
 			final String arg = args[i].toLowerCase();
@@ -621,6 +628,17 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				else
 					IPFilter = arg.substring(3);
 			}
+			else if (arg.startsWith("registered:"))
+			{
+				final String temp = arg.substring(11);
+				System.out.println(temp);
+				if (temp.equals("*"))
+					registeredFilter = null;
+				else if (temp.equalsIgnoreCase("true") || temp.equals("1"))
+					registeredFilter = true;
+				else
+					registeredFilter = false;
+			}
 			else if (arg.startsWith("online:"))
 			{
 				final String temp = arg.substring(7);
@@ -635,11 +653,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			{
 				final String temp = arg.substring(5);
 				if (temp.equals("name"))
-					comparator = new LoginPlayerDataNameComparator();
+					comparator = new LoginDataNameComparator();
 				else if (temp.equals("ip"))
-					comparator = new LoginPlayerDataIPComparator();
+					comparator = new LoginDataIPComparator();
 				else if (temp.equals("date") || temp.equals("time"))
-					comparator = new LoginPlayerDataLastActionComparator();
+					comparator = new LoginDataLastActionComparator();
 				else
 					throw new CrazyCommandParameterException(i, "sortType", "sort:Name/IP/Date");
 			}
@@ -650,14 +668,34 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				}
 				catch (final NumberFormatException e)
 				{
-					throw new CrazyCommandUsageException("/crazylogin list [name:Player] [ip:IP] [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
+					throw new CrazyCommandUsageException("/crazylogin list [name:Player] [ip:IP] [registered:True/False/*] [online:True/False/*] [amount:Integer] [sort:Name/IP/Date] [[page:]Integer]");
 				}
 		}
-		final ArrayList<LoginPlayerData> dataList = new ArrayList<LoginPlayerData>();
-		if (IPFilter == null)
+		final ArrayList<LoginData> dataList = new ArrayList<LoginData>();
+		if (registeredFilter == null)
+		{
 			dataList.addAll(datas.values());
+			for (OfflinePlayer offline : getServer().getOfflinePlayers())
+				if (!hasAccount(offline))
+					dataList.add(new LoginUnregisteredPlayerData(offline));
+		}
+		else if (registeredFilter.equals(true))
+		{
+			dataList.addAll(datas.values());
+		}
 		else
-			dataList.addAll(getRegistrationsPerIP(IPFilter));
+		{
+			for (OfflinePlayer offline : getServer().getOfflinePlayers())
+				if (!hasAccount(offline))
+					dataList.add(new LoginUnregisteredPlayerData(offline));
+		}
+		if (IPFilter != null)
+		{
+			final Iterator<LoginData> it = dataList.iterator();
+			while (it.hasNext())
+				if (!it.next().hasIP(IPFilter))
+					it.remove();
+		}
 		if (nameFilter != null)
 		{
 			Pattern pattern = null;
@@ -669,20 +707,38 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			{
 				throw new CrazyCommandErrorException(e);
 			}
-			final Iterator<LoginPlayerData> it = dataList.iterator();
+			final Iterator<LoginData> it = dataList.iterator();
 			while (it.hasNext())
 				if (!pattern.matcher(it.next().getName().toLowerCase()).matches())
 					it.remove();
 		}
 		if (onlineFilter != null)
 		{
-			final Iterator<LoginPlayerData> it = dataList.iterator();
+			final Iterator<LoginData> it = dataList.iterator();
 			while (it.hasNext())
 				if (!onlineFilter.equals(it.next().isOnline()))
 					it.remove();
 		}
 		Collections.sort(dataList, comparator);
 		sendListMessage(sender, "PLAYERDATA.LISTHEAD", amount, page, dataList, new ToStringDataGetter());
+	}
+
+	private void commandMainCreate(final CommandSender sender, final String[] args) throws CrazyCommandException
+	{
+		if (!sender.hasPermission("crazylogin.create"))
+			throw new CrazyCommandPermissionException();
+		if (args.length < 2)
+			throw new CrazyCommandUsageException("/crazylogin create <Name> <Password>");
+		final String name = args[0];
+		if (getPlayerData(name) != null)
+			throw new CrazyCommandAlreadyExistsException("Accout", name);
+		final LoginPlayerData data = new LoginPlayerData(name);
+		datas.put(name.toLowerCase(), data);
+		final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
+		data.setPassword(password);
+		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
+		if (database != null)
+			database.save(data);
 	}
 
 	private void commandMainDelete(final CommandSender sender, final String[] args) throws CrazyCommandException
@@ -975,10 +1031,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				}
 				else if (args[0].equalsIgnoreCase("moveRange"))
 				{
-					int range = moveRange;
+					double range = moveRange;
 					try
 					{
-						range = Integer.parseInt(args[1]);
+						range = Double.parseDouble(args[1]);
 					}
 					catch (final NumberFormatException e)
 					{
@@ -1417,7 +1473,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	}
 
 	@Override
-	public int getMoveRange()
+	public double getMoveRange()
 	{
 		return moveRange;
 	}

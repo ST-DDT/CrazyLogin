@@ -7,7 +7,7 @@ public class DropInactiveAccountsTask implements Runnable
 
 	private final CrazyLogin plugin;
 
-	public DropInactiveAccountsTask(CrazyLogin plugin)
+	public DropInactiveAccountsTask(final CrazyLogin plugin)
 	{
 		super();
 		this.plugin = plugin;
@@ -16,10 +16,10 @@ public class DropInactiveAccountsTask implements Runnable
 	@Override
 	public void run()
 	{
-		int amount = plugin.dropInactiveAccounts();
+		final int amount = plugin.dropInactiveAccounts();
 		if (amount > 0)
 		{
-			int autoDelete = plugin.getAutoDelete();
+			final int autoDelete = plugin.getAutoDelete();
 			plugin.broadcastLocaleMessage("ACCOUNTS.DELETED", "DropTask", autoDelete, amount);
 		}
 	}

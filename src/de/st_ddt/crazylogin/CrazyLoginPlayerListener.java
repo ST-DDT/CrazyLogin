@@ -313,7 +313,7 @@ public class CrazyLoginPlayerListener implements Listener
 			movementBlocker.clear();
 	}
 
-	public void triggerSaveLogin(Player player)
+	public void triggerSaveLogin(final Player player)
 	{
 		if (savelogin.get(player.getName().toLowerCase()) == null)
 			savelogin.put(player.getName().toLowerCase(), player.getLocation());

@@ -2,7 +2,7 @@ name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
 #C*=needed core version
-version: C7.5_5.10
+version: C7.5_5.11
 depend: [CrazyCore]
 description: >
             CrazyLogin protect your server with passwords and many usefully features.
@@ -70,6 +70,9 @@ permissions:
     default: op
   crazylogin.warndelete:
     description: Get informed if old accounts are deleted (via admincommands)
+    default: op
+  crazylogin.create:
+    description: Allow creating new accounts for another player.
     default: op
   crazylogin.delete:
     description: Allow deleting old accounts.

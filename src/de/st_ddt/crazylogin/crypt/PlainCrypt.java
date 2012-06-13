@@ -4,13 +4,13 @@ public class PlainCrypt implements Encryptor
 {
 
 	@Override
-	public String encrypt(String name, String salt, String password)
+	public String encrypt(final String name, final String salt, final String password)
 	{
 		return password;
 	}
 
 	@Override
-	public boolean match(String name, String password, String encrypted)
+	public boolean match(final String name, final String password, final String encrypted)
 	{
 		return encrypted.equals(password);
 	}
