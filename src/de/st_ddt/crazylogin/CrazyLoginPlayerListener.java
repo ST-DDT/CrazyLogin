@@ -128,7 +128,7 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerInventoryOpen(final InventoryOpenEvent event)
 	{
 		if (!(event.getPlayer() instanceof Player))
@@ -140,7 +140,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(player);
 	}
 
-	@EventHandler(ignoreCancelled = true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerPickupItem(final PlayerPickupItemEvent event)
 	{
 		if (plugin.isLoggedIn(event.getPlayer()))
@@ -149,7 +149,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	@EventHandler(ignoreCancelled = true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerDropItem(final PlayerDropItemEvent event)
 	{
 		if (plugin.isLoggedIn(event.getPlayer()))
@@ -158,7 +158,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	@EventHandler(ignoreCancelled = true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerInteract(final PlayerInteractEvent event)
 	{
 		if (plugin.isLoggedIn(event.getPlayer()))
@@ -167,7 +167,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	@EventHandler(ignoreCancelled = true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerInteractEntity(final PlayerInteractEntityEvent event)
 	{
 		if (plugin.isLoggedIn(event.getPlayer()))
@@ -176,7 +176,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	@EventHandler(priority=EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerMove(final PlayerMoveEvent event)
 	{
 		final Player player = event.getPlayer();
@@ -186,17 +186,19 @@ public class CrazyLoginPlayerListener implements Listener
 		if (current == null)
 			return;
 		double dist = Double.MAX_VALUE;
+		double moveRange = plugin.getMoveRange();
 		if (current.getWorld() == event.getTo().getWorld())
 			dist = current.distance(event.getTo());
-		if (dist > plugin.getMoveRange() * 2)
-			player.teleport(current, TeleportCause.PLUGIN);
-		if (dist < plugin.getMoveRange())
-			return;
-		event.setCancelled(true);
-		plugin.requestLogin(event.getPlayer());
+		if (dist >= moveRange)
+		{
+			if (dist >= moveRange * 2)
+				player.teleport(current, TeleportCause.PLUGIN);
+			event.setCancelled(true);
+			plugin.requestLogin(event.getPlayer());
+		}
 	}
 
-	@EventHandler(priority=EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerTeleport(final PlayerTeleportEvent event)
 	{
 		final Player player = event.getPlayer();
@@ -213,7 +215,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(event.getPlayer());
 	}
 
-	@EventHandler(ignoreCancelled = true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerDamage(final EntityDamageEvent event)
 	{
 		if (!(event.getEntity() instanceof Player))
@@ -224,7 +226,7 @@ public class CrazyLoginPlayerListener implements Listener
 		event.setCancelled(true);
 	}
 
-	@EventHandler(ignoreCancelled = true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerDamage(final EntityDamageByBlockEvent event)
 	{
 		if (!(event.getEntity() instanceof Player))
@@ -236,7 +238,7 @@ public class CrazyLoginPlayerListener implements Listener
 		event.setCancelled(true);
 	}
 
-	@EventHandler(ignoreCancelled = true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerDamage(final EntityDamageByEntityEvent event)
 	{
 		if (!(event.getEntity() instanceof Player))
@@ -248,7 +250,7 @@ public class CrazyLoginPlayerListener implements Listener
 		event.setCancelled(true);
 	}
 
-	@EventHandler(priority=EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{
 		final Player player = event.getPlayer();
@@ -275,7 +277,7 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true, priority=EventPriority.LOW)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerCommand(final PlayerChatEvent event)
 	{
 		final Player player = event.getPlayer();
