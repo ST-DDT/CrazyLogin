@@ -228,7 +228,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			System.out.println("NO SUCH SAVETYPE " + saveType);
 			type = null;
 		}
-		final String tableName = config.getString("database.tableName", "players");
+		final String tableName = config.getString("database.tableName", "CrazyLogin_players");
 		config.set("database.tableName", tableName);
 		// Columns
 		final String colName = config.getString("database.columns.name", "name");
