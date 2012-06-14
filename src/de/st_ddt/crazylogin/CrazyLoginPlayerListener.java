@@ -56,6 +56,14 @@ public class CrazyLoginPlayerListener implements Listener
 			event.setKickMessage(ChatColor.RED + "Banned until : " + ChatColor.YELLOW + plugin.getTempBannedString(event.getAddress().getHostAddress()));
 			return;
 		}
+		final int maxOnlinesPerIP = plugin.getMaxOnlinesPerIP();
+		if (maxOnlinesPerIP != -1)
+			if (plugin.getOnlinesPerIP(event.getAddress().getHostAddress()).size() >= maxOnlinesPerIP)
+			{
+				event.setResult(Result.KICK_OTHER);
+				event.setKickMessage(ChatColor.RED + "Too many connections");
+				return;
+			}
 		if (plugin.isForceSingleSessionEnabled())
 			if (player.isOnline())
 			{

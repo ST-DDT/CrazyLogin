@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -85,6 +86,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected boolean forceSaveLogin;
 	protected Encryptor encryptor;
 	protected int autoDelete;
+	protected int maxOnlinesPerIP;
 	protected int maxRegistrationsPerIP;
 	protected boolean pluginCommunicationEnabled;
 	protected double moveRange;
@@ -152,6 +154,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
 		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
+		maxOnlinesPerIP = config.getInt("maxOnlinesPerIP", 3);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
 		if (autoDelete != -1)
@@ -331,6 +334,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("forceSingleSession", forceSingleSession);
 		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
 		config.set("forceSaveLogin", forceSaveLogin);
+		config.set("maxOnlinesPerIP", maxOnlinesPerIP);
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
 		config.set("moveRange", moveRange);
@@ -509,8 +513,9 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				throw new CrazyCommandPermissionException();
 			final String ip = player.getAddress().getAddress().getHostAddress();
 			final int registrations = getRegistrationsPerIP(ip).size();
-			if (registrations >= maxRegistrationsPerIP)
-				throw new CrazyCommandExceedingLimitsException("Max Registrations per IP", maxRegistrationsPerIP);
+			if (maxRegistrationsPerIP != -1)
+				if (registrations >= maxRegistrationsPerIP)
+					throw new CrazyCommandExceedingLimitsException("Max Registrations per IP", maxRegistrationsPerIP);
 			final CrazyLoginPreRegisterEvent event = new CrazyLoginPreRegisterEvent(this, player, data);
 			getServer().getPluginManager().callEvent(event);
 			if (event.isCancelled())
@@ -989,6 +994,38 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("maxRegistrationsPerIP"))
+				{
+					int newValue = maxRegistrationsPerIP;
+					try
+					{
+						newValue = Integer.parseInt(args[1]);
+					}
+					catch (final NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled");
+					}
+					maxRegistrationsPerIP = Math.max(newValue, -1);
+					sendLocaleMessage("MODE.CHANGE", sender, "maxRegistrationsPerIP", maxRegistrationsPerIP);
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("maxOnlinesPerIP"))
+				{
+					int newValue = maxOnlinesPerIP;
+					try
+					{
+						newValue = Integer.parseInt(args[1]);
+					}
+					catch (final NumberFormatException e)
+					{
+						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled");
+					}
+					maxOnlinesPerIP = Math.max(newValue, -1);
+					sendLocaleMessage("MODE.CHANGE", sender, "maxOnlinesPerIP", maxOnlinesPerIP);
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("saveType"))
 				{
 					final String saveType = args[1];
@@ -1144,6 +1181,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					sendLocaleMessage("MODE.CHANGE", sender, "resetGuestLocations", resetGuestLocations ? "True" : "False");
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("maxRegistrationsPerIP"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "maxRegistrationsPerIP", maxRegistrationsPerIP);
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("maxOnlinesPerIP"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "maxOnlinesPerIP", maxOnlinesPerIP);
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("saveType"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "saveType", database.getType().toString());
@@ -1289,6 +1336,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			sendLocaleMessage("REGISTER.REQUEST", player);
 		else
 			sendLocaleMessage("LOGIN.REQUEST", player);
+	}
+
+	@Override
+	public List<Player> getOnlinesPerIP(final String ip)
+	{
+		final List<Player> list = new LinkedList<Player>();
+		for (final Player player : Bukkit.getOnlinePlayers())
+			if (player.getAddress().getAddress().getHostAddress().equals(ip))
+				list.add(player);
+		return list;
 	}
 
 	@Override
@@ -1459,6 +1516,12 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public int getAutoDelete()
 	{
 		return autoDelete;
+	}
+
+	@Override
+	public int getMaxOnlinesPerIP()
+	{
+		return maxOnlinesPerIP;
 	}
 
 	@Override
