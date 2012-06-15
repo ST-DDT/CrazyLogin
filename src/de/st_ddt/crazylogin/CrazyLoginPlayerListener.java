@@ -258,6 +258,17 @@ public class CrazyLoginPlayerListener implements Listener
 		event.setCancelled(true);
 	}
 
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PlayerDamageDeal(final EntityDamageByEntityEvent event)
+	{
+		if (!(event.getDamager() instanceof Player))
+			return;
+		final Player player = (Player) event.getDamager();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+	}
+
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{
