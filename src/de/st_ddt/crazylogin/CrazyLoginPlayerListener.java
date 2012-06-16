@@ -2,6 +2,7 @@ package de.st_ddt.crazylogin;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -87,10 +88,12 @@ public class CrazyLoginPlayerListener implements Listener
 			player.teleport(movementBlocker.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
 		if (!plugin.hasAccount(player))
 		{
-			if (plugin.isResettingGuestLocationsEnabled())
-				triggerSaveLogin(player);
 			if (plugin.isAlwaysNeedPassword())
+			{
 				plugin.sendLocaleMessage("REGISTER.HEADER", player);
+				if (movementBlocker.get(player.getName().toLowerCase()) == null)
+					movementBlocker.put(player.getName().toLowerCase(), player.getLocation());
+			}
 			else
 				plugin.sendLocaleMessage("REGISTER.HEADER2", player);
 			plugin.sendLocaleMessage("REGISTER.MESSAGE", player);
@@ -132,6 +135,11 @@ public class CrazyLoginPlayerListener implements Listener
 			playerdata.notifyAction();
 			if (plugin.isInstantAutoLogoutEnabled())
 				playerdata.logout();
+		}
+		else
+		{
+			if (plugin.isResettingGuestLocationsEnabled())
+				player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), TeleportCause.PLUGIN);
 		}
 	}
 
