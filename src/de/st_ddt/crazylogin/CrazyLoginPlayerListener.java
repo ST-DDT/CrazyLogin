@@ -56,14 +56,6 @@ public class CrazyLoginPlayerListener implements Listener
 			event.setKickMessage(ChatColor.RED + "Banned until : " + ChatColor.YELLOW + plugin.getTempBannedString(event.getAddress().getHostAddress()));
 			return;
 		}
-		final int maxOnlinesPerIP = plugin.getMaxOnlinesPerIP();
-		if (maxOnlinesPerIP != -1)
-			if (plugin.getOnlinesPerIP(event.getAddress().getHostAddress()).size() >= maxOnlinesPerIP)
-			{
-				event.setResult(Result.KICK_OTHER);
-				event.setKickMessage(ChatColor.RED + "Too many connections");
-				return;
-			}
 		if (plugin.isForceSingleSessionEnabled())
 			if (player.isOnline())
 			{
@@ -77,6 +69,14 @@ public class CrazyLoginPlayerListener implements Listener
 				plugin.broadcastLocaleMessage(true, "crazylogin.warnsession", "SESSION.DUPLICATEWARN", event.getAddress().getHostAddress(), player.getName());
 				plugin.sendLocaleMessage("SESSION.DUPLICATEWARN", player, event.getAddress().getHostAddress(), player.getName());
 			}
+		final int maxOnlinesPerIP = plugin.getMaxOnlinesPerIP();
+		if (maxOnlinesPerIP != -1)
+			if (plugin.getOnlinesPerIP(event.getAddress().getHostAddress()).size() >= maxOnlinesPerIP)
+			{
+				event.setResult(Result.KICK_OTHER);
+				event.setKickMessage(ChatColor.RED + "Too many connections");
+				return;
+			}
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
@@ -88,8 +88,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (!plugin.hasAccount(player))
 		{
 			if (plugin.isResettingGuestLocationsEnabled())
-				if (movementBlocker.get(player.getName().toLowerCase()) == null)
-					movementBlocker.put(player.getName().toLowerCase(), player.getLocation());
+				triggerSaveLogin(player);
 			if (plugin.isAlwaysNeedPassword())
 				plugin.sendLocaleMessage("REGISTER.HEADER", player);
 			else
