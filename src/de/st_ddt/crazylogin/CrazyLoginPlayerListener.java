@@ -13,6 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -228,6 +230,28 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PlayerHeal(final EntityRegainHealthEvent event)
+	{
+		if (!(event.getEntity() instanceof Player))
+			return;
+		final Player player = (Player) event.getEntity();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PlayerFood(final FoodLevelChangeEvent event)
+	{
+		if (!(event.getEntity() instanceof Player))
+			return;
+		final Player player = (Player) event.getEntity();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
