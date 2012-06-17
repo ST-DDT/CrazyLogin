@@ -600,6 +600,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				try
 				{
 					page = Integer.parseInt(arg.substring(5));
+					if (page < 0)
+						throw new CrazyCommandParameterException(i, "positive Integer");
 				}
 				catch (final NumberFormatException e)
 				{
