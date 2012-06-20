@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -151,6 +152,18 @@ public class CrazyLoginPlayerListener implements Listener
 		if (!(event.getPlayer() instanceof Player))
 			return;
 		final Player player = (Player) event.getPlayer();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+		plugin.requestLogin(player);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PlayerInventoryClick(final InventoryClickEvent event)
+	{
+		if (!(event.getWhoClicked() instanceof Player))
+			return;
+		final Player player = (Player) event.getWhoClicked();
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
@@ -300,7 +313,7 @@ public class CrazyLoginPlayerListener implements Listener
 		event.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{
 		final Player player = event.getPlayer();
@@ -327,7 +340,7 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerCommand(final PlayerChatEvent event)
 	{
 		final Player player = event.getPlayer();
