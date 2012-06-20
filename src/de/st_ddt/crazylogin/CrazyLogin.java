@@ -513,9 +513,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				throw new CrazyCommandPermissionException();
 			final String ip = player.getAddress().getAddress().getHostAddress();
 			final int registrations = getRegistrationsPerIP(ip).size();
-			if (maxRegistrationsPerIP != -1)
-				if (registrations >= maxRegistrationsPerIP)
-					throw new CrazyCommandExceedingLimitsException("Max Registrations per IP", maxRegistrationsPerIP);
+			if (!sender.hasPermission("crazylogin.ensureregistration"))
+				if (maxRegistrationsPerIP != -1)
+					if (registrations >= maxRegistrationsPerIP)
+						throw new CrazyCommandExceedingLimitsException("Max Registrations per IP", maxRegistrationsPerIP);
 			final CrazyLoginPreRegisterEvent event = new CrazyLoginPreRegisterEvent(this, player, data);
 			getServer().getPluginManager().callEvent(event);
 			if (event.isCancelled())
@@ -1274,7 +1275,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public boolean isLoggedIn(final Player player)
 	{
-		final LoginPlayerData data = datas.get(player.getName().toLowerCase());
+		final LoginPlayerData data = getPlayerData(player);
 		if (data == null)
 			return !alwaysNeedPassword;
 		return data.isOnline() && player.isOnline();
@@ -1289,7 +1290,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	@Override
 	public boolean hasAccount(final String player)
 	{
-		return (datas.get(player.toLowerCase()) != null);
+		return getPlayerData(player) != null;
 	}
 
 	@Override
