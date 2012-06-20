@@ -2,7 +2,7 @@ name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
 #C*=needed core version
-version: C7.5_5.13
+version: C7.5_5.14
 depend: [CrazyCore]
 description: >
             CrazyLogin protect your server with passwords and many usefully features.
@@ -26,6 +26,7 @@ permissions:
     children:
       crazylogin.admin: true
       crazylogin.mode: true
+      crazylogin.ensureregistration: true
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
       crazylogin.warndatabase: true
@@ -44,6 +45,8 @@ permissions:
     description: Allow changing passwords for other players
     default: op
     children: 
+      crazylogin.mode: true
+      crazylogin.ensureregistration: true
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
       crazylogin.warndatabase: true
@@ -54,6 +57,9 @@ permissions:
       crazylogin.delete: true
       crazylogin.commands: true
       crazylogin.list: true
+  crazylogin.ensureregistration:
+    description: This player can always register an account
+    default: op
   crazylogin.register:
     description: Allow players to create a password. (for external registration)
     default: true
