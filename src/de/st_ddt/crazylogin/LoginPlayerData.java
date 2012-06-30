@@ -392,4 +392,9 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		if (timeOut.after(lastAction))
 			this.online = false;
 	}
+
+	public void setOnline(boolean online)
+	{
+		this.online = online;
+	}
 }

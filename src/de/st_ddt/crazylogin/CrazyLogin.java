@@ -1349,8 +1349,15 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	{
 		if (database.isStaticDatabase())
 			return;
-		datas.remove(name.toLowerCase());
-		datas.put(name.toLowerCase(), database.getEntry(name));
+		LoginPlayerData data = datas.remove(name.toLowerCase());
+		boolean online = false;
+		if (data != null)
+			online = data.isOnline();
+		data = database.getEntry(name);
+		if (data == null)
+			return;
+		data.setOnline(online);
+		datas.put(name.toLowerCase(), data);
 	}
 
 	@Override
