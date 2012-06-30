@@ -72,6 +72,7 @@ public class CrazyLoginPlayerListener implements Listener
 				event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "SESSION.DUPLICATE"));
 				plugin.broadcastLocaleMessage(true, "crazylogin.warnsession", "SESSION.DUPLICATEWARN", event.getAddress().getHostAddress(), player.getName());
 				plugin.sendLocaleMessage("SESSION.DUPLICATEWARN", player, event.getAddress().getHostAddress(), player.getName());
+				return;
 			}
 		final int maxOnlinesPerIP = plugin.getMaxOnlinesPerIP();
 		if (maxOnlinesPerIP != -1)
@@ -81,6 +82,7 @@ public class CrazyLoginPlayerListener implements Listener
 				event.setKickMessage(ChatColor.RED + "Too many connections");
 				return;
 			}
+		plugin.updateAccount(player.getName());
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)

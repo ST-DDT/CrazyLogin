@@ -94,6 +94,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected int maxNameLength;
 	// Database
 	protected Database<LoginPlayerData> database;
+	protected boolean saveDatabaseOnShutdown;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -107,6 +108,14 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		registerHooks();
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new ScheduledCheckTask(this), 30 * 60 * 20, 15 * 60 * 20);
 		super.onEnable();
+	}
+
+	@Override
+	public void onDisable()
+	{
+		if (saveDatabaseOnShutdown)
+			saveDatabase();
+		saveConfiguration();
 	}
 
 	public void registerHooks()
@@ -207,6 +216,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			for (final LoginPlayerData data : database.getAllEntries())
 				datas.put(data.getName().toLowerCase(), data);
 		dropInactiveAccounts();
+		saveDatabaseOnShutdown = config.getBoolean("database.saveOnShutdown", true);
 		for (final Player player : getServer().getOnlinePlayers())
 		{
 			requestLogin(player);
@@ -269,18 +279,6 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	}
 
 	@Override
-	public void save()
-	{
-		final ConfigurationSection config = getConfig();
-		if (database != null)
-			config.set("database.saveType", database.getType().toString());
-		dropInactiveAccounts();
-		if (database != null)
-			database.saveAll(datas.values());
-		saveConfiguration();
-	}
-
-	@Override
 	public int dropInactiveAccounts()
 	{
 		if (autoDelete != -1)
@@ -313,6 +311,23 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return amount;
 	}
 
+	@Override
+	public void save()
+	{
+		saveDatabase();
+		saveConfiguration();
+	}
+
+	public void saveDatabase()
+	{
+		final ConfigurationSection config = getConfig();
+		if (database != null)
+			config.set("database.saveType", database.getType().toString());
+		dropInactiveAccounts();
+		if (database != null)
+			database.saveAll(datas.values());
+	}
+
 	public void saveConfiguration()
 	{
 		final ConfigurationSection config = getConfig();
@@ -340,6 +355,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("moveRange", moveRange);
 		config.set("minNameLength", minNameLength);
 		config.set("maxNameLength", maxNameLength);
+		config.set("database.saveOnShutdown", saveDatabaseOnShutdown);
 		saveConfig();
 	}
 
@@ -683,7 +699,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		if (registeredFilter == null)
 		{
 			dataList.addAll(datas.values());
-			for (OfflinePlayer offline : getServer().getOfflinePlayers())
+			for (final OfflinePlayer offline : getServer().getOfflinePlayers())
 				if (!hasAccount(offline))
 					dataList.add(new LoginUnregisteredPlayerData(offline));
 		}
@@ -693,7 +709,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		}
 		else
 		{
-			for (OfflinePlayer offline : getServer().getOfflinePlayers())
+			for (final OfflinePlayer offline : getServer().getOfflinePlayers())
 				if (!hasAccount(offline))
 					dataList.add(new LoginUnregisteredPlayerData(offline));
 		}
@@ -1117,6 +1133,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("saveDatabaseOnShutdown"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					saveDatabaseOnShutdown = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "saveDatabaseOnShutdown", saveDatabaseOnShutdown ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			case 1:
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
@@ -1224,6 +1250,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					sendLocaleMessage("MODE.CHANGE", sender, "algorithm", encryptor.getAlgorithm());
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("saveDatabaseOnShutdown"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "saveDatabaseOnShutdown", saveDatabaseOnShutdown ? "True" : "False");
+					return;
+				}
 				throw new CrazyCommandNoSuchException("Mode", args[0]);
 			default:
 				throw new CrazyCommandUsageException("/crazylogin mode <Mode> [Value]");
@@ -1311,6 +1342,15 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public LoginPlayerData getPlayerData(final String name)
 	{
 		return datas.get(name.toLowerCase());
+	}
+
+	@Override
+	public void updateAccount(final String name)
+	{
+		if (database.isStaticDatabase())
+			return;
+		datas.remove(name.toLowerCase());
+		datas.put(name.toLowerCase(), database.getEntry(name));
 	}
 
 	@Override
