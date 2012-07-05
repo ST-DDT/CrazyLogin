@@ -4,11 +4,13 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -39,6 +41,7 @@ import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
 import de.st_ddt.crazylogin.events.LoginFailReason;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazyplugin.CrazyPlugin;
+import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandAlreadyExistsException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExceedingLimitsException;
@@ -293,21 +296,28 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		return dropInactiveAccounts(compare);
 	}
 
-	protected int dropInactiveAccounts(final Date limit)
+	protected synchronized int dropInactiveAccounts(final Date limit)
 	{
 		int amount = 0;
-		final Iterator<LoginPlayerData> it = datas.values().iterator();
-		while (it.hasNext())
+		final Iterator<Entry<String, LoginPlayerData>> it = datas.entrySet().iterator();
+		try
 		{
-			final LoginPlayerData data = it.next();
-			if (data.getLastActionTime().before(limit))
+			while (it.hasNext())
 			{
-				amount++;
-				datas.remove(data.getName().toLowerCase());
-				if (database != null)
-					database.delete(data.getName());
+				final LoginPlayerData data = it.next().getValue();
+				if (data.getLastActionTime().before(limit))
+				{
+					amount++;
+					it.remove();
+					if (database != null)
+						database.delete(data.getName());
+					if (pluginCommunicationEnabled)
+						Bukkit.getPluginManager().callEvent(new CrazyPlayerRemoveEvent(this, data.getName()));
+				}
 			}
 		}
+		catch (ConcurrentModificationException e)
+		{}
 		return amount;
 	}
 
