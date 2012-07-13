@@ -18,6 +18,7 @@ CRAZYLOGIN.ACCOUNTS.DELETEWARN=&CWARNING! $0$ tried to delete accounts (at least
 CRAZYLOGIN.ACCOUNTS.DELETED=&EINFORMATION! $0$ deleted $2$ old accounts (at least &E$1$ &Cdays inactive)!
 CRAZYLOGIN.SESSION.DUPLICATE=&CYou are already online! &CPlease wait for client timeout or contact an operator.
 CRAZYLOGIN.SESSION.DUPLICATEWARN=&E$0$ tried to connect as $1$!
+CRAZYLOGIN.NAME.INVALIDCHARS=&EINVALID CHAR IN USERNAME!
 CRAZYLOGIN.NAME.INVALIDLENGTH=&EINVALID USERNAME LENGTH!
 CRAZYLOGIN.COMMAND.LISTHEAD=Command Whitelist (Page $0$ / $1$)
 CRAZYLOGIN.COMMAND.ADDED=Command added

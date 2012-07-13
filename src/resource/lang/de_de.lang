@@ -18,6 +18,7 @@ CRAZYLOGIN.ACCOUNTS.DELETEWARN=&CWARNUNG! $0$ hat versucht Accounts zu löschen 
 CRAZYLOGIN.ACCOUNTS.DELETED=&EHINWEIS! $0$ hat $2$ alte Accounts gelöscht (mindestens $1$ Tage inaktiv)!
 CRAZYLOGIN.SESSION.DUPLICATE=&CDu bist bereits online! &CBitte warte oder kontaktiere einen Admin.
 CRAZYLOGIN.SESSION.DUPLICATEWARN=&E$0$ hat versucht sich als $1$ einzuloggen!
+CRAZYLOGIN.NAME.INVALIDCHARS=&EUNGÜLTIGES ZEICHEN IM BENUTZERNAMEN! 
 CRAZYLOGIN.NAME.INVALIDLENGTH=&EUNGÜLTIGE BENUTZERNAMESLÄNGE!
 CRAZYLOGIN.COMMAND.LISTHEAD=Befehls Whitelist (Seite $0$ / $1$)
 CRAZYLOGIN.COMMAND.ADDED=Befehl hinzugefügt

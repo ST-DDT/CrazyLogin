@@ -93,6 +93,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected int maxRegistrationsPerIP;
 	protected boolean pluginCommunicationEnabled;
 	protected double moveRange;
+	protected String filterNames;
 	protected int minNameLength;
 	protected int maxNameLength;
 	// Database
@@ -173,6 +174,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		moveRange = config.getDouble("moveRange", 5);
 		playerListener.clearMovementBlocker(false);
+		filterNames = config.getString("filterNames", "false");
+		if (filterNames.equals("false"))
+			filterNames = ".";
+		else if (filterNames.equals("true"))
+			filterNames = "[a-zA-Z0-9_]";
 		minNameLength = Math.min(Math.max(config.getInt("minNameLength", 3), 1), 16);
 		maxNameLength = Math.min(Math.max(config.getInt("maxNameLength", 16), minNameLength), 16);
 		uniqueIDKey = config.getString("uniqueIDKey");
@@ -363,6 +369,10 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
 		config.set("moveRange", moveRange);
+		if (filterNames.equals("."))
+			config.set("filterNames", false);
+		else
+			config.set("filterNames", filterNames);
 		config.set("minNameLength", minNameLength);
 		config.set("maxNameLength", maxNameLength);
 		config.set("database.saveOnShutdown", saveDatabaseOnShutdown);
@@ -1599,6 +1609,12 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public double getMoveRange()
 	{
 		return moveRange;
+	}
+
+	@Override
+	public boolean checkNameChars(String name)
+	{
+		return name.matches(filterNames + "*");
 	}
 
 	@Override
