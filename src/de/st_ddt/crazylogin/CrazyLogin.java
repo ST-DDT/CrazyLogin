@@ -219,6 +219,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				encryptor = new CrazyCrypt1();
 			}
 		}
+		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Logout", "LoginFail", "CommandBlocked", "AccessDenied");
 		setupDatabase();
 		datas.clear();
 		if (database != null)
@@ -442,10 +443,12 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			else
 				sendLocaleMessage("LOGIN.FAILED", player);
 			loginFailures.put(player.getName().toLowerCase(), fails);
+			logger.log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong password");
 			return;
 		}
 		getServer().getPluginManager().callEvent(new CrazyLoginLoginEvent(this, data, player));
 		sendLocaleMessage("LOGIN.SUCCESS", player);
+		logger.log("Login", player.getName() + " logged in successfully");
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		loginFailures.remove(player.getName().toLowerCase());
@@ -470,6 +473,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				database.save(data);
 		}
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
+		logger.log("Logout", player.getName() + " logged out");
 	}
 
 	@Override

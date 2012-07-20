@@ -44,28 +44,49 @@ public class CrazyLoginPlayerListener implements Listener
 		this.plugin = plugin;
 	}
 
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-	public void PlayerLogin(final PlayerLoginEvent event)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PlayerLoginBanCheck(final PlayerLoginEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (!plugin.checkNameChars(event.getPlayer().getName()))
-		{
-			event.setResult(Result.KICK_OTHER);
-			event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "NAME.INVALIDCHARS"));
-			return;
-		}
-		if (!plugin.checkNameLength(event.getPlayer().getName()))
-		{
-			event.setResult(Result.KICK_OTHER);
-			event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "NAME.INVALIDLENGTH", plugin.getMinNameLength(), plugin.getMaxNameLength()));
-			return;
-		}
 		if (plugin.isTempBanned(event.getAddress().getHostAddress()))
 		{
 			event.setResult(Result.KICK_OTHER);
 			event.setKickMessage(ChatColor.RED + "Banned until : " + ChatColor.YELLOW + plugin.getTempBannedString(event.getAddress().getHostAddress()));
+			plugin.getCrazyLogger().log("AccessDenied", "Denied access for player " + player.getName() + " @ " + event.getAddress().getHostAddress() + " because of a temporary ban");
 			return;
 		}
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
+	public void PlayerLoginNameCharCheck(final PlayerLoginEvent event)
+	{
+		final Player player = event.getPlayer();
+		if (!plugin.checkNameChars(player.getName()))
+		{
+			event.setResult(Result.KICK_OTHER);
+			event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "NAME.INVALIDCHARS"));
+			plugin.getCrazyLogger().log("AccessDenied", "Denied access for player " + player.getName() + " @ " + event.getAddress().getHostAddress() + " because of invalid chars");
+			return;
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
+	public void PlayerLoginNameLengthCheck(final PlayerLoginEvent event)
+	{
+		final Player player = event.getPlayer();
+		if (!plugin.checkNameLength(event.getPlayer().getName()))
+		{
+			event.setResult(Result.KICK_OTHER);
+			event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "NAME.INVALIDLENGTH", plugin.getMinNameLength(), plugin.getMaxNameLength()));
+			plugin.getCrazyLogger().log("AccessDenied", "Denied access for player " + player.getName() + " @ " + event.getAddress().getHostAddress() + " because of invalid name length");
+			return;
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	public void PlayerLoginSessionCheck(final PlayerLoginEvent event)
+	{
+		final Player player = event.getPlayer();
 		if (plugin.isForceSingleSessionEnabled())
 			if (player.isOnline())
 			{
@@ -78,17 +99,30 @@ public class CrazyLoginPlayerListener implements Listener
 				event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "SESSION.DUPLICATE"));
 				plugin.broadcastLocaleMessage(true, "crazylogin.warnsession", "SESSION.DUPLICATEWARN", event.getAddress().getHostAddress(), player.getName());
 				plugin.sendLocaleMessage("SESSION.DUPLICATEWARN", player, event.getAddress().getHostAddress(), player.getName());
+				plugin.getCrazyLogger().log("AccessDenied", "Denied access for player " + player.getName() + " @ " + event.getAddress().getHostAddress() + " because of a player with this name being already online");
 				return;
 			}
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	public void PlayerLoginConnectionCheck(final PlayerLoginEvent event)
+	{
+		final Player player = event.getPlayer();
 		final int maxOnlinesPerIP = plugin.getMaxOnlinesPerIP();
 		if (maxOnlinesPerIP != -1)
 			if (plugin.getOnlinesPerIP(event.getAddress().getHostAddress()).size() >= maxOnlinesPerIP)
 			{
 				event.setResult(Result.KICK_OTHER);
 				event.setKickMessage(ChatColor.RED + "Too many connections");
+				plugin.getCrazyLogger().log("AccessDenied", "Denied access for player " + player.getName() + " @ " + event.getAddress().getHostAddress() + " because of to many connections for this IP");
 				return;
 			}
-		plugin.updateAccount(player.getName());
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+	public void PlayerLoginDataUpdate(final PlayerLoginEvent event)
+	{
+		plugin.updateAccount(event.getPlayer().getName());
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
@@ -111,6 +145,7 @@ public class CrazyLoginPlayerListener implements Listener
 			final int autoKick = plugin.getAutoKickUnregistered();
 			if (autoKick != -1)
 				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("REGISTER.REQUEST"), true), autoKick * 20);
+			plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server (No Account)");
 			return;
 		}
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
@@ -128,6 +163,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (movementBlocker.get(player.getName().toLowerCase()) == null)
 			movementBlocker.put(player.getName().toLowerCase(), location);
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
+		plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server");
 		final int autoKick = plugin.getAutoKick();
 		if (autoKick >= 10)
 			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST"), plugin.getAutoTempBan()), autoKick * 20);
@@ -137,6 +173,7 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerQuit(final PlayerQuitEvent event)
 	{
 		final Player player = event.getPlayer();
+		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server");
 		final LoginData playerdata = plugin.getPlayerData(player);
 		disableSaveLogin(player);
 		if (playerdata != null)
@@ -341,9 +378,11 @@ public class CrazyLoginPlayerListener implements Listener
 			if (plugin.isAutoKickCommandUsers())
 			{
 				player.kickPlayer(plugin.getLocale().getLocaleMessage(player, "LOGIN.REQUEST"));
+				plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " has been kicked for trying to execute", event.getMessage());
 				return;
 			}
 			plugin.requestLogin(event.getPlayer());
+			plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to execute", event.getMessage());
 			return;
 		}
 	}
@@ -354,6 +393,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
+		plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to execute", event.getMessage());
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
 	}
