@@ -377,6 +377,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("minNameLength", minNameLength);
 		config.set("maxNameLength", maxNameLength);
 		config.set("database.saveOnShutdown", saveDatabaseOnShutdown);
+		logger.save(config, "logs.");
 		saveConfig();
 	}
 
