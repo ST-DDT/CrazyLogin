@@ -42,7 +42,7 @@ permissions:
       crazylogin.playerinfo.extended: true
       crazylogin.list: true
   crazylogin.admin:
-    description: Allow changing passwords for other players
+    description: Allow changing account data for other players
     default: op
     children: 
       crazylogin.mode: true
