@@ -1126,6 +1126,19 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("filterNames"))
+				{
+					String newFilter = filterNames;
+					newFilter = args[0];
+					if (newFilter.equalsIgnoreCase("false") || newFilter.equalsIgnoreCase("0") || newFilter.equalsIgnoreCase("off"))
+						newFilter = ".";
+					else if (newFilter.equalsIgnoreCase("true") || newFilter.equalsIgnoreCase("1") || newFilter.equalsIgnoreCase("on"))
+						newFilter = "[a-zA-Z0-9_]";
+					filterNames = newFilter;
+					sendLocaleMessage("MODE.CHANGE", sender, "filterNames", filterNames.equals(".") ? "disabled" : filterNames);
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("minNameLength"))
 				{
 					int length = minNameLength;
