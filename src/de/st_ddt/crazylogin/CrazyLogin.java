@@ -1273,6 +1273,11 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					sendLocaleMessage("MODE.CHANGE", sender, "moveRange", moveRange + " blocks");
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("filterNames"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "filterNames", filterNames.equals(".") ? "disabled" : filterNames);
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("minNameLength"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "minNameLength", minNameLength + " characters");
