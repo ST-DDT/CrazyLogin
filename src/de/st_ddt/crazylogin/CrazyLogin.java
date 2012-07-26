@@ -220,8 +220,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 			}
 		}
 		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Logout", "LoginFail", "CommandBlocked", "AccessDenied");
-		setupDatabase();
 		datas.clear();
+		setupDatabase();
 		if (database != null)
 			for (final LoginPlayerData data : database.getAllEntries())
 				datas.put(data.getName().toLowerCase(), data);
