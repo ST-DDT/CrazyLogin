@@ -80,6 +80,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	protected long autoTempBanLoginFailer;
 	protected boolean autoKickCommandUsers;
 	protected boolean blockGuestCommands;
+	protected boolean blockGuestChat;
+	protected boolean blockGuestJoin;
 	protected boolean resetGuestLocations;
 	protected List<String> commandWhiteList;
 	protected String uniqueIDKey;
@@ -153,6 +155,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		loginFailures.clear();
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		blockGuestCommands = config.getBoolean("blockGuestCommands", false);
+		blockGuestChat = config.getBoolean("blockGuestChat", false);
+		blockGuestJoin = config.getBoolean("blockGuestJoin", false);
 		resetGuestLocations = config.getBoolean("resetGuestLocations", true);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		antiRequestSpamTable.clear();
@@ -219,7 +223,7 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				encryptor = new CrazyCrypt1();
 			}
 		}
-		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Logout", "LoginFail", "CommandBlocked", "AccessDenied");
+		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
 		datas.clear();
 		setupDatabase();
 		if (database != null)
@@ -357,6 +361,8 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 		config.set("autoTempBanLoginFailer", autoTempBanLoginFailer);
 		config.set("autoKickCommandUsers", autoKickCommandUsers);
 		config.set("blockGuestCommands", blockGuestCommands);
+		config.set("blockGuestChat", blockGuestChat);
+		config.set("blockGuestJoin", blockGuestJoin);
 		config.set("resetGuestLocations", resetGuestLocations);
 		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("commandWhitelist", commandWhiteList);
@@ -1026,6 +1032,26 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("blockGuestChat"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					blockGuestChat = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestChat", blockGuestChat ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("blockGuestJoin"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					blockGuestJoin = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestJoin", blockGuestJoin ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("resetGuestLocations"))
 				{
 					boolean newValue = false;
@@ -1241,6 +1267,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 				else if (args[0].equalsIgnoreCase("blockGuestCommands"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestCommands", blockGuestCommands ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("blockGuestChat"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestChat", blockGuestChat ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("blockGuestJoin"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestJoin", blockGuestJoin ? "True" : "False");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("resetGuestLocations"))
@@ -1526,6 +1562,16 @@ public class CrazyLogin extends CrazyPlugin implements LoginPlugin
 	public boolean isBlockingGuestCommandsEnabled()
 	{
 		return blockGuestCommands;
+	}
+
+	public boolean isBlockingGuestChatEnabled()
+	{
+		return blockGuestChat;
+	}
+
+	public boolean isBlockingGuestJoinEnabled()
+	{
+		return blockGuestJoin;
 	}
 
 	@Override

@@ -122,7 +122,13 @@ public class CrazyLoginPlayerListener implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void PlayerLoginDataUpdate(final PlayerLoginEvent event)
 	{
-		plugin.updateAccount(event.getPlayer().getName());
+		final Player player = event.getPlayer();
+		plugin.updateAccount(player.getName());
+		if (!plugin.isBlockingGuestJoinEnabled() || plugin.hasAccount(player))
+			return;
+		event.setResult(Result.KICK_WHITELIST);
+		event.setKickMessage(ChatColor.RED + "You need an account to join this server.");
+		plugin.getCrazyLogger().log("AccessDenied", "Denied access for player " + player.getName() + " @ " + event.getAddress().getHostAddress() + " because of he has no account!");
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
@@ -362,9 +368,13 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (!plugin.isBlockingGuestCommandsEnabled() || plugin.hasAccount(player))
+		if (plugin.hasAccount(player))
+		{
 			if (plugin.isLoggedIn(player))
 				return;
+		}
+		else if (!plugin.isBlockingGuestCommandsEnabled())
+			return;
 		final String message = event.getMessage().toLowerCase();
 		if (message.startsWith("/"))
 		{
@@ -388,12 +398,17 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerCommand(final PlayerChatEvent event)
+	public void PlayerChat(final PlayerChatEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.isLoggedIn(player))
+		if (plugin.hasAccount(player))
+		{
+			if (plugin.isLoggedIn(player))
+				return;
+		}
+		else if (!plugin.isBlockingGuestChatEnabled())
 			return;
-		plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to execute", event.getMessage());
+		plugin.getCrazyLogger().log("ChatBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to execute", event.getMessage());
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
 	}
