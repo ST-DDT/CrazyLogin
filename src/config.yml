@@ -1,0 +1,89 @@
+# CrazyLogin config.yml
+# The current version number (required CoreVersion_PluginVersion)
+version: C8_6
+database:
+# the table/file/section name of the database
+  tableName: CrazyLogin_players
+# column names (does not affect FLAT databases)
+  column:
+    name: name
+    password: password
+    ips: ips
+    lastAction: lastAction
+# database saveTypes can be MYSQL, FLAT and CONFIG
+# additional information about MYSQL can be fould here http://dev.bukkit.org/server-mods/crazycore/pages/mys-ql/
+  saveType: FLAT
+# whether the database should be saved on shutdown
+  saveOnShutdown: true
+# if true you have to create a password, if false having a password is optional
+alwaysNeedPassword: true
+# you have to login again after being inactive/offline for at least x seconds
+# when using a new ip you are logged out automatically
+autoLogout: 3600
+# when enabled you are kicked when having an account and you did not login after x seconds (-1=disabled)
+autoKick: -1
+# when enabled you are banned for x seconds after being kicked for waiting to long to login (-1=disabled)
+autoTempBan: -1
+# when enabled you are kicked when not having an account after x seconds (-1=disabled)
+autoKickUnregistered: -1
+# when enabled you are kicked when failing login x times (-1=disabled)
+autoKickLoginFailer: 3
+# when enabled you are banned for x seconds for failing to login (-1=disabled)
+autoTempBanLoginFailer: -1
+# when enabled you are kicked when using a none whitelisted command (true/false)
+autoKickCommandUsers: false
+# when enabled you cannot execute a command without having registered (works with autoKickCommandUsers) (true/false)
+blockGuestCommands: false
+# when enabled you cannot chat without having registered (true/false)
+blockGuestChat: false
+# when enabled you cannot join without having registered (use with mysql databases) (true/false)
+blockGuestJoin: false
+# guest are teleported to spawn, when leaving the server.
+resetGuestLocations: true
+# when disabled request login/register messages are spammed every cancelled action, when enabled only every 5 seconds (true/false)
+doNotSpamRequests: false
+# these commands can be executed as guest (even if blockGuestCommands is enabled) or when not logged in
+commandWhitelist:
+- /login
+- /register
+- /crazylogin password
+- /worldedit cui
+# the encryption alogrithm used to encrypt your passwords. View plugin main page for more information
+algorithm: CrazyCrypt1
+# automatically delete accounts that haven't been used for x day (-1=disabled)
+autoDelete: -1
+# block player join with an online players name (prevents Logged in from another location messages) (true/false)
+forceSingleSession: true
+# bypass forceSingleSession when using the same ip (true/false)
+forceSingleSessionSameIPBypass: true
+# when enabled you are teleported to spawn until login
+forceSaveLogin: false
+# when enabled your inventory is wiped until login
+hideInventory: false
+# maximum players allowed to play on your server at once
+maxOnlinesPerIP: 3
+# maximum players allowed to register an account using the same ip on your server
+maxRegistrationsPerIP: 3
+# call special events (do not enable it, if you don't need it)
+# when player data are deleted via autoDelete /crazycore delete <Player> is triggered
+# send raw passwords to other plugins when changing passwords
+pluginCommunicationEnabled: false
+# you can move x blocks from the location you joined when not logged in
+# when set to 0 you cannot move/rotate
+moveRange: 5.0
+# when enabled only default chars are allowed in a players name (true/false/[a-zA-Z0-9_]/...)
+filterNames: false
+# minimun length of player names
+minNameLength: 3
+# maximum length of player names (minecraft max is 16)
+maxNameLength: 16
+# additional information about logging can be found here http://dev.bukkit.org/server-mods/crazycore/pages/logging/
+logs:
+  Login: false
+  ChatBlocked: false
+  CommandBlocked: false
+  Logout: false
+  AccessDenied: false
+  Quit: false
+  Join: false
+  LoginFail: false
