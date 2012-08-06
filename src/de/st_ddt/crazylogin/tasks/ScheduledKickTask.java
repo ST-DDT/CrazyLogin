@@ -47,7 +47,12 @@ public class ScheduledKickTask implements Runnable
 			return;
 		if (requireAccount)
 			if (!CrazyLogin.getPlugin().hasPlayerData(player))
+			{
 				player.kickPlayer(locale.getLanguageText(player));
+				if (tempBan > 0)
+					CrazyLogin.getPlugin().setTempBanned(player, tempBan);
+				return;
+			}
 		if (!CrazyLogin.getPlugin().isLoggedIn(player))
 			player.kickPlayer(locale.getLanguageText(player));
 		if (tempBan > 0)
