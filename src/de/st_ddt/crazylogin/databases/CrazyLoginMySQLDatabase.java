@@ -1,26 +1,46 @@
 package de.st_ddt.crazylogin.databases;
 
-import de.st_ddt.crazylogin.LoginPlayerData;
-import de.st_ddt.crazyutil.databases.MySQLColumn;
-import de.st_ddt.crazyutil.databases.MySQLConnection;
-import de.st_ddt.crazyutil.databases.MySQLDatabase;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
 
-public class CrazyLoginMySQLDatabase extends MySQLDatabase<LoginPlayerData>
+import de.st_ddt.crazylogin.data.LoginPlayerData;
+import de.st_ddt.crazyutil.databases.MySQLColumn;
+import de.st_ddt.crazyutil.databases.MySQLDatabase;
+import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
+
+public class CrazyLoginMySQLDatabase extends MySQLDatabase<LoginPlayerData> implements PlayerDataDatabase<LoginPlayerData>
 {
 
-	public CrazyLoginMySQLDatabase(final MySQLConnection connection, final String table, final String colName, final String colPassword, final String colIPs, final String colLastAction)
+	public CrazyLoginMySQLDatabase(final String tableName, final ConfigurationSection config)
 	{
-		super(LoginPlayerData.class, connection, table, getColumns(colName, colPassword, colIPs, colLastAction), 0);
-		checkTable();
+		super(LoginPlayerData.class, tableName, config, getColumns(config), 0);
 	}
 
-	private static MySQLColumn[] getColumns(final String colName, final String colPassword, final String colIPs, final String colLastAction)
+	private static MySQLColumn[] getColumns(final ConfigurationSection config)
 	{
 		final MySQLColumn[] columns = new MySQLColumn[4];
-		columns[0] = new MySQLColumn(colName, "CHAR(50)", true, false);
-		columns[1] = new MySQLColumn(colPassword, "CHAR(255)", null, false, false);
-		columns[2] = new MySQLColumn(colIPs, "CHAR(255)", null, false, false);
-		columns[3] = new MySQLColumn(colLastAction, "TIMESTAMP", null, false, false);
+		columns[0] = new MySQLColumn(config.getString("column.name", "name"), "CHAR(50)", true, false);
+		columns[1] = new MySQLColumn(config.getString("column.password", "password"), "CHAR(255)", null, false, false);
+		columns[2] = new MySQLColumn(config.getString("column.ips", "ips"), "CHAR(255)", null, false, false);
+		columns[3] = new MySQLColumn(config.getString("column.lastAction", "lastAction"), "TIMESTAMP", null, false, false);
 		return columns;
+	}
+
+	@Override
+	public LoginPlayerData getEntry(final OfflinePlayer player)
+	{
+		return getEntry(player.getName());
+	}
+
+	@Override
+	public boolean hasEntry(final OfflinePlayer player)
+	{
+		return hasEntry(player.getName());
+	}
+
+	@Override
+	public boolean deleteEntry(final OfflinePlayer player)
+	{
+		return deleteEntry(player.getName());
 	}
 }

@@ -1,4 +1,4 @@
-package de.st_ddt.crazylogin;
+package de.st_ddt.crazylogin.listener;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -6,6 +6,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+
+import de.st_ddt.crazylogin.CrazyLogin;
 
 public class CrazyLoginVehicleListener implements Listener
 {

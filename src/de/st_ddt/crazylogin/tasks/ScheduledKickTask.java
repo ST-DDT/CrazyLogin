@@ -1,7 +1,8 @@
-package de.st_ddt.crazylogin;
+package de.st_ddt.crazylogin.tasks;
 
 import org.bukkit.entity.Player;
 
+import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
 
 public class ScheduledKickTask implements Runnable
@@ -45,7 +46,7 @@ public class ScheduledKickTask implements Runnable
 		if (!player.isOnline())
 			return;
 		if (requireAccount)
-			if (!CrazyLogin.getPlugin().hasAccount(player))
+			if (!CrazyLogin.getPlugin().hasPlayerData(player))
 				player.kickPlayer(locale.getLanguageText(player));
 		if (!CrazyLogin.getPlugin().isLoggedIn(player))
 			player.kickPlayer(locale.getLanguageText(player));

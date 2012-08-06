@@ -1,4 +1,6 @@
-package de.st_ddt.crazylogin;
+package de.st_ddt.crazylogin.tasks;
+
+import de.st_ddt.crazylogin.CrazyLogin;
 
 public class ScheduledCheckTask implements Runnable
 {

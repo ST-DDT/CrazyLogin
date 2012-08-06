@@ -1,16 +1,18 @@
-package de.st_ddt.crazylogin;
+package de.st_ddt.crazylogin.data;
 
 import java.util.Date;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyplugin.CrazyPluginInterface;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 
-public class LoginUnregisteredPlayerData implements LoginData
+public class LoginUnregisteredPlayerData implements LoginData<LoginUnregisteredPlayerData>
 {
 
 	private final String player;
@@ -53,12 +55,12 @@ public class LoginUnregisteredPlayerData implements LoginData
 	public boolean equals(final Object obj)
 	{
 		if (obj instanceof LoginData)
-			return equals((LoginData) obj);
+			return equals((LoginData<?>) obj);
 		return false;
 	}
 
 	@Override
-	public boolean equals(final LoginData data)
+	public boolean equals(final LoginData<?> data)
 	{
 		if (data instanceof LoginPlayerData)
 			return false;
@@ -103,7 +105,7 @@ public class LoginUnregisteredPlayerData implements LoginData
 	@Override
 	public String getLatestIP()
 	{
-		Player player = getPlayer();
+		final Player player = getPlayer();
 		if (player == null)
 			return "";
 		return player.getAddress().getAddress().getHostAddress();
@@ -117,7 +119,7 @@ public class LoginUnregisteredPlayerData implements LoginData
 	@Override
 	public Date getLastActionTime()
 	{
-		OfflinePlayer player = getOfflinePlayer();
+		final OfflinePlayer player = getOfflinePlayer();
 		if (player == null)
 			return new Date(0);
 		return new Date(player.getLastPlayed());
@@ -125,12 +127,6 @@ public class LoginUnregisteredPlayerData implements LoginData
 
 	@Override
 	public boolean isOnline()
-	{
-		return isPlayerOnline();
-	}
-
-	@Override
-	public boolean isPlayerOnline()
 	{
 		final Player player = getPlayer();
 		if (player == null)
@@ -160,6 +156,68 @@ public class LoginUnregisteredPlayerData implements LoginData
 		String IP = getLatestIP();
 		if (!IP.equals(""))
 			IP = " @" + IP;
-		return (isPlayerOnline() ? ChatColor.DARK_GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(getLastActionTime()) + IP;
+		return (isOnline() ? ChatColor.DARK_GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(getLastActionTime()) + IP;
+	}
+
+	@Override
+	public String getParameter(final int index)
+	{
+		switch (index)
+		{
+			case 0:
+				return getName();
+			case 1:
+				return CrazyPluginInterface.DateFormat.format(new Date());
+			case 2:
+				return isOnline() ? "Online" : "Offline";
+			case 3:
+				return getLatestIP();
+		}
+		return "";
+	}
+
+	@Override
+	public int getParameterCount()
+	{
+		return 4;
+	}
+
+	@Override
+	public String getShortInfo(final String... arg0)
+	{
+		return toString();
+	}
+
+	@Override
+	public void show(final CommandSender sender)
+	{
+		final CrazyLogin plugin = CrazyLogin.getPlugin();
+		final Player player = getPlayer();
+		plugin.sendLocaleMessage("PLAYERINFO.HEAD", sender, CrazyPluginInterface.DateFormat.format(new Date()));
+		plugin.sendLocaleMessage("PLAYERINFO.USERNAME", sender, getName());
+		if (player == null)
+		{
+			plugin.sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, getLatestIP());
+		}
+		else
+		{
+			plugin.sendLocaleMessage("PLAYERINFO.DISPLAYNAME", sender, player.getDisplayName());
+			plugin.sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, player.getAddress().getAddress().getHostAddress());
+			plugin.sendLocaleMessage("PLAYERINFO.CONNECTION", sender, player.getAddress().getHostName());
+			if (sender.hasPermission("crazylogin.playerinfo.extended"))
+				plugin.sendLocaleMessage("PLAYERINFO.URL", sender, player.getAddress().getAddress().getHostAddress());
+		}
+	}
+
+	@Override
+	public void show(final CommandSender sender, final String... args)
+	{
+		show(sender);
+	}
+
+	@Override
+	public boolean isLoggedIn()
+	{
+		return false;
 	}
 }

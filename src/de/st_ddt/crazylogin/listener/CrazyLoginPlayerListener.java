@@ -1,4 +1,4 @@
-package de.st_ddt.crazylogin;
+package de.st_ddt.crazylogin.listener;
 
 import java.util.HashMap;
 
@@ -17,7 +17,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -31,12 +31,18 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import de.st_ddt.crazylogin.CrazyLogin;
+import de.st_ddt.crazylogin.data.LoginPlayerData;
+import de.st_ddt.crazylogin.tasks.ScheduledKickTask;
+import de.st_ddt.crazyutil.PlayerSaver;
+
 public class CrazyLoginPlayerListener implements Listener
 {
 
 	private final CrazyLogin plugin;
 	private final HashMap<String, Location> movementBlocker = new HashMap<String, Location>();
 	private final HashMap<String, Location> savelogin = new HashMap<String, Location>();
+	private final HashMap<String, PlayerSaver> hidenInventory = new HashMap<String, PlayerSaver>();
 
 	public CrazyLoginPlayerListener(final CrazyLogin plugin)
 	{
@@ -110,7 +116,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		final int maxOnlinesPerIP = plugin.getMaxOnlinesPerIP();
 		if (maxOnlinesPerIP != -1)
-			if (plugin.getOnlinesPerIP(event.getAddress().getHostAddress()).size() >= maxOnlinesPerIP)
+			if (plugin.getOnlinePlayersPerIP(event.getAddress().getHostAddress()).size() >= maxOnlinesPerIP)
 			{
 				event.setResult(Result.KICK_OTHER);
 				event.setKickMessage(ChatColor.RED + "Too many connections");
@@ -124,7 +130,7 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		final Player player = event.getPlayer();
 		plugin.updateAccount(player.getName());
-		if (!plugin.isBlockingGuestJoinEnabled() || plugin.hasAccount(player))
+		if (!plugin.isBlockingGuestJoinEnabled() || plugin.hasPlayerData(player))
 			return;
 		event.setResult(Result.KICK_WHITELIST);
 		event.setKickMessage(ChatColor.RED + "You need an account to join this server.");
@@ -137,7 +143,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (movementBlocker.get(player.getName().toLowerCase()) != null)
 			player.teleport(movementBlocker.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
-		if (!plugin.hasAccount(player))
+		if (!plugin.hasPlayerData(player))
 		{
 			if (plugin.isAlwaysNeedPassword())
 			{
@@ -166,6 +172,10 @@ public class CrazyLoginPlayerListener implements Listener
 			triggerSaveLogin(player);
 			location = player.getWorld().getSpawnLocation();
 		}
+		if (plugin.isHidingInventoryEnabled())
+		{
+			triggerHidenInventory(player);
+		}
 		if (movementBlocker.get(player.getName().toLowerCase()) == null)
 			movementBlocker.put(player.getName().toLowerCase(), location);
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
@@ -180,8 +190,9 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		final Player player = event.getPlayer();
 		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server");
-		final LoginData playerdata = plugin.getPlayerData(player);
 		disableSaveLogin(player);
+		disableHidenInventory(player);
+		final LoginPlayerData playerdata = plugin.getPlayerData(player);
 		if (playerdata != null)
 		{
 			if (!plugin.isLoggedIn(player))
@@ -206,6 +217,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
+		player.closeInventory();
 		plugin.requestLogin(player);
 	}
 
@@ -218,25 +230,30 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
+		player.closeInventory();
 		plugin.requestLogin(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerPickupItem(final PlayerPickupItemEvent event)
 	{
-		if (plugin.isLoggedIn(event.getPlayer()))
+		final Player player = event.getPlayer();
+		if (plugin.isLoggedIn(player))
 			return;
+		player.closeInventory();
 		event.setCancelled(true);
-		plugin.requestLogin(event.getPlayer());
+		plugin.requestLogin(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerDropItem(final PlayerDropItemEvent event)
 	{
-		if (plugin.isLoggedIn(event.getPlayer()))
+		final Player player = event.getPlayer();
+		if (plugin.isLoggedIn(player))
 			return;
+		player.closeInventory();
 		event.setCancelled(true);
-		plugin.requestLogin(event.getPlayer());
+		plugin.requestLogin(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -368,7 +385,7 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.hasAccount(player))
+		if (plugin.hasPlayerData(player))
 		{
 			if (plugin.isLoggedIn(player))
 				return;
@@ -398,10 +415,10 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerChat(final PlayerChatEvent event)
+	public void PlayerChat(final AsyncPlayerChatEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.hasAccount(player))
+		if (plugin.hasPlayerData(player))
 		{
 			if (plugin.isLoggedIn(player))
 				return;
@@ -438,7 +455,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (guestsOnly)
 		{
 			for (final String name : movementBlocker.keySet())
-				if (!plugin.hasAccount(name))
+				if (!plugin.hasPlayerData(name))
 					movementBlocker.remove(name);
 		}
 		else
@@ -460,8 +477,37 @@ public class CrazyLoginPlayerListener implements Listener
 		player.teleport(location, TeleportCause.PLUGIN);
 	}
 
-	public boolean dropSaveLogin(final String player)
+	public void triggerHidenInventory(Player player)
 	{
-		return savelogin.remove(player.toLowerCase()) != null;
+		if (hidenInventory.get(player.getName().toLowerCase()) == null)
+		{
+			PlayerSaver saver = new PlayerSaver(player);
+			hidenInventory.put(player.getName().toLowerCase(), saver);
+			saver.backup();
+			saver.clear();
+		}
+	}
+
+	public void disableHidenInventory(Player player)
+	{
+		final PlayerSaver saver = hidenInventory.remove(player.getName().toLowerCase());
+		if (saver == null)
+			return;
+		saver.reasignPlayer(player);
+		saver.restore();
+	}
+
+	public boolean dropPlayerData(final String player)
+	{
+		return (savelogin.remove(player.toLowerCase()) != null) || (hidenInventory.remove(player.toLowerCase()) != null);
+	}
+
+	public void shutdown()
+	{
+		for (Player player : Bukkit.getOnlinePlayers())
+		{
+			disableSaveLogin(player);
+			disableHidenInventory(player);
+		}
 	}
 }

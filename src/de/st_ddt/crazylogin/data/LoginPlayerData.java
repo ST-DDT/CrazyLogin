@@ -1,4 +1,4 @@
-package de.st_ddt.crazylogin;
+package de.st_ddt.crazylogin.data;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -8,14 +8,16 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyplugin.CrazyPluginInterface;
+import de.st_ddt.crazyplugin.data.PlayerData;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyutil.ChatHelper;
@@ -23,12 +25,12 @@ import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.databases.ConfigurationDatabaseEntry;
 import de.st_ddt.crazyutil.databases.FlatDatabaseEntry;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
+import de.st_ddt.crazyutil.databases.MySQLDatabase;
 import de.st_ddt.crazyutil.databases.MySQLDatabaseEntry;
 
-public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabaseEntry, FlatDatabaseEntry, LoginData
+public class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationDatabaseEntry, MySQLDatabaseEntry, FlatDatabaseEntry, LoginData<LoginPlayerData>
 {
 
-	private final String player;
 	private String password;
 	private final ArrayList<String> ips = new ArrayList<String>();
 	private boolean online;
@@ -36,10 +38,10 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 
 	public LoginPlayerData(final String name)
 	{
-		super();
-		this.player = name;
+		super(name);
 		online = false;
 		lastAction = new Date();
+		password = "FAILEDLOADING";
 	}
 
 	public LoginPlayerData(final String name, final String ip)
@@ -57,16 +59,11 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	// aus Config-Datenbank laden
 	public LoginPlayerData(final ConfigurationSection config, final String[] columnNames)
 	{
-		super();
-		final String colName = columnNames[0];
-		final String colPassword = columnNames[1];
-		final String colIPs = columnNames[2];
-		final String colAction = columnNames[3];
-		this.player = config.getString(colName);
-		this.password = config.getString(colPassword);
-		for (final String ip : config.getStringList(colIPs))
+		super(config.getString(columnNames[0]));
+		this.password = config.getString(columnNames[1]);
+		for (final String ip : config.getStringList(columnNames[2]))
 			ips.add(ip);
-		lastAction = ObjectSaveLoadHelper.StringToDate(config.getString(colAction), new Date());
+		lastAction = ObjectSaveLoadHelper.StringToDate(config.getString(columnNames[3]), new Date());
 		online = false;
 	}
 
@@ -74,41 +71,19 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public void saveToConfigDatabase(final ConfigurationSection config, final String path, final String[] columnNames)
 	{
-		final String colName = columnNames[0];
-		final String colPassword = columnNames[1];
-		final String colIPs = columnNames[2];
-		final String colAction = columnNames[3];
-		config.set(path + colName, this.player);
-		config.set(path + colPassword, this.password);
-		config.set(path + colIPs, this.ips);
-		config.set(path + colAction, lastAction);
+		config.set(path + columnNames[0], name);
+		config.set(path + columnNames[1], password);
+		config.set(path + columnNames[2], ips);
+		config.set(path + columnNames[3], lastAction);
 	}
 
 	// aus MySQL-Datenbank laden
 	public LoginPlayerData(final ResultSet rawData, final String[] columnNames)
 	{
-		super();
-		final String colName = columnNames[0];
-		final String colPassword = columnNames[1];
-		final String colIPs = columnNames[2];
-		final String colAction = columnNames[3];
-		String name = null;
+		super(MySQLDatabase.readName(rawData, columnNames[0]));
 		try
 		{
-			name = rawData.getString(colName);
-		}
-		catch (final Exception e)
-		{
-			name = "ERROR";
-			e.printStackTrace();
-		}
-		finally
-		{
-			this.player = name;
-		}
-		try
-		{
-			password = rawData.getString(colPassword);
+			password = rawData.getString(columnNames[1]);
 		}
 		catch (final SQLException e)
 		{
@@ -117,7 +92,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		}
 		try
 		{
-			final String ipsString = rawData.getString(colIPs);
+			final String ipsString = rawData.getString(columnNames[2]);
 			if (ipsString != null)
 			{
 				final String[] ips = ipsString.split(",");
@@ -131,7 +106,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		}
 		try
 		{
-			lastAction = rawData.getTimestamp(colAction);
+			lastAction = rawData.getTimestamp(columnNames[3]);
 		}
 		catch (final SQLException e)
 		{
@@ -146,16 +121,12 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	public void saveToMySQLDatabase(final MySQLConnection connection, final String table, final String[] columnNames)
 	{
 		Statement query = null;
-		final String colName = columnNames[0];
-		final String colPassword = columnNames[1];
-		final String colIPs = columnNames[2];
-		final String colAction = columnNames[3];
 		final String IPs = ChatHelper.listingString(",", ips);
 		try
 		{
 			query = connection.getConnection().createStatement();
 			final Timestamp timestamp = new Timestamp(lastAction.getTime());
-			query.executeUpdate("INSERT INTO " + table + " (" + colName + "," + colPassword + "," + colIPs + "," + colAction + ") VALUES ('" + player + "','" + password + "','" + IPs + "','" + timestamp + "') " + " ON DUPLICATE KEY UPDATE " + colPassword + "='" + password + "', " + colIPs + "='" + IPs + "'," + colAction + "='" + timestamp + "'");
+			query.executeUpdate("INSERT INTO " + table + " (" + columnNames[0] + "," + columnNames[1] + "," + columnNames[3] + "," + columnNames[4] + ") VALUES ('" + name + "','" + password + "','" + IPs + "','" + timestamp + "') " + " ON DUPLICATE KEY UPDATE " + columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "'," + columnNames[3] + "='" + timestamp + "'");
 		}
 		catch (final SQLException e)
 		{
@@ -177,8 +148,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	// aus Flat-Datenbank laden
 	public LoginPlayerData(final String[] rawData)
 	{
-		super();
-		this.player = rawData[0];
+		super(rawData[0]);
 		this.password = rawData[1];
 		try
 		{
@@ -202,7 +172,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	public String[] saveToFlatDatabase()
 	{
 		final String[] strings = new String[4];
-		strings[0] = player;
+		strings[0] = name;
 		strings[1] = password;
 		strings[2] = ChatHelper.listingString(",", ips);
 		if (strings[2].equals(""))
@@ -211,39 +181,21 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		return strings;
 	}
 
-	@Override
-	public String getName()
-	{
-		return player;
-	}
-
-	@Override
-	public Player getPlayer()
-	{
-		return Bukkit.getPlayerExact(player);
-	}
-
 	protected String getPassword()
 	{
 		return password;
 	}
 
 	@Override
-	public OfflinePlayer getOfflinePlayer()
-	{
-		return Bukkit.getOfflinePlayer(player);
-	}
-
-	@Override
 	public boolean equals(final Object obj)
 	{
 		if (obj instanceof LoginData)
-			return equals((LoginData) obj);
+			return equals((LoginData<?>) obj);
 		return false;
 	}
 
 	@Override
-	public boolean equals(final LoginData data)
+	public boolean equals(final LoginData<?> data)
 	{
 		return getName().equals(data.getName()) && data.isPasswordHash(password);
 	}
@@ -251,7 +203,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public int hashCode()
 	{
-		return player.toLowerCase().hashCode() + password.hashCode();
+		return name.toLowerCase().hashCode() + password.hashCode();
 	}
 
 	@Override
@@ -259,7 +211,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	{
 		try
 		{
-			this.password = CrazyLogin.getPlugin().getEncryptor().encrypt(player, genSeed(), password);
+			this.password = CrazyLogin.getPlugin().getEncryptor().encrypt(name, genSeed(), password);
 		}
 		catch (final UnsupportedEncodingException e)
 		{
@@ -285,7 +237,9 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	@Override
 	public boolean isPassword(final String password)
 	{
-		return CrazyLogin.getPlugin().getEncryptor().match(player, password, this.password);
+		if (password.equals("FAILEDLOADING"))
+			return false;
+		return CrazyLogin.getPlugin().getEncryptor().match(name, password, this.password);
 	}
 
 	@Override
@@ -330,18 +284,9 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	}
 
 	@Override
-	public boolean isOnline()
+	public boolean isLoggedIn()
 	{
 		return online;
-	}
-
-	@Override
-	public boolean isPlayerOnline()
-	{
-		final Player player = getPlayer();
-		if (player == null)
-			return false;
-		return player.isOnline();
 	}
 
 	@Override
@@ -374,7 +319,7 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 		String IP = getLatestIP();
 		if (!IP.equals(""))
 			IP = " @" + IP;
-		return (online ? ChatColor.GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(lastAction) + IP;
+		return (online ? ChatColor.GREEN : ChatColor.WHITE) + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(lastAction) + IP;
 	}
 
 	public void checkTimeOut(final CrazyLogin plugin, final boolean ignoreIfOnline)
@@ -387,14 +332,80 @@ public class LoginPlayerData implements ConfigurationDatabaseEntry, MySQLDatabas
 	public void checkTimeOut(final CrazyLogin plugin, final Date timeOut, final boolean ignoreIfOnline)
 	{
 		if (ignoreIfOnline)
-			if (isPlayerOnline())
+			if (isOnline())
 				return;
 		if (timeOut.after(lastAction))
 			this.online = false;
 	}
 
-	public void setOnline(boolean online)
+	public void setOnline(final boolean online)
 	{
 		this.online = online;
+	}
+
+	@Override
+	public String getParameter(final int index)
+	{
+		switch (index)
+		{
+			case 0:
+				return getName();
+			case 1:
+				return CrazyPluginInterface.DateFormat.format(lastAction);
+			case 2:
+				return online ? "Online" : "Offline";
+			case 3:
+				return getLatestIP();
+		}
+		return "";
+	}
+
+	@Override
+	public int getParameterCount()
+	{
+		return 4;
+	}
+
+	@Override
+	public String getShortInfo(final String... args)
+	{
+		return toString();
+	}
+
+	@Override
+	public void show(final CommandSender sender)
+	{
+		final CrazyLogin plugin = CrazyLogin.getPlugin();
+		final Player player = getPlayer();
+		plugin.sendLocaleMessage("PLAYERINFO.HEAD", sender, CrazyPluginInterface.DateFormat.format(new Date()));
+		plugin.sendLocaleMessage("PLAYERINFO.USERNAME", sender, getName());
+		if (player == null)
+		{
+			plugin.sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, getLatestIP());
+			// Associates
+			HashSet<String> associates = new HashSet<String>();
+			for (LoginPlayerData data : plugin.getPlayerDatasPerIP(getLatestIP()))
+				associates.add(data.getName());
+			plugin.sendLocaleMessage("PLAYERINFO.ASSOCIATES", sender, ChatHelper.listingString(associates));
+		}
+		else
+		{
+			plugin.sendLocaleMessage("PLAYERINFO.DISPLAYNAME", sender, player.getDisplayName());
+			plugin.sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, player.getAddress().getAddress().getHostAddress());
+			plugin.sendLocaleMessage("PLAYERINFO.CONNECTION", sender, player.getAddress().getHostName());
+			// Associates
+			HashSet<String> associates = new HashSet<String>();
+			for (LoginPlayerData data : plugin.getPlayerDatasPerIP(getLatestIP()))
+				associates.add(data.getName());
+			plugin.sendLocaleMessage("PLAYERINFO.ASSOCIATES", sender, ChatHelper.listingString(associates));
+			if (sender.hasPermission("crazylogin.playerinfo.extended"))
+				plugin.sendLocaleMessage("PLAYERINFO.URL", sender, player.getAddress().getAddress().getHostAddress());
+		}
+	}
+
+	@Override
+	public void show(final CommandSender sender, final String... args)
+	{
+		show(sender);
 	}
 }
