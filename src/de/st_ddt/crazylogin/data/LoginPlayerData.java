@@ -126,7 +126,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		{
 			query = connection.getConnection().createStatement();
 			final Timestamp timestamp = new Timestamp(lastAction.getTime());
-			query.executeUpdate("INSERT INTO " + table + " (" + columnNames[0] + "," + columnNames[1] + "," + columnNames[3] + "," + columnNames[4] + ") VALUES ('" + name + "','" + password + "','" + IPs + "','" + timestamp + "') " + " ON DUPLICATE KEY UPDATE " + columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "'," + columnNames[3] + "='" + timestamp + "'");
+			query.executeUpdate("INSERT INTO " + table + " (" + columnNames[0] + "," + columnNames[1] + "," + columnNames[2] + "," + columnNames[3] + ") VALUES ('" + name + "','" + password + "','" + IPs + "','" + timestamp + "') " + " ON DUPLICATE KEY UPDATE " + columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "'," + columnNames[3] + "='" + timestamp + "'");
 		}
 		catch (final SQLException e)
 		{
