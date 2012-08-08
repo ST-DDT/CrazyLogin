@@ -134,12 +134,8 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	@Override
 	public void onDisable()
 	{
-		for (Player player : Bukkit.getOnlinePlayers())
-		{
-			LoginPlayerData data = getPlayerData(player);
-			if (data != null)
-				data.notifyAction();
-		}
+		for (LoginPlayerData data : getOnlinePlayerDatas())
+			data.notifyAction();
 		playerListener.shutdown();
 		super.onDisable();
 	}
