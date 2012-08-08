@@ -11,7 +11,7 @@ import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
 public class CrazyLoginMySQLDatabase extends MySQLDatabase<LoginPlayerData> implements PlayerDataDatabase<LoginPlayerData>
 {
 
-	public CrazyLoginMySQLDatabase(final String tableName, final ConfigurationSection config)
+	public CrazyLoginMySQLDatabase(final String tableName, final ConfigurationSection config) throws Exception
 	{
 		super(LoginPlayerData.class, tableName, config, getColumns(config), 0);
 	}
@@ -19,10 +19,10 @@ public class CrazyLoginMySQLDatabase extends MySQLDatabase<LoginPlayerData> impl
 	private static MySQLColumn[] getColumns(final ConfigurationSection config)
 	{
 		final MySQLColumn[] columns = new MySQLColumn[4];
-		columns[0] = new MySQLColumn(config.getString("column.name", "name"), "CHAR(50)", true, false);
-		columns[1] = new MySQLColumn(config.getString("column.password", "password"), "CHAR(255)", null, false, false);
-		columns[2] = new MySQLColumn(config.getString("column.ips", "ips"), "CHAR(255)", null, false, false);
-		columns[3] = new MySQLColumn(config.getString("column.lastAction", "lastAction"), "TIMESTAMP", null, false, false);
+		columns[0] = new MySQLColumn("name", "CHAR(50)", true, false);
+		columns[1] = new MySQLColumn("password", "CHAR(255)", null, false, false);
+		columns[2] = new MySQLColumn("ips", "CHAR(255)", null, false, false);
+		columns[3] = new MySQLColumn("lastAction", "TIMESTAMP", null, false, false);
 		return columns;
 	}
 
