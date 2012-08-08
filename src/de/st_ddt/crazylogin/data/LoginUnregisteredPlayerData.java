@@ -1,8 +1,8 @@
 package de.st_ddt.crazylogin.data;
 
 import java.util.Date;
+import java.util.HashSet;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -10,34 +10,22 @@ import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyplugin.CrazyPluginInterface;
+import de.st_ddt.crazyplugin.data.PlayerData;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
+import de.st_ddt.crazyutil.ChatHelper;
+import de.st_ddt.crazyutil.locales.CrazyLocale;
 
-public class LoginUnregisteredPlayerData implements LoginData<LoginUnregisteredPlayerData>
+public class LoginUnregisteredPlayerData extends PlayerData<LoginUnregisteredPlayerData> implements LoginData
 {
-
-	private final String player;
 
 	public LoginUnregisteredPlayerData(final String name)
 	{
-		super();
-		this.player = name;
+		super(name);
 	}
 
 	public LoginUnregisteredPlayerData(final OfflinePlayer player)
 	{
 		this(player.getName());
-	}
-
-	@Override
-	public String getName()
-	{
-		return player;
-	}
-
-	@Override
-	public Player getPlayer()
-	{
-		return Bukkit.getPlayerExact(player);
 	}
 
 	protected String getPassword()
@@ -46,21 +34,15 @@ public class LoginUnregisteredPlayerData implements LoginData<LoginUnregisteredP
 	}
 
 	@Override
-	public OfflinePlayer getOfflinePlayer()
-	{
-		return Bukkit.getOfflinePlayer(player);
-	}
-
-	@Override
 	public boolean equals(final Object obj)
 	{
 		if (obj instanceof LoginData)
-			return equals((LoginData<?>) obj);
+			return equals((LoginData) obj);
 		return false;
 	}
 
 	@Override
-	public boolean equals(final LoginData<?> data)
+	public boolean equals(final LoginData data)
 	{
 		if (data instanceof LoginPlayerData)
 			return false;
@@ -70,7 +52,7 @@ public class LoginUnregisteredPlayerData implements LoginData<LoginUnregisteredP
 	@Override
 	public int hashCode()
 	{
-		return player.toLowerCase().hashCode();
+		return name.toLowerCase().hashCode();
 	}
 
 	@Override
@@ -183,41 +165,31 @@ public class LoginUnregisteredPlayerData implements LoginData<LoginUnregisteredP
 	}
 
 	@Override
-	public String getShortInfo(final String... arg0)
-	{
-		return toString();
-	}
-
-	@Override
-	public void show(final CommandSender sender)
-	{
-		final CrazyLogin plugin = CrazyLogin.getPlugin();
-		final Player player = getPlayer();
-		plugin.sendLocaleMessage("PLAYERINFO.HEAD", sender, CrazyPluginInterface.DateFormat.format(new Date()));
-		plugin.sendLocaleMessage("PLAYERINFO.USERNAME", sender, getName());
-		if (player == null)
-		{
-			plugin.sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, getLatestIP());
-		}
-		else
-		{
-			plugin.sendLocaleMessage("PLAYERINFO.DISPLAYNAME", sender, player.getDisplayName());
-			plugin.sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, player.getAddress().getAddress().getHostAddress());
-			plugin.sendLocaleMessage("PLAYERINFO.CONNECTION", sender, player.getAddress().getHostName());
-			if (sender.hasPermission("crazylogin.playerinfo.extended"))
-				plugin.sendLocaleMessage("PLAYERINFO.URL", sender, player.getAddress().getAddress().getHostAddress());
-		}
-	}
-
-	@Override
-	public void show(final CommandSender sender, final String... args)
-	{
-		show(sender);
-	}
-
-	@Override
 	public boolean isLoggedIn()
 	{
 		return false;
+	}
+
+	public CrazyLogin getPlugin()
+	{
+		return CrazyLogin.getPlugin();
+	}
+
+	@Override
+	protected String getChatHeader()
+	{
+		return getPlugin().getChatHeader();
+	}
+
+	@Override
+	public void showDetailed(CommandSender target, String chatHeader)
+	{
+		if (!isOnline())
+			return;
+		final CrazyLocale locale = CrazyLocale.getLocaleHead().getSecureLanguageEntry("CRAZYLOGIN.PLAYERINFO");
+		HashSet<String> associates = new HashSet<String>();
+		for (LoginPlayerData data : getPlugin().getPlayerDatasPerIP(getLatestIP()))
+			associates.add(data.getName());
+		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("ASSOCIATES"), ChatHelper.listingString(associates));
 	}
 }

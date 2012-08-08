@@ -71,7 +71,7 @@ import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.ToStringDataGetter;
 import de.st_ddt.crazyutil.databases.DatabaseType;
 
-public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implements LoginPlugin<LoginPlayerData>
+public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData> implements LoginPlugin<LoginPlayerData>
 {
 
 	private static CrazyLogin plugin;
@@ -110,8 +110,6 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 	protected String filterNames;
 	protected int minNameLength;
 	protected int maxNameLength;
-	// Database
-	protected boolean saveDatabaseOnShutdown;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -137,9 +135,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 	public void onDisable()
 	{
 		playerListener.shutdown();
-		if (saveDatabaseOnShutdown)
-			saveDatabase();
-		saveConfiguration();
+		super.onDisable();
 	}
 
 	public void registerHooks()
@@ -247,7 +243,6 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 		// Database
 		setupDatabase();
 		dropInactiveAccounts();
-		saveDatabaseOnShutdown = config.getBoolean("database.saveOnShutdown", true);
 		// OnlinePlayer
 		for (final Player player : getServer().getOnlinePlayers())
 		{
@@ -276,7 +271,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 		{
 			if (type == DatabaseType.CONFIG)
 			{
-				database = new CrazyLoginConfigurationDatabase(tableName, config);
+				database = new CrazyLoginConfigurationDatabase(tableName, config, this);
 			}
 			else if (type == DatabaseType.MYSQL)
 			{
@@ -340,21 +335,13 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 	}
 
 	@Override
-	public void save()
-	{
-		saveDatabase();
-		saveConfiguration();
-	}
-
 	public void saveDatabase()
 	{
-		final ConfigurationSection config = getConfig();
-		if (database != null)
-			config.set("database.saveType", database.getType().toString());
 		dropInactiveAccounts();
-		database.saveDatabase();
+		super.saveDatabase();
 	}
 
+	@Override
 	public void saveConfiguration()
 	{
 		final ConfigurationSection config = getConfig();
@@ -389,9 +376,8 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 			config.set("filterNames", filterNames);
 		config.set("minNameLength", minNameLength);
 		config.set("maxNameLength", maxNameLength);
-		config.set("database.saveOnShutdown", saveDatabaseOnShutdown);
 		logger.save(config, "logs.");
-		saveConfig();
+		super.saveConfiguration();
 	}
 
 	@Override
@@ -505,42 +491,32 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 			if (!isLoggedIn((Player) sender))
 				throw new CrazyCommandPermissionException();
 		}
-		if (commandLabel.equalsIgnoreCase("admin"))
+		if (commandLabel.equals("admin"))
 		{
 			commandMainAdmin(sender, args);
 			return true;
 		}
-		if (commandLabel.equalsIgnoreCase("player") || commandLabel.equalsIgnoreCase("playerinfo"))
-		{
-			commandPlayerInfo(sender, args);
-			return true;
-		}
-		if (commandLabel.equalsIgnoreCase("list") || commandLabel.equalsIgnoreCase("accounts"))
+		if (commandLabel.equals("list") || commandLabel.equals("accounts"))
 		{
 			commandMainList(sender, args);
 			return true;
 		}
-		if (commandLabel.equalsIgnoreCase("mode"))
+		if (commandLabel.equals("dropolddata"))
+		{
+			commandMainDropOldData(sender, args);
+			return true;
+		}
+		if (commandLabel.equals("mode"))
 		{
 			commandMainMode(sender, args);
 			return true;
 		}
-		if (commandLabel.equalsIgnoreCase("create"))
-		{
-			commandMainCreate(sender, args);
-			return true;
-		}
-		if (commandLabel.equalsIgnoreCase("delete"))
-		{
-			commandMainDelete(sender, args);
-			return true;
-		}
-		if (commandLabel.equalsIgnoreCase("commands"))
+		if (commandLabel.equals("commands"))
 		{
 			commandMainCommands(sender, args);
 			return true;
 		}
-		return false;
+		return super.commandMain(sender, commandLabel, args);
 	}
 
 	public void commandMainPassword(final CommandSender sender, final String[] args) throws CrazyCommandException
@@ -737,7 +713,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 					throw new CrazyCommandUsageException("/crazylogin list [name:Player] [ip:IP] [registered:True/False/*] [online:True/False/*] [amount:Integer] [sort:Name/IP/Date] [[page:]Integer] [> Pipe]");
 				}
 		}
-		final ArrayList<LoginData<?>> dataList = new ArrayList<LoginData<?>>();
+		final ArrayList<LoginData> dataList = new ArrayList<LoginData>();
 		if (registeredFilter == null)
 		{
 			dataList.addAll(database.getAllEntries());
@@ -757,7 +733,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 		}
 		if (IPFilter != null)
 		{
-			final Iterator<LoginData<?>> it = dataList.iterator();
+			final Iterator<LoginData> it = dataList.iterator();
 			while (it.hasNext())
 				if (!it.next().hasIP(IPFilter))
 					it.remove();
@@ -773,14 +749,14 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 			{
 				throw new CrazyCommandErrorException(e);
 			}
-			final Iterator<LoginData<?>> it = dataList.iterator();
+			final Iterator<LoginData> it = dataList.iterator();
 			while (it.hasNext())
 				if (!pattern.matcher(it.next().getName().toLowerCase()).matches())
 					it.remove();
 		}
 		if (onlineFilter != null)
 		{
-			final Iterator<LoginData<?>> it = dataList.iterator();
+			final Iterator<LoginData> it = dataList.iterator();
 			while (it.hasNext())
 				if (!onlineFilter.equals(it.next().isOnline()))
 					it.remove();
@@ -795,25 +771,9 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 		sendListMessage(sender, "PLAYERDATA.LISTHEAD", amount, page, dataList, new ToStringDataGetter());
 	}
 
-	private void commandMainCreate(final CommandSender sender, final String[] args) throws CrazyCommandException
+	protected void commandMainDropOldData(final CommandSender sender, final String[] args) throws CrazyCommandException
 	{
-		if (!sender.hasPermission("crazylogin.create"))
-			throw new CrazyCommandPermissionException();
-		if (args.length < 2)
-			throw new CrazyCommandUsageException("/crazylogin create <Name> <Password>");
-		final String name = args[0];
-		if (database.hasEntry(name))
-			throw new CrazyCommandAlreadyExistsException("Accout", name);
-		final LoginPlayerData data = new LoginPlayerData(name);
-		final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
-		data.setPassword(password);
-		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
-		database.save(data);
-	}
-
-	private void commandMainDelete(final CommandSender sender, final String[] args) throws CrazyCommandException
-	{
-		if (!sender.hasPermission("crazylogin.delete"))
+		if (!sender.hasPermission("crazylogin.dropOldData"))
 		{
 			String days = "(-)";
 			if (args.length != 0)
@@ -823,9 +783,9 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 		}
 		if (args.length < 2)
 			if (sender instanceof ConsoleCommandSender)
-				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> CONSOLE_CONFIRM");
+				throw new CrazyCommandUsageException("/crazylogin dropOldData <DaysToKeep> CONSOLE_CONFIRM");
 			else
-				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> <Password>");
+				throw new CrazyCommandUsageException("/crazylogin dropOldData <DaysToKeep> <Password>");
 		int days = 0;
 		try
 		{
@@ -841,12 +801,12 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 		if (sender instanceof ConsoleCommandSender)
 		{
 			if (!password.equals("CONSOLE_CONFIRM"))
-				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> CONSOLE_CONFIRM");
+				throw new CrazyCommandUsageException("/crazylogin dropOldData <DaysToKeep> CONSOLE_CONFIRM");
 		}
 		else
 		{
 			if (!database.getEntry((Player) sender).isPassword(password))
-				throw new CrazyCommandUsageException("/crazylogin delete <DaysToKeep> <Password>");
+				throw new CrazyCommandUsageException("/crazylogin dropOldData <DaysToKeep> <Password>");
 		}
 		final int amount = dropInactiveAccounts(days);
 		broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETED", sender.getName(), days, amount);
@@ -1365,6 +1325,33 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginPlayerData> implement
 				}
 				throw new CrazyCommandUsageException("/crazylogin command [Page]", "/crazylogin command <add/del> command...");
 		}
+	}
+
+	@Override
+	public boolean commandPlayer(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
+	{
+		if (commandLabel.equals("create"))
+		{
+			commandPlayerCreate(sender, args);
+			return true;
+		}
+		return super.commandPlayer(sender, commandLabel, args);
+	}
+
+	protected void commandPlayerCreate(final CommandSender sender, final String[] args) throws CrazyCommandException
+	{
+		if (!sender.hasPermission("crazylogin.player.create"))
+			throw new CrazyCommandPermissionException();
+		if (args.length < 2)
+			throw new CrazyCommandUsageException("/crazylogin create <Name> <Password>");
+		final String name = args[0];
+		if (database.hasEntry(name))
+			throw new CrazyCommandAlreadyExistsException("Account", name);
+		final LoginPlayerData data = new LoginPlayerData(name);
+		final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
+		data.setPassword(password);
+		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
+		database.save(data);
 	}
 
 	@Override

@@ -27,8 +27,9 @@ import de.st_ddt.crazyutil.databases.FlatDatabaseEntry;
 import de.st_ddt.crazyutil.databases.MySQLConnection;
 import de.st_ddt.crazyutil.databases.MySQLDatabase;
 import de.st_ddt.crazyutil.databases.MySQLDatabaseEntry;
+import de.st_ddt.crazyutil.locales.CrazyLocale;
 
-public class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationDatabaseEntry, MySQLDatabaseEntry, FlatDatabaseEntry, LoginData<LoginPlayerData>
+public class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationDatabaseEntry, MySQLDatabaseEntry, FlatDatabaseEntry, LoginData
 {
 
 	private String password;
@@ -190,12 +191,12 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	public boolean equals(final Object obj)
 	{
 		if (obj instanceof LoginData)
-			return equals((LoginData<?>) obj);
+			return equals((LoginData) obj);
 		return false;
 	}
 
 	@Override
-	public boolean equals(final LoginData<?> data)
+	public boolean equals(final LoginData data)
 	{
 		return getName().equals(data.getName()) && data.isPasswordHash(password);
 	}
@@ -366,46 +367,27 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		return 4;
 	}
 
-	@Override
-	public String getShortInfo(final String... args)
+	public CrazyLogin getPlugin()
 	{
-		return toString();
+		return CrazyLogin.getPlugin();
 	}
 
 	@Override
-	public void show(final CommandSender sender)
+	protected String getChatHeader()
 	{
-		final CrazyLogin plugin = CrazyLogin.getPlugin();
-		final Player player = getPlayer();
-		plugin.sendLocaleMessage("PLAYERINFO.HEAD", sender, CrazyPluginInterface.DateFormat.format(new Date()));
-		plugin.sendLocaleMessage("PLAYERINFO.USERNAME", sender, getName());
-		if (player == null)
-		{
-			plugin.sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, getLatestIP());
-			// Associates
-			HashSet<String> associates = new HashSet<String>();
-			for (LoginPlayerData data : plugin.getPlayerDatasPerIP(getLatestIP()))
-				associates.add(data.getName());
-			plugin.sendLocaleMessage("PLAYERINFO.ASSOCIATES", sender, ChatHelper.listingString(associates));
-		}
-		else
-		{
-			plugin.sendLocaleMessage("PLAYERINFO.DISPLAYNAME", sender, player.getDisplayName());
-			plugin.sendLocaleMessage("PLAYERINFO.IPADDRESS", sender, player.getAddress().getAddress().getHostAddress());
-			plugin.sendLocaleMessage("PLAYERINFO.CONNECTION", sender, player.getAddress().getHostName());
-			// Associates
-			HashSet<String> associates = new HashSet<String>();
-			for (LoginPlayerData data : plugin.getPlayerDatasPerIP(getLatestIP()))
-				associates.add(data.getName());
-			plugin.sendLocaleMessage("PLAYERINFO.ASSOCIATES", sender, ChatHelper.listingString(associates));
-			if (sender.hasPermission("crazylogin.playerinfo.extended"))
-				plugin.sendLocaleMessage("PLAYERINFO.URL", sender, player.getAddress().getAddress().getHostAddress());
-		}
+		return getPlugin().getChatHeader();
 	}
 
 	@Override
-	public void show(final CommandSender sender, final String... args)
+	public void showDetailed(CommandSender target, String chatHeader)
 	{
-		show(sender);
+		final CrazyLocale locale = CrazyLocale.getLocaleHead().getSecureLanguageEntry("CRAZYLOGIN.PLAYERINFO");
+		if (!isOnline())
+			ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("IPADDRESS"), getLatestIP());
+		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("LASTACTION"), CrazyPluginInterface.DateFormat.format(getLastActionTime()));
+		HashSet<String> associates = new HashSet<String>();
+		for (LoginPlayerData data : getPlugin().getPlayerDatasPerIP(getLatestIP()))
+			associates.add(data.getName());
+		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("ASSOCIATES"), ChatHelper.listingString(associates));
 	}
 }

@@ -2,7 +2,7 @@ name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
 #C*=needed core version
-version: C8_6.0.1
+version: C8.1_6.1
 depend: [CrazyCore]
 description: >
             CrazyLogin protect your server with passwords and many usefully features.
@@ -34,13 +34,14 @@ permissions:
       crazylogin.warndelete: true
       crazylogin.warnsession: true
       crazylogin.register: true
-      crazylogin.create: true
-      crazylogin.delete: true
+      crazylogin.list: true
       crazylogin.commands: true
-      crazylogin.playerinfo: true
-      crazylogin.playerinfo.self: true
-      crazylogin.playerinfo.other: true
-      crazylogin.playerinfo.extended: true
+      crazylogin.dropOldData: true
+      crazylogin.player.info: true
+      crazylogin.player.info.self: true
+      crazylogin.player.info.other: true
+      crazylogin.player.create: true
+      crazylogin.player.delete: true
       crazylogin.list: true
   crazylogin.admin:
     description: Allow changing account data for other players
@@ -54,10 +55,14 @@ permissions:
       crazylogin.warndelete: true
       crazylogin.warnsession: true
       crazylogin.register: true
-      crazylogin.create: true
-      crazylogin.delete: true
       crazylogin.commands: true
       crazylogin.list: true
+      crazylogin.dropOldData: true
+      crazylogin.player.info: true
+      crazylogin.player.info.self: true
+      crazylogin.player.info.other: true
+      crazylogin.player.create: true
+      crazylogin.player.delete: true
   crazylogin.ensureregistration:
     description: This player can always register an account
     default: op
@@ -82,36 +87,35 @@ permissions:
   crazylogin.warndelete:
     description: Get informed if old accounts are deleted (via admincommands)
     default: op
-  crazylogin.create:
-    description: Allow creating new accounts for another player.
-    default: op
-  crazylogin.delete:
-    description: Allow deleting old accounts.
-    default: op
-    children:
-      crazylogin.warndelete: true
   crazylogin.mode:
     description: Allow changing plugin mode
     default: op
   crazylogin.commands:
     description: Allow viewing and editing command whitelist.
     default: op
-  crazylogin.playerinfo:
+  crazylogin.list:
+    description: List all player accounts.
+    default: op
+  crazylogin.dropOldData:
+    description: Allow deleting old accounts.
+    default: op
+    children:
+      crazylogin.warndelete: true
+  crazylogin.player.info:
     description: Allow viewing playerinfo.
     default: op
     children:
-      crazylogin.playerinfo.self: true
-      crazylogin.playerinfo.other: true
-      crazylogin.playerinfo.extended: true
+      crazylogin.player.info.self: true
+      crazylogin.player.info.other: true
   crazylogin.playerinfo.self:
     description: Allow viewing own playerinfo.
     default: true
-  crazylogin.playerinfo.other:
+  crazylogin.player.info.other:
     description: Allow viewing playerinfo for other players.
     default: op
-  crazylogin.playerinfo.extended:
-    description: Show link to detailed playerinfo.
+  crazylogin.player.create:
+    description: Allow creating player data
     default: op
-  crazylogin.list:
-    description: List all player accounts.
+  crazylogin.player.delete:
+    description: Allow deleting player data
     default: op
