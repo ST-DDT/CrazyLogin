@@ -386,8 +386,9 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 			ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("IPADDRESS"), getLatestIP());
 		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("LASTACTION"), CrazyPluginInterface.DateFormat.format(getLastActionTime()));
 		HashSet<String> associates = new HashSet<String>();
-		for (LoginPlayerData data : getPlugin().getPlayerDatasPerIP(getLatestIP()))
-			associates.add(data.getName());
+		for (String ip : ips)
+			for (LoginPlayerData data : getPlugin().getPlayerDatasPerIP(ip))
+				associates.add(data.getName());
 		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("ASSOCIATES"), ChatHelper.listingString(associates));
 	}
 }
