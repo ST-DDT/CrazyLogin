@@ -1,11 +1,12 @@
 # CrazyLogin config.yml
-# The current version number (required CoreVersion_PluginVersion)
+# For more information visit
+# https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/config.yml
 version: C8_6
 database:
 # the table/file/section name of the database
   tableName: CrazyLogin_players
 # column names (does not affect FLAT databases)
-  column:
+  columns:
     name: name
     password: password
     ips: ips
