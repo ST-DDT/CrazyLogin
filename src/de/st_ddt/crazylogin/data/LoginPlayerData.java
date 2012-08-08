@@ -382,13 +382,13 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	public void showDetailed(CommandSender target, String chatHeader)
 	{
 		final CrazyLocale locale = CrazyLocale.getLocaleHead().getSecureLanguageEntry("CRAZYLOGIN.PLAYERINFO");
-		if (!isOnline())
-			ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("IPADDRESS"), getLatestIP());
+		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("IPADDRESS"), ChatHelper.listingString(ips));
 		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("LASTACTION"), CrazyPluginInterface.DateFormat.format(getLastActionTime()));
 		HashSet<String> associates = new HashSet<String>();
 		for (String ip : ips)
 			for (LoginPlayerData data : getPlugin().getPlayerDatasPerIP(ip))
 				associates.add(data.getName());
+		associates.remove(name);
 		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("ASSOCIATES"), ChatHelper.listingString(associates));
 	}
 }
