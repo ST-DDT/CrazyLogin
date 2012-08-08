@@ -107,7 +107,7 @@ permissions:
     children:
       crazylogin.player.info.self: true
       crazylogin.player.info.other: true
-  crazylogin.playerinfo.self:
+  crazylogin.player.info.self:
     description: Allow viewing own playerinfo.
     default: true
   crazylogin.player.info.other:
