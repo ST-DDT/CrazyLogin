@@ -140,7 +140,6 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 			if (data != null)
 				data.notifyAction();
 		}
-		super.onDisable();
 		playerListener.shutdown();
 		super.onDisable();
 	}
