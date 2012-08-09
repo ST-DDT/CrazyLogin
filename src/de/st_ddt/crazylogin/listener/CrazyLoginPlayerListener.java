@@ -98,7 +98,7 @@ public class CrazyLoginPlayerListener implements Listener
 			{
 				if (plugin.isForceSingleSessionSameIPBypassEnabled())
 				{
-					LoginPlayerData data = plugin.getPlayerData(player);
+					final LoginPlayerData data = plugin.getPlayerData(player);
 					if (data != null)
 						if (event.getAddress().getHostAddress().equals(data.getLatestIP()))
 							return;
@@ -403,15 +403,17 @@ public class CrazyLoginPlayerListener implements Listener
 				if (message.startsWith(command))
 					return;
 			event.setCancelled(true);
-			plugin.broadcastLocaleMessage(true, "crazylogin.warncommandexploits", "COMMAND.EXPLOITWARN", player.getName(), player.getAddress().getAddress().getHostAddress(), message);
+			final String IP = player.getAddress().getAddress().getHostAddress();
 			if (plugin.isAutoKickCommandUsers())
 			{
 				player.kickPlayer(plugin.getLocale().getLocaleMessage(player, "LOGIN.REQUEST"));
-				plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " has been kicked for trying to execute", event.getMessage());
+				plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + IP + " has been kicked for trying to execute", event.getMessage());
+				plugin.broadcastLocaleMessage(true, "crazylogin.warncommandexploits", "COMMAND.EXPLOITWARN", player.getName(), IP, event.getMessage().replaceAll("\\$", "_"));
 				return;
 			}
 			plugin.requestLogin(event.getPlayer());
-			plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to execute", event.getMessage());
+			plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + IP + " tried to execute", event.getMessage());
+			plugin.broadcastLocaleMessage(true, "crazylogin.warncommandexploits", "COMMAND.EXPLOITWARN", player.getName(), IP, event.getMessage().replaceAll("\\$", "_"));
 			return;
 		}
 	}
@@ -479,18 +481,18 @@ public class CrazyLoginPlayerListener implements Listener
 		player.teleport(location, TeleportCause.PLUGIN);
 	}
 
-	public void triggerHidenInventory(Player player)
+	public void triggerHidenInventory(final Player player)
 	{
 		if (hidenInventory.get(player.getName().toLowerCase()) == null)
 		{
-			PlayerSaver saver = new PlayerSaver(player);
+			final PlayerSaver saver = new PlayerSaver(player);
 			hidenInventory.put(player.getName().toLowerCase(), saver);
 			saver.backup();
 			saver.clear();
 		}
 	}
 
-	public void disableHidenInventory(Player player)
+	public void disableHidenInventory(final Player player)
 	{
 		final PlayerSaver saver = hidenInventory.remove(player.getName().toLowerCase());
 		if (saver == null)
@@ -506,7 +508,7 @@ public class CrazyLoginPlayerListener implements Listener
 
 	public void shutdown()
 	{
-		for (Player player : Bukkit.getOnlinePlayers())
+		for (final Player player : Bukkit.getOnlinePlayers())
 		{
 			disableSaveLogin(player);
 			disableHidenInventory(player);
