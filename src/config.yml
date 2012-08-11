@@ -1,7 +1,7 @@
 # CrazyLogin config.yml
 # For more information visit
 # https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/config.yml
-version: C8.1_6.1
+version: C8.1_6.1.1
 database:
 # the table/file/section name of the database
   tableName: CrazyLogin_players

@@ -841,6 +841,16 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("hideInventory"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					hideInventory = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "hideInventory", hideInventory ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("forceSingleSession"))
 				{
 					boolean newValue = false;
@@ -1164,6 +1174,11 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 				else if (args[0].equalsIgnoreCase("forceSaveLogin"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "forceSaveLogin", forceSaveLogin ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("hideInventory"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "hideInventory", hideInventory ? "True" : "False");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("forceSingleSession"))
