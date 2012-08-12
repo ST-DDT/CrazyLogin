@@ -93,7 +93,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	protected boolean blockGuestCommands;
 	protected boolean blockGuestChat;
 	protected boolean blockGuestJoin;
-	protected boolean resetGuestLocations;
+	protected boolean removeGuestData;
 	protected List<String> commandWhiteList;
 	protected String uniqueIDKey;
 	protected boolean doNotSpamRequests;
@@ -134,8 +134,11 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	@Override
 	public void onDisable()
 	{
-		for (LoginPlayerData data : getOnlinePlayerDatas())
+		for (final LoginPlayerData data : getOnlinePlayerDatas())
+		{
 			data.notifyAction();
+			database.save(data);
+		}
 		playerListener.shutdown();
 		super.onDisable();
 	}
@@ -173,7 +176,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		blockGuestCommands = config.getBoolean("blockGuestCommands", false);
 		blockGuestChat = config.getBoolean("blockGuestChat", false);
 		blockGuestJoin = config.getBoolean("blockGuestJoin", false);
-		resetGuestLocations = config.getBoolean("resetGuestLocations", true);
+		removeGuestData = config.getBoolean("removeGuestData", false);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		antiRequestSpamTable.clear();
 		commandWhiteList = config.getStringList("commandWhitelist");
@@ -358,7 +361,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		config.set("blockGuestCommands", blockGuestCommands);
 		config.set("blockGuestChat", blockGuestChat);
 		config.set("blockGuestJoin", blockGuestJoin);
-		config.set("resetGuestLocations", resetGuestLocations);
+		config.set("removeGuestData", removeGuestData);
 		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("commandWhitelist", commandWhiteList);
 		config.set("uniqueIDKey", uniqueIDKey);
@@ -1007,15 +1010,15 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					saveConfiguration();
 					return;
 				}
-				else if (args[0].equalsIgnoreCase("resetGuestLocations"))
+				else if (args[0].equalsIgnoreCase("removeGuestData"))
 				{
 					boolean newValue = false;
 					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
 						newValue = true;
-					resetGuestLocations = newValue;
-					if (resetGuestLocations)
+					removeGuestData = newValue;
+					if (removeGuestData)
 						playerListener.clearMovementBlocker(true);
-					sendLocaleMessage("MODE.CHANGE", sender, "resetGuestLocations", resetGuestLocations ? "True" : "False");
+					sendLocaleMessage("MODE.CHANGE", sender, "removeGuestData", removeGuestData ? "True" : "False");
 					saveConfiguration();
 					return;
 				}
@@ -1164,7 +1167,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					saveConfiguration();
 					return;
 				}
-				throw new CrazyCommandNoSuchException("Mode", args[0]);
+				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm (ReadOnly)");
 			case 1:
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
 				{
@@ -1241,9 +1244,9 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestJoin", blockGuestJoin ? "True" : "False");
 					return;
 				}
-				else if (args[0].equalsIgnoreCase("resetGuestLocations"))
+				else if (args[0].equalsIgnoreCase("removeGuestData"))
 				{
-					sendLocaleMessage("MODE.CHANGE", sender, "resetGuestLocations", resetGuestLocations ? "True" : "False");
+					sendLocaleMessage("MODE.CHANGE", sender, "removeGuestData", removeGuestData ? "True" : "False");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("maxRegistrationsPerIP"))
@@ -1296,7 +1299,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					sendLocaleMessage("MODE.CHANGE", sender, "saveDatabaseOnShutdown", saveDatabaseOnShutdown ? "True" : "False");
 					return;
 				}
-				throw new CrazyCommandNoSuchException("Mode", args[0]);
+				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm");
 			default:
 				throw new CrazyCommandUsageException("/crazylogin mode <Mode> [Value]");
 		}
@@ -1489,20 +1492,22 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		return blockGuestCommands;
 	}
 
+	@Override
 	public boolean isBlockingGuestChatEnabled()
 	{
 		return blockGuestChat;
 	}
 
+	@Override
 	public boolean isBlockingGuestJoinEnabled()
 	{
 		return blockGuestJoin;
 	}
 
 	@Override
-	public boolean isResettingGuestLocationsEnabled()
+	public boolean isRemovingGuestDataEnabled()
 	{
-		return resetGuestLocations;
+		return removeGuestData;
 	}
 
 	@Override

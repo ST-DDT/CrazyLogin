@@ -34,6 +34,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazylogin.tasks.ScheduledKickTask;
+import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
 import de.st_ddt.crazyutil.PlayerSaver;
 
 public class CrazyLoginPlayerListener implements Listener
@@ -195,18 +196,19 @@ public class CrazyLoginPlayerListener implements Listener
 		disableSaveLogin(player);
 		disableHidenInventory(player);
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
-		if (playerdata != null)
+		if (playerdata == null)
+		{
+			if (plugin.isRemovingGuestDataEnabled())
+				new CrazyPlayerRemoveEvent(plugin, player).callEvent();
+		}
+		else
 		{
 			if (!plugin.isLoggedIn(player))
 				return;
 			playerdata.notifyAction();
 			if (plugin.isInstantAutoLogoutEnabled())
 				playerdata.logout();
-		}
-		else
-		{
-			if (plugin.isResettingGuestLocationsEnabled())
-				player.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), TeleportCause.PLUGIN);
+			plugin.getCrazyDatabase().save(playerdata);
 		}
 	}
 

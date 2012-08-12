@@ -1,7 +1,7 @@
 # CrazyLogin config.yml
 # For more information visit
 # https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/config.yml
-version: C8.1_6.1.1
+version: C8.2_6.1.2
 database:
 # the table/file/section name of the database
   tableName: CrazyLogin_players
@@ -39,8 +39,8 @@ blockGuestCommands: false
 blockGuestChat: false
 # when enabled you cannot join without having registered (use with mysql databases) (true/false)
 blockGuestJoin: false
-# guest are teleported to spawn, when leaving the server.
-resetGuestLocations: true
+# guest data are removed when leaving the server
+removeGuestData: false
 # when disabled request login/register messages are spammed every cancelled action, when enabled only every 5 seconds (true/false)
 doNotSpamRequests: false
 # these commands can be executed as guest (even if blockGuestCommands is enabled) or when not logged in
