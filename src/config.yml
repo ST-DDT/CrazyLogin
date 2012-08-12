@@ -1,7 +1,7 @@
 # CrazyLogin config.yml
 # For more information visit
 # https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/config.yml
-version: C8.2_6.1.2
+version: C8.2_6.2
 database:
 # the table/file/section name of the database
   tableName: CrazyLogin_players
@@ -52,6 +52,7 @@ commandWhitelist:
 # the encryption alogrithm used to encrypt your passwords. View plugin main page for more information
 algorithm: CrazyCrypt1
 # automatically delete accounts that haven't been used for x day (-1=disabled)
+# WARNING: deletes all data belonging to this player in every listening plugin and the player file itself.
 autoDelete: -1
 # block player join with an online players name (prevents Logged in from another location messages) (true/false)
 forceSingleSession: true
@@ -66,7 +67,6 @@ maxOnlinesPerIP: 3
 # maximum players allowed to register an account using the same ip on your server
 maxRegistrationsPerIP: 3
 # call special events (do not enable it, if you don't need it)
-# when player data are deleted via autoDelete /crazycore delete <Player> is triggered
 # send raw passwords to other plugins when changing passwords
 pluginCommunicationEnabled: false
 # you can move x blocks from the location you joined when not logged in

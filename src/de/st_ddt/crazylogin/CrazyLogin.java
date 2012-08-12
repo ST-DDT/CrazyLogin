@@ -333,8 +333,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		for (final String name : deletions)
 		{
 			database.deleteEntry(name);
-			if (pluginCommunicationEnabled)
-				Bukkit.getPluginManager().callEvent(new CrazyPlayerRemoveEvent(this, name));
+			new CrazyPlayerRemoveEvent(this, name).callAsyncEvent();
 		}
 		return deletions.size();
 	}
@@ -416,23 +415,23 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		final String password = ChatHelper.listingString(args);
 		final LoginPlayerData data = database.getEntry(player);
 		final CrazyLoginPreLoginEvent<LoginPlayerData> event = new CrazyLoginPreLoginEvent<LoginPlayerData>(this, player, data);
-		getServer().getPluginManager().callEvent(event);
+		event.callEvent();
 		if (event.isCancelled())
 		{
-			getServer().getPluginManager().callEvent(new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.CANCELLED));
+			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.CANCELLED).callAsyncEvent();
 			sendLocaleMessage("LOGIN.FAILED", player);
 			return;
 		}
 		if (data == null)
 		{
-			getServer().getPluginManager().callEvent(new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.NO_ACCOUNT));
+			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.NO_ACCOUNT).callAsyncEvent();
 			sendLocaleMessage("REGISTER.HEADER", player);
 			sendLocaleMessage("REGISTER.MESSAGE", player);
 			return;
 		}
 		if (!data.login(password))
 		{
-			getServer().getPluginManager().callEvent(new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.WRONG_PASSWORD));
+			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.WRONG_PASSWORD).callAsyncEvent();
 			broadcastLocaleMessage(true, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			Integer fails = loginFailures.get(player.getName().toLowerCase());
 			if (fails == null)
@@ -451,7 +450,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 			logger.log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong password");
 			return;
 		}
-		getServer().getPluginManager().callEvent(new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data));
+		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callAsyncEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
 		logger.log("Login", player.getName() + " logged in successfully");
 		playerListener.removeFromMovementBlocker(player);
@@ -552,7 +551,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					if (registrations >= maxRegistrationsPerIP)
 						throw new CrazyCommandExceedingLimitsException("Max Registrations per IP", maxRegistrationsPerIP);
 			final CrazyLoginPreRegisterEvent<LoginPlayerData> event = new CrazyLoginPreRegisterEvent<LoginPlayerData>(this, player, data);
-			getServer().getPluginManager().callEvent(event);
+			event.callEvent();
 			if (event.isCancelled())
 				throw new CrazyCommandPermissionException();
 			data = new LoginPlayerData(player);
@@ -560,7 +559,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		}
 		final String password = ChatHelper.listingString(args);
 		if (pluginCommunicationEnabled)
-			getServer().getPluginManager().callEvent(new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password));
+			new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password).callAsyncEvent();
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
