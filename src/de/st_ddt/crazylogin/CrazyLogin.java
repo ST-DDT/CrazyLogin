@@ -129,17 +129,17 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		registerHooks();
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new ScheduledCheckTask(this), 30 * 60 * 20, 15 * 60 * 20);
 		super.onEnable();
+		// OnlinePlayer
+		for (final Player player : Bukkit.getOnlinePlayers())
+			playerListener.PlayerJoin(player);
 	}
 
 	@Override
 	public void onDisable()
 	{
-		for (final LoginPlayerData data : getOnlinePlayerDatas())
-		{
-			data.notifyAction();
-			database.save(data);
-		}
-		playerListener.shutdown();
+		// OnlinePlayer
+		for (final Player player : Bukkit.getOnlinePlayers())
+			playerListener.PlayerQuit2(player);
 		super.onDisable();
 	}
 
@@ -248,12 +248,6 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		// Database
 		setupDatabase();
 		dropInactiveAccounts();
-		// OnlinePlayer
-		for (final Player player : getServer().getOnlinePlayers())
-		{
-			requestLogin(player);
-			playerListener.addToMovementBlocker(player);
-		}
 	}
 
 	public void setupDatabase()
@@ -380,7 +374,6 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 			config.set("filterNames", filterNames);
 		config.set("minNameLength", minNameLength);
 		config.set("maxNameLength", maxNameLength);
-		logger.save(config, "logs.");
 		super.saveConfiguration();
 	}
 
@@ -459,6 +452,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		loginFailures.remove(player.getName().toLowerCase());
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		data.addIP(player.getAddress().getAddress().getHostAddress());
+		data.notifyAction();
 		if (database != null)
 			database.save(data);
 	}
@@ -470,9 +464,10 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		final Player player = (Player) sender;
 		if (!isLoggedIn(player))
 			throw new CrazyCommandPermissionException();
-		final LoginPlayerData data = database.getEntry(player);
+		final LoginPlayerData data = getPlayerData(player);
 		if (data != null)
 		{
+			data.notifyAction();
 			data.logout();
 			if (database != null)
 				database.save(data);
@@ -536,7 +531,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 				throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
 			playerListener.removeFromMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
-			database.deleteEntry(player);
+			deletePlayerData(player);
 			return;
 		}
 		LoginPlayerData data = getPlayerData(player);
@@ -587,7 +582,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					throw new CrazyCommandNoSuchException("Player", args[0]);
 				playerListener.removeFromMovementBlocker(target);
 				sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
-				database.deleteEntry(target);
+				deletePlayerData(target);
 				return;
 			default:
 				target = getServer().getPlayerExact(args[0]);
@@ -599,7 +594,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 				}
 				if (target == null)
 					throw new CrazyCommandNoSuchException("Player", args[0]);
-				final LoginPlayerData data = database.getEntry(target);
+				final LoginPlayerData data = getPlayerData(target);
 				if (data == null)
 					throw new CrazyCommandNoSuchException("Player", args[0]);
 				final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
@@ -720,14 +715,14 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		final ArrayList<LoginData> dataList = new ArrayList<LoginData>();
 		if (registeredFilter == null)
 		{
-			dataList.addAll(database.getAllEntries());
+			dataList.addAll(getPlayerData());
 			for (final OfflinePlayer offline : getServer().getOfflinePlayers())
 				if (!hasPlayerData(offline))
 					dataList.add(new LoginUnregisteredPlayerData(offline));
 		}
 		else if (registeredFilter.equals(true))
 		{
-			dataList.addAll(database.getAllEntries());
+			dataList.addAll(getPlayerData());
 		}
 		else
 		{
@@ -809,7 +804,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		}
 		else
 		{
-			if (!database.getEntry((Player) sender).isPassword(password))
+			if (!getPlayerData((Player) sender).isPassword(password))
 				throw new CrazyCommandUsageException("/crazylogin dropOldData <DaysToKeep> <Password>");
 		}
 		final int amount = dropInactiveAccounts(days);
@@ -1364,7 +1359,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		if (args.length < 2)
 			throw new CrazyCommandUsageException("/crazylogin create <Name> <Password>");
 		final String name = args[0];
-		if (database.hasEntry(name))
+		if (hasPlayerData(name))
 			throw new CrazyCommandAlreadyExistsException("Account", name);
 		final LoginPlayerData data = new LoginPlayerData(name);
 		final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
@@ -1376,7 +1371,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	@Override
 	public boolean isLoggedIn(final Player player)
 	{
-		final LoginPlayerData data = database.getEntry(player);
+		final LoginPlayerData data = getPlayerData(player);
 		if (data == null)
 			return !alwaysNeedPassword;
 		return data.isLoggedIn() && player.isOnline();
@@ -1387,7 +1382,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	{
 		if (database.isStaticDatabase())
 			return;
-		LoginPlayerData data = database.getEntry(name);
+		LoginPlayerData data = getPlayerData(name);
 		boolean online = false;
 		if (data != null)
 			online = data.isLoggedIn();
@@ -1408,7 +1403,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 				return;
 		now.setTime(now.getTime() + 5000L);
 		antiRequestSpamTable.put(player.getName(), now);
-		if (database.hasEntry(player))
+		if (hasPlayerData(player))
 			sendLocaleMessage("LOGIN.REQUEST", player);
 		else
 			sendLocaleMessage("REGISTER.REQUEST", player);
@@ -1444,7 +1439,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		{
 			final Date timeOut = new Date();
 			timeOut.setTime(timeOut.getTime() - autoLogout * 1000);
-			for (final LoginPlayerData data : database.getAllEntries())
+			for (final LoginPlayerData data : getPlayerData())
 				data.checkTimeOut(this, timeOut, true);
 		}
 	}
@@ -1664,7 +1659,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	public HashSet<LoginPlayerData> getPlayerDatasPerIP(final String IP)
 	{
 		final HashSet<LoginPlayerData> res = new HashSet<LoginPlayerData>();
-		for (final LoginPlayerData data : database.getAllEntries())
+		for (final LoginPlayerData data : getPlayerData())
 			if (data.hasIP(IP))
 				res.add(data);
 		return res;

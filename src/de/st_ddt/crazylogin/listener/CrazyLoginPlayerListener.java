@@ -2,7 +2,6 @@ package de.st_ddt.crazylogin.listener;
 
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -143,7 +142,11 @@ public class CrazyLoginPlayerListener implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void PlayerJoin(final PlayerJoinEvent event)
 	{
-		final Player player = event.getPlayer();
+		PlayerJoin(event.getPlayer());
+	}
+
+	public void PlayerJoin(final Player player)
+	{
 		if (movementBlocker.get(player.getName().toLowerCase()) != null)
 			player.teleport(movementBlocker.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
 		if (!plugin.hasPlayerData(player))
@@ -191,7 +194,11 @@ public class CrazyLoginPlayerListener implements Listener
 	@EventHandler
 	public void PlayerQuit(final PlayerQuitEvent event)
 	{
-		final Player player = event.getPlayer();
+		PlayerQuit(event.getPlayer());
+	}
+
+	public void PlayerQuit(final Player player)
+	{
 		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server");
 		disableSaveLogin(player);
 		disableHidenInventory(player);
@@ -203,7 +210,24 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 		else
 		{
-			if (!plugin.isLoggedIn(player))
+			if (!playerdata.isLoggedIn())
+				return;
+			playerdata.notifyAction();
+			if (plugin.isInstantAutoLogoutEnabled())
+				playerdata.logout();
+			plugin.getCrazyDatabase().save(playerdata);
+		}
+	}
+
+	public void PlayerQuit2(final Player player)
+	{
+		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server");
+		disableSaveLogin(player);
+		disableHidenInventory(player);
+		final LoginPlayerData playerdata = plugin.getPlayerData(player);
+		if (playerdata != null)
+		{
+			if (!playerdata.isLoggedIn())
 				return;
 			playerdata.notifyAction();
 			if (plugin.isInstantAutoLogoutEnabled())
@@ -219,7 +243,15 @@ public class CrazyLoginPlayerListener implements Listener
 			return;
 		final Player player = (Player) event.getPlayer();
 		if (plugin.isLoggedIn(player))
+		{
+			final LoginPlayerData playerdata = plugin.getPlayerData(player);
+			if (playerdata != null)
+			{
+				playerdata.notifyAction();
+				plugin.getCrazyDatabase().save(playerdata);
+			}
 			return;
+		}
 		event.setCancelled(true);
 		player.closeInventory();
 		plugin.requestLogin(player);
@@ -232,7 +264,15 @@ public class CrazyLoginPlayerListener implements Listener
 			return;
 		final Player player = (Player) event.getWhoClicked();
 		if (plugin.isLoggedIn(player))
+		{
+			final LoginPlayerData playerdata = plugin.getPlayerData(player);
+			if (playerdata != null)
+			{
+				playerdata.notifyAction();
+				plugin.getCrazyDatabase().save(playerdata);
+			}
 			return;
+		}
 		event.setCancelled(true);
 		player.closeInventory();
 		plugin.requestLogin(player);
@@ -255,7 +295,6 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		player.closeInventory();
 		event.setCancelled(true);
 		plugin.requestLogin(player);
 	}
@@ -305,7 +344,15 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
+		{
+			final LoginPlayerData playerdata = plugin.getPlayerData(player);
+			if (playerdata != null)
+			{
+				playerdata.notifyAction();
+				plugin.getCrazyDatabase().save(playerdata);
+			}
 			return;
+		}
 		if (movementBlocker.get(player.getName().toLowerCase()) == null)
 			return;
 		if (event.getCause() == TeleportCause.PLUGIN || event.getCause() == TeleportCause.UNKNOWN)
@@ -426,8 +473,13 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (plugin.hasPlayerData(player))
 		{
-			if (plugin.isLoggedIn(player))
-				return;
+			final LoginPlayerData playerdata = plugin.getPlayerData(player);
+			if (playerdata != null)
+			{
+				playerdata.notifyAction();
+				plugin.getCrazyDatabase().save(playerdata);
+			}
+			return;
 		}
 		else if (!plugin.isBlockingGuestChatEnabled())
 			return;
@@ -487,10 +539,8 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		if (hidenInventory.get(player.getName().toLowerCase()) == null)
 		{
-			final PlayerSaver saver = new PlayerSaver(player);
+			final PlayerSaver saver = new PlayerSaver(player, true);
 			hidenInventory.put(player.getName().toLowerCase(), saver);
-			saver.backup();
-			saver.clear();
 		}
 	}
 
@@ -499,21 +549,11 @@ public class CrazyLoginPlayerListener implements Listener
 		final PlayerSaver saver = hidenInventory.remove(player.getName().toLowerCase());
 		if (saver == null)
 			return;
-		saver.reasignPlayer(player);
-		saver.restore();
+		saver.restore(player);
 	}
 
 	public boolean dropPlayerData(final String player)
 	{
 		return (savelogin.remove(player.toLowerCase()) != null) || (hidenInventory.remove(player.toLowerCase()) != null);
-	}
-
-	public void shutdown()
-	{
-		for (final Player player : Bukkit.getOnlinePlayers())
-		{
-			disableSaveLogin(player);
-			disableHidenInventory(player);
-		}
 	}
 }
