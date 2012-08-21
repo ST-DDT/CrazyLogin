@@ -284,7 +284,6 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		player.closeInventory();
 		event.setCancelled(true);
 		plugin.requestLogin(player);
 	}
@@ -475,11 +474,12 @@ public class CrazyLoginPlayerListener implements Listener
 		{
 			final LoginPlayerData playerdata = plugin.getPlayerData(player);
 			if (playerdata != null)
-			{
-				playerdata.notifyAction();
-				plugin.getCrazyDatabase().save(playerdata);
-			}
-			return;
+				if (playerdata.isLoggedIn())
+				{
+					playerdata.notifyAction();
+					plugin.getCrazyDatabase().save(playerdata);
+					return;
+				}
 		}
 		else if (!plugin.isBlockingGuestChatEnabled())
 			return;
