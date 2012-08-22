@@ -46,6 +46,7 @@ import de.st_ddt.crazylogin.events.CrazyLoginPasswordEvent;
 import de.st_ddt.crazylogin.events.CrazyLoginPreLoginEvent;
 import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
 import de.st_ddt.crazylogin.events.LoginFailReason;
+import de.st_ddt.crazylogin.exceptions.CrazyLoginMaxRegistrationsPerIPReached;
 import de.st_ddt.crazylogin.listener.CrazyLoginCrazyListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
@@ -57,7 +58,6 @@ import de.st_ddt.crazyplugin.data.ParameterData;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandAlreadyExistsException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
-import de.st_ddt.crazyplugin.exceptions.CrazyCommandExceedingLimitsException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandNoSuchException;
@@ -540,11 +540,11 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 			if (!sender.hasPermission("crazylogin.register"))
 				throw new CrazyCommandPermissionException();
 			final String ip = player.getAddress().getAddress().getHostAddress();
-			final int registrations = getPlayerDatasPerIP(ip).size();
+			final HashSet<LoginPlayerData> associates = getPlayerDatasPerIP(ip);
 			if (!sender.hasPermission("crazylogin.ensureregistration"))
 				if (maxRegistrationsPerIP != -1)
-					if (registrations >= maxRegistrationsPerIP)
-						throw new CrazyCommandExceedingLimitsException("Max Registrations per IP", maxRegistrationsPerIP);
+					if (associates.size() >= maxRegistrationsPerIP)
+						throw new CrazyLoginMaxRegistrationsPerIPReached(maxRegistrationsPerIP, associates);
 			final CrazyLoginPreRegisterEvent<LoginPlayerData> event = new CrazyLoginPreRegisterEvent<LoginPlayerData>(this, player, data);
 			event.callEvent();
 			if (event.isCancelled())
@@ -1392,6 +1392,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		data.setOnline(online);
 	}
 
+	@Override
 	public void requestLogin(final Player player)
 	{
 		if (doNotSpamRequests)
