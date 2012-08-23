@@ -16,6 +16,8 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.painting.PaintingBreakByEntityEvent;
+import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -301,19 +303,43 @@ public class CrazyLoginPlayerListener implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerInteract(final PlayerInteractEvent event)
 	{
-		if (plugin.isLoggedIn(event.getPlayer()))
+		final Player player = event.getPlayer();
+		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.requestLogin(event.getPlayer());
+		plugin.requestLogin(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerInteractEntity(final PlayerInteractEntityEvent event)
 	{
-		if (plugin.isLoggedIn(event.getPlayer()))
+		final Player player = event.getPlayer();
+		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.requestLogin(event.getPlayer());
+		plugin.requestLogin(player);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PaintingPlace(PaintingPlaceEvent event)
+	{
+		final Player player = event.getPlayer();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+		plugin.requestLogin(player);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PaintingBreak(PaintingBreakByEntityEvent event)
+	{
+		if (!(event.getRemover() instanceof Player))
+			return;
+		final Player player = (Player) event.getRemover();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+		plugin.requestLogin(player);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
