@@ -70,6 +70,7 @@ import de.st_ddt.crazyutil.CrazyPipe;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.ToStringDataGetter;
 import de.st_ddt.crazyutil.databases.DatabaseType;
+import de.st_ddt.crazyutil.locales.CrazyLocale;
 
 public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData> implements LoginPlugin<LoginPlayerData>
 {
@@ -425,7 +426,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		if (!data.login(password))
 		{
 			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.WRONG_PASSWORD).callAsyncEvent();
-			broadcastLocaleMessage(true, "crazylogin.warnloginfailure", "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
+			broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			Integer fails = loginFailures.get(player.getName().toLowerCase());
 			if (fails == null)
 				fails = 0;
@@ -489,6 +490,26 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		{
 			if (!isLoggedIn((Player) sender))
 				throw new CrazyCommandPermissionException();
+		}
+		if (commandLabel.equals("account") || commandLabel.equals("accounts"))
+		{
+			if (args.length == 0)
+			{
+				commandPlayerInfo(sender, args);
+				return true;
+			}
+			try
+			{
+				final String[] newArgs = ChatHelper.shiftArray(args, 1);
+				if (!commandPlayer(sender, args[0].toLowerCase(), newArgs))
+					commandPlayerInfo(sender, newArgs);
+				return true;
+			}
+			catch (final CrazyCommandException e)
+			{
+				e.shiftCommandIndex();
+				throw e;
+			}
 		}
 		if (commandLabel.equals("admin"))
 		{
@@ -1357,7 +1378,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		if (!sender.hasPermission("crazylogin.player.create"))
 			throw new CrazyCommandPermissionException();
 		if (args.length < 2)
-			throw new CrazyCommandUsageException("/crazylogin create <Name> <Password>");
+			throw new CrazyCommandUsageException("/crazylogin player create <Name> <Password>");
 		final String name = args[0];
 		if (hasPlayerData(name))
 			throw new CrazyCommandAlreadyExistsException("Account", name);
@@ -1664,5 +1685,55 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 			if (data.hasIP(IP))
 				res.add(data);
 		return res;
+	}
+
+	@Override
+	public final void broadcastLocaleMessage(final boolean console, final String permission, final boolean loggedInOnly, final String localepath, final Object... args)
+	{
+		broadcastLocaleMessage(console, permission, loggedInOnly, getLocale().getLanguageEntry(localepath), args);
+	}
+
+	@Override
+	public final void broadcastLocaleRootMessage(final boolean console, final String permission, final boolean loggedInOnly, final String localepath, final Object... args)
+	{
+		broadcastLocaleMessage(console, permission, loggedInOnly, CrazyLocale.getLocaleHead().getLanguageEntry(localepath), args);
+	}
+
+	@Override
+	public final void broadcastLocaleMessage(final boolean console, final String permission, final boolean loggedInOnly, final CrazyLocale locale, final Object... args)
+	{
+		if (permission == null)
+			broadcastLocaleMessage(console, new String[] {}, loggedInOnly, locale, args);
+		else
+			broadcastLocaleMessage(console, new String[] { permission }, loggedInOnly, locale, args);
+	}
+
+	@Override
+	public final void broadcastLocaleMessage(final boolean console, final String[] permissions, final boolean loggedInOnly, final String localepath, final Object... args)
+	{
+		broadcastLocaleMessage(console, permissions, loggedInOnly, getLocale().getLanguageEntry(localepath), args);
+	}
+
+	@Override
+	public final void broadcastLocaleRootMessage(final boolean console, final String[] permissions, final boolean loggedInOnly, final String localepath, final Object... args)
+	{
+		broadcastLocaleMessage(console, permissions, loggedInOnly, CrazyLocale.getLocaleHead().getLanguageEntry(localepath), args);
+	}
+
+	@Override
+	public final void broadcastLocaleMessage(final boolean console, final String[] permissions, final boolean loggedInOnly, final CrazyLocale locale, final Object... args)
+	{
+		if (console)
+			sendLocaleMessage(locale, Bukkit.getConsoleSender(), args);
+		Player: for (final Player player : Bukkit.getOnlinePlayers())
+		{
+			for (final String permission : permissions)
+				if (!player.hasPermission(permission))
+					continue Player;
+			if (loggedInOnly)
+				if (!isLoggedIn(player))
+					continue;
+			sendLocaleMessage(locale, player, args);
+		}
 	}
 }
