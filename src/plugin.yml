@@ -1,8 +1,8 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-#C*=needed core version
-version: C8.5_6.4
+version: 6.4.1
+# requires CrazyCore v8.5 or later
 depend: [CrazyCore]
 description: >
             CrazyLogin protect your server with passwords and many usefully features.

@@ -174,11 +174,11 @@ public class CrazyLoginPlayerListener implements Listener
 		playerdata.checkTimeOut(plugin, false);
 		if (plugin.isLoggedIn(player))
 			return;
-		Location location = player.getLocation();
+		Location location = player.getLocation().clone();
 		if (plugin.isForceSaveLoginEnabled())
 		{
 			triggerSaveLogin(player);
-			location = player.getWorld().getSpawnLocation();
+			location = player.getWorld().getSpawnLocation().clone();
 		}
 		if (plugin.isHidingInventoryEnabled())
 		{
@@ -321,7 +321,7 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-	public void PaintingPlace(PaintingPlaceEvent event)
+	public void PaintingPlace(final PaintingPlaceEvent event)
 	{
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
@@ -331,7 +331,7 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-	public void PaintingBreak(PaintingBreakByEntityEvent event)
+	public void PaintingBreak(final PaintingBreakByEntityEvent event)
 	{
 		if (!(event.getRemover() instanceof Player))
 			return;
@@ -549,7 +549,7 @@ public class CrazyLoginPlayerListener implements Listener
 	public void triggerSaveLogin(final Player player)
 	{
 		if (savelogin.get(player.getName().toLowerCase()) == null)
-			savelogin.put(player.getName().toLowerCase(), player.getLocation());
+			savelogin.put(player.getName().toLowerCase(), player.getLocation().clone());
 		player.teleport(player.getWorld().getSpawnLocation(), TeleportCause.PLUGIN);
 	}
 
