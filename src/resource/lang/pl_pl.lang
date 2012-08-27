@@ -1,13 +1,11 @@
 ﻿CRAZYLOGIN=CrazyLogin
-CRAZYLOGIN.REGISTER.HEADER=Z powodow bezpieczenstwa prosimy ustawic haslo!
-CRAZYLOGIN.REGISTER.HEADER2=Mozesz ustawic haslo (jesli chcesz)
-CRAZYLOGIN.REGISTER.MESSAGE=Wpisz /crazylogin password <Password...> aby utworzyc/zmienic je!
+CRAZYLOGIN.REGISTER.HEADER=Z powodow bezpieczenstwa prosimy ustawic haslo!\nWpisz /crazylogin password <Password...> aby utworzyc/zmienic je!
+CRAZYLOGIN.REGISTER.HEADER2=Mozesz ustawic haslo (jesli chcesz)\nWpisz /crazylogin password <Password...> aby utworzyc/zmienic je!
 CRAZYLOGIN.LOGIN.FAILED=&CNIE UDALO SIE ZALOGOWAC!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CUWAGA! PROBA ZALOGOWANIA NIE UDANA! $0$ @ $1$
 CRAZYLOGIN.LOGIN.SUCCESS=&ALogowanie udane.
 CRAZYLOGIN.LOGOUT.SUCCESS=&AWylogowywanie udane.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CUWAGA! ZABRONIONE WYKONYWANIE POLECEN! $0$ @ $1$: $2$
-CRAZYLOGIN.DATABASE.ACCESSWARN=&CUWAGA! NIE MOZNA POLACZYC SIE Z BAZA DANYCH!
 CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Haslo zmienione!
 CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Haslo usuniete!
 CRAZYLOGIN.REGISTER.REQUEST=&CZarejestruj sie uzywajac /register <haslo>

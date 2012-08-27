@@ -46,7 +46,7 @@ import de.st_ddt.crazylogin.events.CrazyLoginPasswordEvent;
 import de.st_ddt.crazylogin.events.CrazyLoginPreLoginEvent;
 import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
 import de.st_ddt.crazylogin.events.LoginFailReason;
-import de.st_ddt.crazylogin.exceptions.CrazyLoginMaxRegistrationsPerIPReached;
+import de.st_ddt.crazylogin.exceptions.CrazyLoginExceedingMaxRegistrationsPerIPException;
 import de.st_ddt.crazylogin.listener.CrazyLoginCrazyListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
@@ -539,7 +539,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		return super.commandMain(sender, commandLabel, args);
 	}
 
-	public void commandMainPassword(final CommandSender sender, final String[] args) throws CrazyCommandException
+	public void commandMainPassword(final CommandSender sender, final String[] args) throws CrazyException
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
@@ -565,7 +565,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 			if (!sender.hasPermission("crazylogin.ensureregistration"))
 				if (maxRegistrationsPerIP != -1)
 					if (associates.size() >= maxRegistrationsPerIP)
-						throw new CrazyLoginMaxRegistrationsPerIPReached(maxRegistrationsPerIP, associates);
+						throw new CrazyLoginExceedingMaxRegistrationsPerIPException(maxRegistrationsPerIP, associates);
 			final CrazyLoginPreRegisterEvent<LoginPlayerData> event = new CrazyLoginPreRegisterEvent<LoginPlayerData>(this, player, data);
 			event.callEvent();
 			if (event.isCancelled())

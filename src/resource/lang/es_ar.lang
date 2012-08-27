@@ -1,13 +1,11 @@
 ﻿CRAZYLOGIN=CrazyLogin
-CRAZYLOGIN.REGISTER.HEADER=Por razones de seguridad, tenés que especificar una contraseña!
-CRAZYLOGIN.REGISTER.HEADER2=Si lo deseás, podés crear una contraseña.
-CRAZYLOGIN.REGISTER.MESSAGE=Usá /crazylogin password <contraseña...> para crear una o cambiarla!
+CRAZYLOGIN.REGISTER.HEADER=Por razones de seguridad, tenés que especificar una contraseña!\n
+CRAZYLOGIN.REGISTER.HEADER2=Si lo deseás, podés crear una contraseña.\nUsá /crazylogin password <contraseña...> para crear una o cambiarla!
 CRAZYLOGIN.LOGIN.FAILED=&CLOGIN INCORRECTO!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CADVERTENCIA! INTENTO DE LOGIN INCORRECTO! $0$ @ $1$
 CRAZYLOGIN.LOGIN.SUCCESS=&ATe logueaste corrrectamente
 CRAZYLOGIN.LOGOUT.SUCCESS=&ATe deslogueaste correctamente
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CADVERTENCIA! Ejecutaste un comando sin permiso! $0$ @ $1$: $2$
-CRAZYLOGIN.DATABASE.ACCESSWARN=&CADVERTENCIA! No se puede acceder a la Base de Datos!
 CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Cambiaste la contraseña!
 CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Borraste la contraseña!
 CRAZYLOGIN.REGISTER.REQUEST=&EPor favor registrate! /register <Contraseña>
