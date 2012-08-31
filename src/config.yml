@@ -45,6 +45,8 @@ blockGuestJoin: false
 removeGuestData: false
 # when disabled request login/register messages are spammed every cancelled action, when enabled only every 5 seconds (true/false)
 doNotSpamRequests: false
+# only ask the player once to create a password (if alwaysNeedPassword=false) (true/false)
+doNotSpamRegisterRequests: false
 # these commands can be executed as guest (even if blockGuestCommands is enabled) or when not logged in
 commandWhitelist:
 - /login

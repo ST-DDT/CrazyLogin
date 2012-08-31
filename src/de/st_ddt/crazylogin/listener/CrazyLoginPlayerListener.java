@@ -1,5 +1,6 @@
 package de.st_ddt.crazylogin.listener;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import org.bukkit.ChatColor;
@@ -19,12 +20,15 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -159,7 +163,7 @@ public class CrazyLoginPlayerListener implements Listener
 				if (movementBlocker.get(player.getName().toLowerCase()) == null)
 					movementBlocker.put(player.getName().toLowerCase(), player.getLocation());
 			}
-			else
+			else if (!plugin.isAvoidingSpammedRegisterRequestsEnabled() || new Date().getTime() - player.getFirstPlayed() < 60000)
 				plugin.sendLocaleMessage("REGISTER.HEADER2", player);
 			final int autoKick = plugin.getAutoKickUnregistered();
 			if (autoKick != -1)
@@ -405,6 +409,39 @@ public class CrazyLoginPlayerListener implements Listener
 		if (!(event.getEntity() instanceof Player))
 			return;
 		final Player player = (Player) event.getEntity();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PlayerShear(final PlayerShearEntityEvent event)
+	{
+		if (!(event.getEntity() instanceof Player))
+			return;
+		final Player player = (Player) event.getEntity();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PlayerBedEnter(final PlayerBedEnterEvent event)
+	{
+		if (!(event.getPlayer() instanceof Player))
+			return;
+		final Player player = (Player) event.getPlayer();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void PlayerFish(final PlayerFishEvent event)
+	{
+		if (!(event.getPlayer() instanceof Player))
+			return;
+		final Player player = (Player) event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
