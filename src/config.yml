@@ -41,7 +41,9 @@ blockGuestCommands: false
 blockGuestChat: false
 # when enabled you cannot join without having registered (use with mysql databases) (true/false)
 blockGuestJoin: false
-# guest data are removed when leaving the server
+# guest data are removed when leaving the server 
+# this include all CrazyPlugins, playerfile (if enabled), +more (if commands are setup)
+# after removing searching for the playersname in all files of that server will have 0 results. (Best Case)
 removeGuestData: false
 # when disabled request login/register messages are spammed every cancelled action, when enabled only every 5 seconds (true/false)
 doNotSpamRequests: false

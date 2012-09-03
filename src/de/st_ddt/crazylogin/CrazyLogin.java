@@ -423,7 +423,6 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		{
 			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.NO_ACCOUNT).callAsyncEvent();
 			sendLocaleMessage("REGISTER.HEADER", player);
-			sendLocaleMessage("REGISTER.MESSAGE", player);
 			return;
 		}
 		if (!data.login(password))
