@@ -45,6 +45,8 @@ blockGuestJoin: false
 # this include all CrazyPlugins, playerfile (if enabled), +more (if commands are setup)
 # after removing searching for the playersname in all files of that server will have 0 results. (Best Case)
 removeGuestData: false
+# when enabled ingame registrations are disabled (command and pluginChannel) (true/false)
+disableRegistrations: false
 # when disabled request login/register messages are spammed every cancelled action, when enabled only every 5 seconds (true/false)
 doNotSpamRequests: false
 # only ask the player once to create a password (if alwaysNeedPassword=false) (true/false)

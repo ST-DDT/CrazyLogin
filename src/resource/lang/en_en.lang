@@ -25,3 +25,4 @@ CRAZYLOGIN.PLAYERDATA.LISTHEAD=Accountlist (Page $0$ / $1$)
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&ELastAction: &5$0$
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&EAssociates: &5$0$
 CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH=Too many accounts registered for this IP!\nYou can register only &C$0$ &Faccounts.\n&FAccounts: &E$1$
+CRAZYLOGIN.EXCEPTION.REGISTER.DISABLED=&CIngame registrations disabled.

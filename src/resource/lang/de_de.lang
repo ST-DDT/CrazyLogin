@@ -25,3 +25,4 @@ CRAZYLOGIN.PLAYERDATA.LISTHEAD=Accountliste (Seite $0$ / $1$)
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&ELetzte Aktion: &5$0$
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&EKollegen: &5$0$
 CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH=Es sind bereits zuviele Accounts für diese IP registriert!\nEs sind maximal &C$0$ &Ferlaubt.\n&FBenutzer: &E$1$
+CRAZYLOGIN.EXCEPTION.REGISTER.DISABLED=&CDu kannst dich hier so nicht registrieren.

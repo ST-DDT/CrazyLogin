@@ -47,6 +47,8 @@ import de.st_ddt.crazylogin.events.CrazyLoginPreLoginEvent;
 import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
 import de.st_ddt.crazylogin.events.LoginFailReason;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginExceedingMaxRegistrationsPerIPException;
+import de.st_ddt.crazylogin.exceptions.CrazyLoginException;
+import de.st_ddt.crazylogin.exceptions.CrazyLoginRegistrationsDisabled;
 import de.st_ddt.crazylogin.listener.CrazyLoginCrazyListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
@@ -79,39 +81,40 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	private final HashMap<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
 	private final HashMap<String, Integer> loginFailures = new HashMap<String, Integer>();
 	private final HashMap<String, Date> tempBans = new HashMap<String, Date>();
-	protected CrazyLoginPlayerListener playerListener;
-	protected CrazyLoginVehicleListener vehicleListener;
-	protected CrazyLoginCrazyListener crazylistener;
-	protected CrazyLoginMessageListener messageListener;
-	protected boolean alwaysNeedPassword;
-	protected int autoLogout;
-	protected int autoKick;
-	protected long autoTempBan;
-	protected int autoKickUnregistered;
-	protected int autoKickLoginFailer;
-	protected long autoTempBanLoginFailer;
-	protected boolean autoKickCommandUsers;
-	protected boolean blockGuestCommands;
-	protected boolean blockGuestChat;
-	protected boolean blockGuestJoin;
-	protected boolean removeGuestData;
-	protected List<String> commandWhiteList;
-	protected String uniqueIDKey;
-	protected boolean doNotSpamRequests;
-	protected boolean doNotSpamRegisterRequests;
-	protected boolean forceSingleSession;
-	protected boolean forceSingleSessionSameIPBypass;
-	protected boolean forceSaveLogin;
-	protected boolean hideInventory;
-	protected Encryptor encryptor;
-	protected int autoDelete;
-	protected int maxOnlinesPerIP;
-	protected int maxRegistrationsPerIP;
-	protected boolean pluginCommunicationEnabled;
-	protected double moveRange;
-	protected String filterNames;
-	protected int minNameLength;
-	protected int maxNameLength;
+	private CrazyLoginPlayerListener playerListener;
+	private CrazyLoginVehicleListener vehicleListener;
+	private CrazyLoginCrazyListener crazylistener;
+	private CrazyLoginMessageListener messageListener;
+	private boolean alwaysNeedPassword;
+	private int autoLogout;
+	private int autoKick;
+	private long autoTempBan;
+	private int autoKickUnregistered;
+	private int autoKickLoginFailer;
+	private long autoTempBanLoginFailer;
+	private boolean autoKickCommandUsers;
+	private boolean blockGuestCommands;
+	private boolean blockGuestChat;
+	private boolean blockGuestJoin;
+	private boolean removeGuestData;
+	private List<String> commandWhiteList;
+	private String uniqueIDKey;
+	private boolean disableRegistrations;
+	private boolean doNotSpamRequests;
+	private boolean doNotSpamRegisterRequests;
+	private boolean forceSingleSession;
+	private boolean forceSingleSessionSameIPBypass;
+	private boolean forceSaveLogin;
+	private boolean hideInventory;
+	private Encryptor encryptor;
+	private int autoDelete;
+	private int maxOnlinesPerIP;
+	private int maxRegistrationsPerIP;
+	private boolean pluginCommunicationEnabled;
+	private double moveRange;
+	private String filterNames;
+	private int minNameLength;
+	private int maxNameLength;
 
 	public static CrazyLogin getPlugin()
 	{
@@ -179,6 +182,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		blockGuestChat = config.getBoolean("blockGuestChat", false);
 		blockGuestJoin = config.getBoolean("blockGuestJoin", false);
 		removeGuestData = config.getBoolean("removeGuestData", false);
+		disableRegistrations = config.getBoolean("disableRegistrations", false);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		doNotSpamRegisterRequests = config.getBoolean("doNotSpamRegisterRequests", false);
 		antiRequestSpamTable.clear();
@@ -358,6 +362,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		config.set("blockGuestChat", blockGuestChat);
 		config.set("blockGuestJoin", blockGuestJoin);
 		config.set("removeGuestData", removeGuestData);
+		config.set("disableRegistrations", disableRegistrations);
 		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("doNotSpamRegisterRequests", doNotSpamRegisterRequests);
 		config.set("commandWhitelist", commandWhiteList);
@@ -406,10 +411,18 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	{
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
+		if (!sender.hasPermission("crazylogin.login.command"))
+			throw new CrazyCommandPermissionException();
 		if (args.length == 0)
 			throw new CrazyCommandUsageException("/login <Passwort...>");
 		final Player player = (Player) sender;
 		final String password = ChatHelper.listingString(args);
+		playerLogin(player, password);
+	}
+
+	@Override
+	public void playerLogin(final Player player, final String password)
+	{
 		final LoginPlayerData data = database.getEntry(player);
 		final CrazyLoginPreLoginEvent<LoginPlayerData> event = new CrazyLoginPreLoginEvent<LoginPlayerData>(this, player, data);
 		event.callEvent();
@@ -465,6 +478,14 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
 		final Player player = (Player) sender;
+		if (!player.hasPermission("crazylogin.logout.command"))
+			throw new CrazyCommandPermissionException();
+		playerLogout(player);
+	}
+
+	@Override
+	public void playerLogout(final Player player) throws CrazyCommandException
+	{
 		if (!isLoggedIn(player))
 			throw new CrazyCommandPermissionException();
 		final LoginPlayerData data = getPlayerData(player);
@@ -548,23 +569,32 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		final Player player = (Player) sender;
 		if (!isLoggedIn(player) && hasPlayerData(player))
 			throw new CrazyCommandPermissionException();
-		if (args.length == 0)
+		if (!hasPlayerData(player))
+			if (!player.hasPermission("crazylogin.register.command"))
+				throw new CrazyCommandPermissionException();
+		playerPassword(player, ChatHelper.listingString(" ", args));
+	}
+
+	@Override
+	public void playerPassword(final Player player, final String password) throws CrazyCommandException, CrazyLoginException
+	{
+		if (disableRegistrations)
+			throw new CrazyLoginRegistrationsDisabled();
+		if (password.length() == 0)
 		{
 			if (alwaysNeedPassword)
 				throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
 			playerListener.removeFromMovementBlocker(player);
-			sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
+			sendLocaleMessage("PASSWORDDELETE.SUCCESS", player);
 			deletePlayerData(player);
 			return;
 		}
 		LoginPlayerData data = getPlayerData(player);
 		if (data == null)
 		{
-			if (!sender.hasPermission("crazylogin.register"))
-				throw new CrazyCommandPermissionException();
 			final String ip = player.getAddress().getAddress().getHostAddress();
 			final HashSet<LoginPlayerData> associates = getPlayerDatasPerIP(ip);
-			if (!sender.hasPermission("crazylogin.ensureregistration"))
+			if (!player.hasPermission("crazylogin.ensureregistration"))
 				if (maxRegistrationsPerIP != -1)
 					if (associates.size() >= maxRegistrationsPerIP)
 						throw new CrazyLoginExceedingMaxRegistrationsPerIPException(maxRegistrationsPerIP, associates);
@@ -575,7 +605,6 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 			data = new LoginPlayerData(player);
 			tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		}
-		final String password = ChatHelper.listingString(args);
 		if (pluginCommunicationEnabled)
 			new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password).callAsyncEvent();
 		data.setPassword(password);
@@ -868,6 +897,16 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 						newValue = true;
 					hideInventory = newValue;
 					sendLocaleMessage("MODE.CHANGE", sender, "hideInventory", hideInventory ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("disableRegistrations"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					disableRegistrations = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "disableRegistrations", disableRegistrations ? "True" : "False");
 					saveConfiguration();
 					return;
 				}
@@ -1204,7 +1243,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					saveConfiguration();
 					return;
 				}
-				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm (Read only)");
+				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "disableRegistrations", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm (Read only)");
 			case 1:
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
 				{
@@ -1219,6 +1258,11 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 				else if (args[0].equalsIgnoreCase("hideInventory"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "hideInventory", hideInventory ? "True" : "False");
+					return;
+				}
+				else if (args[0].equalsIgnoreCase("disableRegistrations"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "disableRegistrations", disableRegistrations ? "True" : "False");
 					return;
 				}
 				else if (args[0].equalsIgnoreCase("doNotSpamRequests"))
@@ -1346,7 +1390,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					sendLocaleMessage("MODE.CHANGE", sender, "saveDatabaseOnShutdown", saveDatabaseOnShutdown ? "True" : "False");
 					return;
 				}
-				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm");
+				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "disableRegistrations", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm");
 			default:
 				throw new CrazyCommandUsageException("/crazylogin mode <Mode> [Value]");
 		}

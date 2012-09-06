@@ -1,7 +1,7 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 6.5.2
+version: 6.6
 # requires CrazyCore v8.5 or later
 depend: [CrazyCore]
 description: >
@@ -33,7 +33,12 @@ permissions:
       crazylogin.warndatabase: true
       crazylogin.warndelete: true
       crazylogin.warnsession: true
-      crazylogin.register: true
+      crazylogin.register.command: true
+      crazylogin.register.channel: true
+      crazylogin.login.command: true
+      crazylogin.login.channel: true
+      crazylogin.logout.command: true
+      crazylogin.logout.channel: true
       crazylogin.list: true
       crazylogin.commands: true
       crazylogin.dropOldData: true
@@ -54,7 +59,12 @@ permissions:
       crazylogin.warndatabase: true
       crazylogin.warndelete: true
       crazylogin.warnsession: true
-      crazylogin.register: true
+      crazylogin.register.command: true
+      crazylogin.register.channel: true
+      crazylogin.login.command: true
+      crazylogin.login.channel: true
+      crazylogin.logout.command: true
+      crazylogin.logout.channel: true
       crazylogin.commands: true
       crazylogin.list: true
       crazylogin.dropOldData: true
@@ -64,10 +74,34 @@ permissions:
       crazylogin.player.create: true
       crazylogin.player.delete: true
   crazylogin.ensureregistration:
-    description: This player can always register an account
+    description: This player can always register an account.
     default: op
+    children: 
+      crazylogin.register.command: true
+      crazylogin.register.channel: true
   crazylogin.register:
-    description: Allow players to create a password. (for external registration)
+    description: Allow players to create a password. (Depreciated)
+    default: true
+    children: 
+      crazylogin.register.command: true
+      crazylogin.register.channel: true
+  crazylogin.register.command:
+    description: Allow players to create a password via command.
+    default: true
+  crazylogin.register.channel:
+    description: Allow players to create a password via pluginChannel.
+    default: true
+  crazylogin.login.command:
+    description: Allow players to login via command.
+    default: true
+  crazylogin.login.channel:
+    description: Allow players to login via pluginChannel.
+    default: true
+  crazylogin.logout.command:
+    description: Allow players to logout via command.
+    default: true
+  crazylogin.logout.channel:
+    description: Allow players to logout via pluginChannel.
     default: true
   crazylogin.warnloginfailure:
     description: Get informed if someone fails to login

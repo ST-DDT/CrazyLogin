@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyplugin.listener.CrazyPluginMessageListener;
 
@@ -48,7 +49,9 @@ public class CrazyLoginMessageListener extends CrazyPluginMessageListener
 				}
 				try
 				{
-					plugin.commandLogin(player, args.split(" "));
+					if (!player.hasPermission("crazylogin.login.channel"))
+						throw new CrazyCommandPermissionException();
+					plugin.playerLogin(player, args);
 				}
 				catch (final CrazyException e)
 				{
@@ -65,10 +68,14 @@ public class CrazyLoginMessageListener extends CrazyPluginMessageListener
 					if (!plugin.isLoggedIn(player))
 					{
 						sendPluginMessage(channel, player, "A_ChgPW LOGIN");
+						return;
 					}
 				try
 				{
-					plugin.commandMainPassword(player, args.split(" "));
+					if (!plugin.hasPlayerData(player))
+						if (!player.hasPermission("crazylogin.register.channel"))
+							throw new CrazyCommandPermissionException();
+					plugin.playerPassword(player, args);
 				}
 				catch (final CrazyException e)
 				{
@@ -83,7 +90,9 @@ public class CrazyLoginMessageListener extends CrazyPluginMessageListener
 			{
 				try
 				{
-					plugin.commandLogout(player, null);
+					if (!player.hasPermission("crazylogin.logout.channel"))
+						throw new CrazyCommandPermissionException();
+					plugin.playerLogout(player);
 				}
 				catch (final CrazyException e)
 				{
