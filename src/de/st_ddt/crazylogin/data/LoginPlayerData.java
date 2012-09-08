@@ -33,7 +33,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 {
 
 	private String password;
-	private final ArrayList<String> ips = new ArrayList<String>();
+	private final ArrayList<String> ips = new ArrayList<String>(6);
 	private boolean online;
 	private Date lastAction;
 
