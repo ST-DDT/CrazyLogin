@@ -59,8 +59,8 @@ commandWhitelist:
 - /worldedit cui
 # the encryption alogrithm used to encrypt your passwords. View plugin main page for more information
 algorithm: CrazyCrypt1
-# automatically delete accounts that haven't been used for x day (-1=disabled)
-# WARNING: deletes all data belonging to this player in every listening plugin and the player file itself.
+# automatically delete accounts that haven't been used for x days(-1=disabled)
+# WARNING: deletes all data belonging to this player (including those saved in other plugins; equals "/crazycore delete Player")
 autoDelete: -1
 # block player join with an online players name (prevents Logged in from another location messages) (true/false)
 forceSingleSession: true
