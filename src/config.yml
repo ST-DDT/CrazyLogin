@@ -82,6 +82,12 @@ pluginCommunicationEnabled: false
 moveRange: 5.0
 # when enabled only default chars are allowed in a players name (true/false/[a-zA-Z0-9_]/...)
 filterNames: false
+# check a players name case for its char case (true/false)
+# when enabled a player cannot join as "PLaYer" when he registered as "Player"
+# some encryptions may fail when a player has different char cases.
+# a player cannot bypass login by using an different name case.
+# WARNING: very old datas of this plugin saved their data using lowercase names.
+blockDifferentNameCases: false
 # minimun length of player names
 minNameLength: 3
 # maximum length of player names (minecraft max is 16)
