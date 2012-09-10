@@ -113,6 +113,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	private boolean pluginCommunicationEnabled;
 	private double moveRange;
 	private String filterNames;
+	private boolean blockDifferentNameCases;
 	private int minNameLength;
 	private int maxNameLength;
 
@@ -210,6 +211,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 			filterNames = ".";
 		else if (filterNames.equals("true"))
 			filterNames = "[a-zA-Z0-9_]";
+		blockDifferentNameCases = config.getBoolean("blockDifferentNameCases", false);
 		minNameLength = Math.min(Math.max(config.getInt("minNameLength", 3), 1), 16);
 		maxNameLength = Math.min(Math.max(config.getInt("maxNameLength", 16), minNameLength), 16);
 		uniqueIDKey = config.getString("uniqueIDKey");
@@ -381,6 +383,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 			config.set("filterNames", false);
 		else
 			config.set("filterNames", filterNames);
+		config.set("blockDifferentNameCases", blockDifferentNameCases);
 		config.set("minNameLength", minNameLength);
 		config.set("maxNameLength", maxNameLength);
 		super.saveConfiguration();
@@ -1201,6 +1204,16 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					saveConfiguration();
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("blockDifferentNameCases"))
+				{
+					boolean newValue = false;
+					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
+						newValue = true;
+					blockDifferentNameCases = newValue;
+					sendLocaleMessage("MODE.CHANGE", sender, "blockDifferentNameCases", blockDifferentNameCases ? "True" : "False");
+					saveConfiguration();
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("minNameLength"))
 				{
 					int length = minNameLength;
@@ -1243,7 +1256,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					saveConfiguration();
 					return;
 				}
-				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "disableRegistrations", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm (Read only)");
+				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "disableRegistrations", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "blockDifferentNameCases", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm (Read only)");
 			case 1:
 				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
 				{
@@ -1370,6 +1383,11 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					sendLocaleMessage("MODE.CHANGE", sender, "filterNames", filterNames.equals(".") ? "disabled" : filterNames);
 					return;
 				}
+				else if (args[0].equalsIgnoreCase("blockDifferentNameCases"))
+				{
+					sendLocaleMessage("MODE.CHANGE", sender, "blockDifferentNameCases", blockDifferentNameCases ? "True" : "False");
+					return;
+				}
 				else if (args[0].equalsIgnoreCase("minNameLength"))
 				{
 					sendLocaleMessage("MODE.CHANGE", sender, "minNameLength", minNameLength + " characters");
@@ -1390,7 +1408,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					sendLocaleMessage("MODE.CHANGE", sender, "saveDatabaseOnShutdown", saveDatabaseOnShutdown ? "True" : "False");
 					return;
 				}
-				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "disableRegistrations", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm");
+				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "disableRegistrations", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "blockDifferentNameCases", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm");
 			default:
 				throw new CrazyCommandUsageException("/crazylogin mode <Mode> [Value]");
 		}
@@ -1714,9 +1732,36 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	}
 
 	@Override
+	public String getNameFilter()
+	{
+		return filterNames;
+	}
+
+	@Override
 	public boolean checkNameChars(final String name)
 	{
 		return name.matches(filterNames + "*");
+	}
+
+	@Override
+	public boolean isBlockingDifferentNameCasesEnabled()
+	{
+		return blockDifferentNameCases;
+	}
+
+	@Override
+	public boolean checkNameCase(final String name)
+	{
+		if (blockDifferentNameCases)
+		{
+			final LoginPlayerData data = getPlayerData(name);
+			if (data == null)
+				return true;
+			else
+				return data.getName().equals(name);
+		}
+		else
+			return true;
 	}
 
 	@Override
