@@ -2,8 +2,8 @@
 # For more information visit
 # https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/config.yml
 version: X.Y
-# requires CrazyCore v8.6 or later 
-# (this information may be outdated, visit plugin main page for uptodate requirements)
+# required plugins +version can be found there
+# https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/plugin.yml
 database:
 # the table/file/section name of the database
   tableName: CrazyLogin_players
@@ -53,12 +53,14 @@ doNotSpamRequests: false
 doNotSpamRegisterRequests: false
 # these commands can be executed as guest (even if blockGuestCommands is enabled) or when not logged in
 commandWhitelist:
-- /login
-- /register
-- /crazylogin password
+- /login .*
+- /register .*
 - /worldedit cui
 # the encryption alogrithm used to encrypt your passwords. View plugin main page for more information
-algorithm: CrazyCrypt1
+encryptor:
+# don't forget to delete name or type when changing encryption algorithm (or change both)
+  name: CrazyCrypt1
+  type: de.st_ddt.crazylogin.crypt.CrazyCrypt1
 # automatically delete accounts that haven't been used for x days(-1=disabled)
 # WARNING: deletes all data belonging to this player (including those saved in other plugins; equals "/crazycore delete Player")
 autoDelete: -1
@@ -94,11 +96,27 @@ minNameLength: 3
 maxNameLength: 16
 # additional information about logging can be found here http://dev.bukkit.org/server-mods/crazycore/pages/logging/
 logs:
-  Login: false
-  ChatBlocked: false
-  CommandBlocked: false
-  Logout: false
-  AccessDenied: false
-  Quit: false
-  Join: false
-  LoginFail: false
+  Login:
+    path: false
+    console: false
+  ChatBlocked:
+    path: false
+    console: false
+  CommandBlocked:
+    path: false
+    console: false
+  Logout:
+    path: false
+    console: false
+  AccessDenied:
+    path: false
+    console: false
+  Quit:
+    path: false
+    console: false
+  Join:
+    path: false
+    console: false
+  LoginFail:
+    path: false
+    console: false
