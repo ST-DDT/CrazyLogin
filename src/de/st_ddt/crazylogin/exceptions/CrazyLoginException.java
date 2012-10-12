@@ -1,6 +1,7 @@
 package de.st_ddt.crazylogin.exceptions;
 
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
+import de.st_ddt.crazyutil.locales.Localized;
 
 public class CrazyLoginException extends CrazyException
 {
@@ -13,6 +14,7 @@ public class CrazyLoginException extends CrazyException
 	}
 
 	@Override
+	@Localized("CRAZYLOGIN.EXCEPTION")
 	public String getLangPath()
 	{
 		return "CRAZYLOGIN.EXCEPTION";

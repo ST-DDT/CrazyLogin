@@ -1,14 +1,12 @@
 package de.st_ddt.crazylogin.data;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -16,20 +14,19 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
-import de.st_ddt.crazyplugin.CrazyPluginInterface;
+import de.st_ddt.crazyplugin.CrazyLightPluginInterface;
 import de.st_ddt.crazyplugin.data.PlayerData;
-import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
-import de.st_ddt.crazyutil.databases.ConfigurationDatabaseEntry;
-import de.st_ddt.crazyutil.databases.FlatDatabaseEntry;
-import de.st_ddt.crazyutil.databases.MySQLConnection;
+import de.st_ddt.crazyutil.databases.ConfigurationPlayerDataDatabaseEntry;
+import de.st_ddt.crazyutil.databases.FlatPlayerDataDatabaseEntry;
 import de.st_ddt.crazyutil.databases.MySQLDatabase;
-import de.st_ddt.crazyutil.databases.MySQLDatabaseEntry;
+import de.st_ddt.crazyutil.databases.MySQLPlayerDataDatabaseEntry;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
+import de.st_ddt.crazyutil.locales.Localized;
 
-public class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationDatabaseEntry, MySQLDatabaseEntry, FlatDatabaseEntry, LoginData
+public final class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationPlayerDataDatabaseEntry, MySQLPlayerDataDatabaseEntry, FlatPlayerDataDatabaseEntry, LoginData
 {
 
 	private String password;
@@ -112,38 +109,18 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		catch (final SQLException e)
 		{
 			e.printStackTrace();
-			lastAction = new Timestamp(new Date().getTime());
+			lastAction = new Date();
 		}
 		online = false;
 	}
 
 	// in MySQL-Datenbank speichern
 	@Override
-	public void saveToMySQLDatabase(final MySQLConnection connection, final String table, final String[] columnNames)
+	public String saveToMySQLDatabase(final String[] columnNames)
 	{
-		Statement query = null;
 		final String IPs = ChatHelper.listingString(",", ips);
-		try
-		{
-			query = connection.getConnection().createStatement();
-			final Timestamp timestamp = new Timestamp(lastAction.getTime());
-			query.executeUpdate("INSERT INTO " + table + " (" + columnNames[0] + "," + columnNames[1] + "," + columnNames[2] + "," + columnNames[3] + ") VALUES ('" + name + "','" + password + "','" + IPs + "','" + timestamp + "') " + " ON DUPLICATE KEY UPDATE " + columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "'," + columnNames[3] + "='" + timestamp + "'");
-		}
-		catch (final SQLException e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if (query != null)
-				try
-				{
-					query.close();
-				}
-				catch (final SQLException e)
-				{}
-			connection.closeConnection();
-		}
+		final Timestamp timestamp = new Timestamp(lastAction.getTime());
+		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "'";
 	}
 
 	// aus Flat-Datenbank laden
@@ -210,18 +187,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	@Override
 	public void setPassword(final String password) throws CrazyCommandException
 	{
-		try
-		{
-			this.password = CrazyLogin.getPlugin().getEncryptor().encrypt(name, genSeed(), password);
-		}
-		catch (final UnsupportedEncodingException e)
-		{
-			throw new CrazyCommandErrorException(e);
-		}
-		catch (final NoSuchAlgorithmException e)
-		{
-			throw new CrazyCommandErrorException(e);
-		}
+		this.password = CrazyLogin.getPlugin().getEncryptor().encrypt(name, genSeed(), password);
 	}
 
 	private String genSeed()
@@ -262,6 +228,11 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	public boolean hasIP(final String ip)
 	{
 		return ips.contains(ip);
+	}
+
+	public List<String> getIPs()
+	{
+		return ips;
 	}
 
 	@Override
@@ -320,23 +291,21 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		String IP = getLatestIP();
 		if (!IP.equals(""))
 			IP = " @" + IP;
-		return (online ? ChatColor.GREEN : ChatColor.WHITE) + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(lastAction) + IP;
+		return (online ? ChatColor.GREEN : ChatColor.WHITE) + getName() + ChatColor.WHITE + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(lastAction) + IP;
 	}
 
-	public void checkTimeOut(final CrazyLogin plugin, final boolean ignoreIfOnline)
+	public boolean checkTimeOut()
 	{
 		final Date timeOut = new Date();
-		timeOut.setTime(timeOut.getTime() - plugin.getAutoLogoutTime() * 1000);
-		checkTimeOut(plugin, timeOut, ignoreIfOnline);
+		timeOut.setTime(timeOut.getTime() - getPlugin().getAutoLogoutTime() * 1000);
+		return checkTimeOut(timeOut);
 	}
 
-	public void checkTimeOut(final CrazyLogin plugin, final Date timeOut, final boolean ignoreIfOnline)
+	public boolean checkTimeOut(final Date timeOut)
 	{
-		if (ignoreIfOnline)
-			if (isOnline())
-				return;
 		if (timeOut.after(lastAction))
 			this.online = false;
+		return online;
 	}
 
 	public void setOnline(final boolean online)
@@ -345,18 +314,24 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	}
 
 	@Override
-	public String getParameter(final int index)
+	public String getParameter(final CommandSender sender, final int index)
 	{
 		switch (index)
 		{
 			case 0:
 				return getName();
 			case 1:
-				return CrazyPluginInterface.DateFormat.format(lastAction);
+				return CrazyLightPluginInterface.DATETIMEFORMAT.format(lastAction);
 			case 2:
 				return online ? "Online" : "Offline";
 			case 3:
 				return getLatestIP();
+			case 4:
+				return "+";
+			case 5:
+				return online ? ChatColor.YELLOW.toString() : ChatColor.WHITE.toString();
+			case 6:
+				return ChatColor.GREEN.toString();
 		}
 		return "";
 	}
@@ -364,7 +339,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	@Override
 	public int getParameterCount()
 	{
-		return 4;
+		return 7;
 	}
 
 	public CrazyLogin getPlugin()
@@ -379,14 +354,15 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	}
 
 	@Override
-	public void showDetailed(CommandSender target, String chatHeader)
+	@Localized({ "CRAZYLOGIN.PLAYERINFO.IPADDRESS $IP$", "CRAZYLOGIN.PLAYERINFO.LASTACTION $LastAction$", "CRAZYLOGIN.PLAYERINFO.ASSOCIATES $Associates$" })
+	public void showDetailed(final CommandSender target, final String chatHeader)
 	{
 		final CrazyLocale locale = CrazyLocale.getLocaleHead().getSecureLanguageEntry("CRAZYLOGIN.PLAYERINFO");
 		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("IPADDRESS"), ChatHelper.listingString(ips));
-		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("LASTACTION"), CrazyPluginInterface.DateFormat.format(getLastActionTime()));
-		HashSet<String> associates = new HashSet<String>();
-		for (String ip : ips)
-			for (LoginPlayerData data : getPlugin().getPlayerDatasPerIP(ip))
+		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("LASTACTION"), CrazyLightPluginInterface.DATETIMEFORMAT.format(getLastActionTime()));
+		final HashSet<String> associates = new HashSet<String>();
+		for (final String ip : ips)
+			for (final LoginPlayerData data : getPlugin().getPlayerDatasPerIP(ip))
 				associates.add(data.getName());
 		associates.remove(name);
 		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("ASSOCIATES"), ChatHelper.listingString(associates));

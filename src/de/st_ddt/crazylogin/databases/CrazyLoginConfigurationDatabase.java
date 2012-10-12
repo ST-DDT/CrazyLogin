@@ -1,36 +1,21 @@
 package de.st_ddt.crazylogin.databases;
 
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.st_ddt.crazylogin.data.LoginPlayerData;
-import de.st_ddt.crazyutil.databases.ConfigurationDatabase;
-import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
+import de.st_ddt.crazyutil.databases.ConfigurationPlayerDataDatabase;
 
-public class CrazyLoginConfigurationDatabase extends ConfigurationDatabase<LoginPlayerData> implements PlayerDataDatabase<LoginPlayerData>
+public final class CrazyLoginConfigurationDatabase extends ConfigurationPlayerDataDatabase<LoginPlayerData>
 {
 
-	public CrazyLoginConfigurationDatabase(final String tableName, final ConfigurationSection config, JavaPlugin plugin)
+	public CrazyLoginConfigurationDatabase(final JavaPlugin plugin, final ConfigurationSection config)
 	{
-		super(LoginPlayerData.class, tableName, config, new String[] { "name", "password", "ips", "lastAction" }, plugin);
+		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction" }, "accounts", plugin, config);
 	}
 
-	@Override
-	public LoginPlayerData getEntry(final OfflinePlayer player)
+	public CrazyLoginConfigurationDatabase(final JavaPlugin plugin, final String path, final String[] columnNames)
 	{
-		return getEntry(player.getName());
-	}
-
-	@Override
-	public boolean hasEntry(final OfflinePlayer player)
-	{
-		return hasEntry(player.getName());
-	}
-
-	@Override
-	public boolean deleteEntry(final OfflinePlayer player)
-	{
-		return deleteEntry(player.getName());
+		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction" }, plugin, path, columnNames);
 	}
 }

@@ -1,37 +1,21 @@
 package de.st_ddt.crazylogin.databases;
 
-import java.io.File;
-
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import de.st_ddt.crazylogin.data.LoginPlayerData;
-import de.st_ddt.crazyutil.databases.FlatDatabase;
-import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
+import de.st_ddt.crazyutil.databases.FlatPlayerDataDatabase;
 
-public class CrazyLoginFlatDatabase extends FlatDatabase<LoginPlayerData> implements PlayerDataDatabase<LoginPlayerData>
+public final class CrazyLoginFlatDatabase extends FlatPlayerDataDatabase<LoginPlayerData>
 {
 
-	public CrazyLoginFlatDatabase(final String tableName, final ConfigurationSection config, final File file)
+	public CrazyLoginFlatDatabase(final JavaPlugin plugin, final ConfigurationSection config)
 	{
-		super(LoginPlayerData.class, tableName, config, new String[] { "name", "password", "ips", "lastAction" }, file);
+		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction" }, "accounts.db", plugin, config);
 	}
 
-	@Override
-	public LoginPlayerData getEntry(final OfflinePlayer player)
+	public CrazyLoginFlatDatabase(final JavaPlugin plugin, final String path)
 	{
-		return getEntry(player.getName());
-	}
-
-	@Override
-	public boolean hasEntry(final OfflinePlayer player)
-	{
-		return hasEntry(player.getName());
-	}
-
-	@Override
-	public boolean deleteEntry(final OfflinePlayer player)
-	{
-		return deleteEntry(player.getName());
+		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction" }, plugin, path);
 	}
 }

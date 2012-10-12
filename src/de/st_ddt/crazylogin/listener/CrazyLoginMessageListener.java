@@ -8,16 +8,14 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyplugin.listener.CrazyPluginMessageListener;
 
-public class CrazyLoginMessageListener extends CrazyPluginMessageListener
+public final class CrazyLoginMessageListener extends CrazyPluginMessageListener<CrazyLogin>
 {
 
-	protected final CrazyLogin plugin;
-	protected final CrazyCrypt1 encryptor = new CrazyCrypt1();
+	protected final CrazyCrypt1 encryptor = new CrazyCrypt1(plugin, (String[]) null);
 
 	public CrazyLoginMessageListener(final CrazyLogin plugin)
 	{
 		super(plugin);
-		this.plugin = plugin;
 	}
 
 	@Override
@@ -118,13 +116,6 @@ public class CrazyLoginMessageListener extends CrazyPluginMessageListener
 
 	protected String encryptID(final Player player)
 	{
-		try
-		{
-			return encryptor.encrypt(player.getName() + " " + player.getAddress().getAddress().getHostAddress(), null, plugin.getUniqueIDKey());
-		}
-		catch (final Exception e)
-		{
-			return "";
-		}
+		return encryptor.encrypt(player.getName(), null, plugin.getUniqueIDKey());
 	}
 }

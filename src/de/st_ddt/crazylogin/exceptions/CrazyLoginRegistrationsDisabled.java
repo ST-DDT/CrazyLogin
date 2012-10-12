@@ -3,6 +3,7 @@ package de.st_ddt.crazylogin.exceptions;
 import org.bukkit.command.CommandSender;
 
 import de.st_ddt.crazyutil.ChatHelper;
+import de.st_ddt.crazyutil.locales.Localized;
 
 public class CrazyLoginRegistrationsDisabled extends CrazyLoginException
 {
@@ -21,6 +22,7 @@ public class CrazyLoginRegistrationsDisabled extends CrazyLoginException
 	}
 
 	@Override
+	@Localized("CRAZYLOGIN.EXCEPTION.REGISTER.DISABLED")
 	public void print(final CommandSender sender, final String header)
 	{
 		ChatHelper.sendMessage(sender, header, locale);

@@ -1,8 +1,8 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 6.6
-# requires CrazyCore v8.5 or later
+version: 7
+# requires CrazyCore v9 or later
 depend: [CrazyCore]
 description: >
             CrazyLogin protect your server with passwords and many usefully features.
@@ -10,6 +10,9 @@ commands:
   login:
     description: Login using a password
     usage: /<command> <Password...>
+  adminlogin:
+    description: Login into another account using an admin account.
+    usage: /<command> <Admin> <AdminPassword...>
   logout:
     description: Logout and leave server
     usage: /<command>
@@ -37,6 +40,7 @@ permissions:
       crazylogin.register.channel: true
       crazylogin.login.command: true
       crazylogin.login.channel: true
+      crazylogin.adminlogin: true
       crazylogin.logout.command: true
       crazylogin.logout.channel: true
       crazylogin.list: true
@@ -46,6 +50,7 @@ permissions:
       crazylogin.player.info.self: true
       crazylogin.player.info.other: true
       crazylogin.player.create: true
+      crazylogin.player.password: true
       crazylogin.player.delete: true
       crazylogin.list: true
   crazylogin.admin:
@@ -63,6 +68,7 @@ permissions:
       crazylogin.register.channel: true
       crazylogin.login.command: true
       crazylogin.login.channel: true
+      crazylogin.adminlogin: true
       crazylogin.logout.command: true
       crazylogin.logout.channel: true
       crazylogin.commands: true
@@ -72,6 +78,7 @@ permissions:
       crazylogin.player.info.self: true
       crazylogin.player.info.other: true
       crazylogin.player.create: true
+      crazylogin.player.password: true
       crazylogin.player.delete: true
   crazylogin.ensureregistration:
     description: This player can always register an account.
@@ -97,6 +104,12 @@ permissions:
   crazylogin.login.channel:
     description: Allow players to login via pluginChannel.
     default: true
+  crazylogin.adminlogin:
+    description: Allow admins to login as another player.
+    default: op
+  crazylogin.blockadminlogin:
+    description: Block admins logins to this account.
+    default: false
   crazylogin.logout.command:
     description: Allow players to logout via command.
     default: true
@@ -149,6 +162,9 @@ permissions:
     default: op
   crazylogin.player.create:
     description: Allow creating player data
+    default: op
+  crazylogin.player.password:
+    description: Allow changing a players password
     default: op
   crazylogin.player.delete:
     description: Allow deleting player data

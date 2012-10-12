@@ -1,42 +1,59 @@
 package de.st_ddt.crazylogin;
 
-import java.io.File;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.messaging.Messenger;
 
+import de.st_ddt.crazylogin.commands.CrazyCommandLoginCheck;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandAdminLogin;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandExecutor;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandLogin;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandLogout;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandMainCommands;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandMainDropOldData;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandPassword;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandPlayerCreate;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandPlayerDetachIP;
+import de.st_ddt.crazylogin.commands.CrazyLoginCommandPlayerPassword;
 import de.st_ddt.crazylogin.crypt.AuthMeCrypt;
+import de.st_ddt.crazylogin.crypt.ChangedAlgorithmEncryptor;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
-import de.st_ddt.crazylogin.crypt.CustomEncryptor;
-import de.st_ddt.crazylogin.crypt.DefaultCrypt;
+import de.st_ddt.crazylogin.crypt.CrazyCrypt2;
+import de.st_ddt.crazylogin.crypt.EncryptHelper;
 import de.st_ddt.crazylogin.crypt.Encryptor;
+import de.st_ddt.crazylogin.crypt.MD2Crypt;
+import de.st_ddt.crazylogin.crypt.MD5Crypt;
 import de.st_ddt.crazylogin.crypt.PlainCrypt;
+import de.st_ddt.crazylogin.crypt.SHA_1Crypt;
+import de.st_ddt.crazylogin.crypt.SHA_256Crypt;
+import de.st_ddt.crazylogin.crypt.SHA_512Crypt;
+import de.st_ddt.crazylogin.crypt.SeededMD2Crypt;
+import de.st_ddt.crazylogin.crypt.SeededMD5Crypt;
+import de.st_ddt.crazylogin.crypt.SeededSHA_1Crypt;
+import de.st_ddt.crazylogin.crypt.SeededSHA_256Crypt;
+import de.st_ddt.crazylogin.crypt.SeededSHA_512Crypt;
+import de.st_ddt.crazylogin.crypt.WebCrypt;
 import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
 import de.st_ddt.crazylogin.data.LoginData;
-import de.st_ddt.crazylogin.data.LoginDataComparator;
-import de.st_ddt.crazylogin.data.LoginDataIPComparator;
-import de.st_ddt.crazylogin.data.LoginDataLastActionComparator;
-import de.st_ddt.crazylogin.data.LoginDataNameComparator;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazylogin.data.LoginUnregisteredPlayerData;
+import de.st_ddt.crazylogin.data.comparator.LoginDataComparator;
+import de.st_ddt.crazylogin.data.comparator.LoginDataIPComparator;
+import de.st_ddt.crazylogin.data.comparator.LoginDataLastActionComparator;
 import de.st_ddt.crazylogin.databases.CrazyLoginConfigurationDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginFlatDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginMySQLDatabase;
@@ -52,35 +69,41 @@ import de.st_ddt.crazylogin.exceptions.CrazyLoginRegistrationsDisabled;
 import de.st_ddt.crazylogin.listener.CrazyLoginCrazyListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
+import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener_125;
 import de.st_ddt.crazylogin.listener.CrazyLoginVehicleListener;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazylogin.tasks.ScheduledCheckTask;
 import de.st_ddt.crazyplugin.CrazyPlayerDataPlugin;
-import de.st_ddt.crazyplugin.data.ParameterData;
+import de.st_ddt.crazyplugin.commands.CrazyPluginCommandMainMode;
+import de.st_ddt.crazyplugin.data.PlayerDataFilter;
+import de.st_ddt.crazyplugin.data.PlayerDataNameFilter;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
-import de.st_ddt.crazyplugin.exceptions.CrazyCommandAlreadyExistsException;
-import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandCircumstanceException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
-import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandNoSuchException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandParameterException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
-import de.st_ddt.crazyutil.CrazyPipe;
-import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
-import de.st_ddt.crazyutil.ToStringDataGetter;
+import de.st_ddt.crazyutil.ChatHelperExtended;
+import de.st_ddt.crazyutil.ListOptionsModder;
+import de.st_ddt.crazyutil.VersionComparator;
 import de.st_ddt.crazyutil.databases.DatabaseType;
+import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
+import de.st_ddt.crazyutil.locales.Localized;
+import de.st_ddt.crazyutil.paramitrisable.BooleanParamitrisable;
+import de.st_ddt.crazyutil.paramitrisable.Paramitrisable;
 
-public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData> implements LoginPlugin<LoginPlayerData>
+public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData> implements LoginPlugin<LoginPlayerData>
 {
 
 	private static CrazyLogin plugin;
 	private final HashMap<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
 	private final HashMap<String, Integer> loginFailures = new HashMap<String, Integer>();
 	private final HashMap<String, Date> tempBans = new HashMap<String, Date>();
+	private final CrazyPluginCommandMainMode modeCommand = new CrazyPluginCommandMainMode(this);
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginVehicleListener vehicleListener;
 	private CrazyLoginCrazyListener crazylistener;
@@ -116,25 +139,810 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	private boolean blockDifferentNameCases;
 	private int minNameLength;
 	private int maxNameLength;
+	static
+	{
+		EncryptHelper.registerAlgorithm("Plaintext", PlainCrypt.class);
+		EncryptHelper.registerAlgorithm("MD2", MD2Crypt.class);
+		EncryptHelper.registerAlgorithm("MD5", MD5Crypt.class);
+		EncryptHelper.registerAlgorithm("SHA-1", SHA_1Crypt.class);
+		EncryptHelper.registerAlgorithm("SHA-256", SHA_256Crypt.class);
+		EncryptHelper.registerAlgorithm("SHA-512", SHA_512Crypt.class);
+		EncryptHelper.registerAlgorithm("SeededMD2", SeededMD2Crypt.class);
+		EncryptHelper.registerAlgorithm("SeededMD5", SeededMD5Crypt.class);
+		EncryptHelper.registerAlgorithm("SeededSHA-1", SeededSHA_1Crypt.class);
+		EncryptHelper.registerAlgorithm("SeededSHA-256", SeededSHA_256Crypt.class);
+		EncryptHelper.registerAlgorithm("SeededSHA-512", SeededSHA_512Crypt.class);
+		EncryptHelper.registerAlgorithm("CrazyCrypt1", CrazyCrypt1.class);
+		EncryptHelper.registerAlgorithm("CrazyCrypt2", CrazyCrypt2.class);
+		EncryptHelper.registerAlgorithm("AuthMe", AuthMeCrypt.class);
+		EncryptHelper.registerAlgorithm("WebCrypt", WebCrypt.class);
+		EncryptHelper.registerAlgorithm("Whirlpool", WhirlPoolCrypt.class);
+	}
 
 	public static CrazyLogin getPlugin()
 	{
 		return plugin;
 	}
 
-	@Override
-	protected String getShortPluginName()
+	public CrazyLogin()
 	{
-		return "cl";
+		super();
+		registerModes();
+		registerFilter();
+		registerSorters();
+	}
+
+	@Localized("CRAZYLOGIN.MODE.CHANGE")
+	private void registerModes()
+	{
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("alwaysNeedPassword")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return alwaysNeedPassword;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				alwaysNeedPassword = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("forceSaveLogin")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return forceSaveLogin;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				forceSaveLogin = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("hideInventory")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return hideInventory;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				hideInventory = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("disableRegistrations")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return disableRegistrations;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				disableRegistrations = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("doNotSpamRequests")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return doNotSpamRequests;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				doNotSpamRequests = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("doNotSpamRegisterRequests")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return doNotSpamRegisterRequests;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				doNotSpamRegisterRequests = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("forceSingleSession")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return forceSingleSession;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				forceSingleSession = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("forceSingleSessionSameIPBypass")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return forceSingleSessionSameIPBypass;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				forceSingleSessionSameIPBypass = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("autoLogout")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue() + " seconds");
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return autoLogout;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				autoLogout = Math.max(newValue, -1);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("autoKick")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue() + " seconds");
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return autoKick;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				autoKick = Math.max(newValue, -1);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new LongMode("autoTempBan")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue() + " seconds");
+			}
+
+			@Override
+			public Long getValue()
+			{
+				return autoTempBan;
+			}
+
+			@Override
+			public void setValue(final Long newValue) throws CrazyException
+			{
+				autoTempBan = Math.max(newValue, -1);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("autoKickUnregistered")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue() + " seconds");
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return autoKickUnregistered;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				autoKickUnregistered = Math.max(newValue, -1);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("autoKickLoginFailer")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue() + " failed attempts");
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return autoKickLoginFailer;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				autoKickLoginFailer = Math.max(newValue, -1);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new LongMode("autoTempBanLoginFailer")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue() + " seconds");
+			}
+
+			@Override
+			public Long getValue()
+			{
+				return autoTempBanLoginFailer;
+			}
+
+			@Override
+			public void setValue(final Long newValue) throws CrazyException
+			{
+				autoTempBanLoginFailer = Math.max(newValue, -1);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("autoKickCommandUsers")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return autoKickCommandUsers;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				autoKickCommandUsers = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("blockGuestCommands")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return blockGuestCommands;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				blockGuestCommands = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("blockGuestChat")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return blockGuestChat;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				blockGuestChat = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("blockGuestJoin")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return blockGuestJoin;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				blockGuestJoin = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("removeGuestData")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return removeGuestData;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				removeGuestData = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("maxRegistrationsPerIP")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue());
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return maxRegistrationsPerIP;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				maxRegistrationsPerIP = Math.max(newValue, -1);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("maxOnlinesPerIP")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue());
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return maxOnlinesPerIP;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				maxOnlinesPerIP = Math.max(newValue, -1);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new Mode<DatabaseType>("saveType", DatabaseType.class)
+		{
+
+			@Override
+			public DatabaseType getValue()
+			{
+				return database.getType();
+			}
+
+			@Override
+			public void setValue(final CommandSender sender, final String... args) throws CrazyException
+			{
+				if (args.length > 1)
+					throw new CrazyCommandUsageException("[SaveType (MYSQL/FLAT/CONFIG)]");
+				final String saveType = args[0];
+				DatabaseType type = null;
+				try
+				{
+					type = DatabaseType.valueOf(saveType.toUpperCase());
+				}
+				catch (final Exception e)
+				{
+					type = null;
+				}
+				if (type == null)
+					throw new CrazyCommandNoSuchException("SaveType", saveType, "MYSQL", "FLAT", "CONFIG");
+				setValue(type);
+				showValue(sender);
+			}
+
+			@Override
+			public void setValue(final DatabaseType newValue) throws CrazyException
+			{
+				if (database != null)
+					if (newValue == database.getType())
+						return;
+				final PlayerDataDatabase<LoginPlayerData> oldDatabase = database;
+				getConfig().set("database.saveType", newValue.toString());
+				loadDatabase();
+				if (database == null)
+					database = oldDatabase;
+				else if (oldDatabase != null)
+					database.saveAll(oldDatabase.getAllEntries());
+				save();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("autoDelete")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue() + " days");
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return autoDelete;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				autoDelete = Math.max(newValue, -1);
+				saveConfiguration();
+				if (autoDelete != -1)
+					getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new DropInactiveAccountsTask(plugin), 20 * 60 * 60, 20 * 60 * 60 * 6);
+			}
+		});
+		modeCommand.addMode(modeCommand.new DoubleMode("moveRange")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue() + " blocks");
+			}
+
+			@Override
+			public Double getValue()
+			{
+				return moveRange;
+			}
+
+			@Override
+			public void setValue(final Double newValue) throws CrazyException
+			{
+				moveRange = Math.max(newValue, -1);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new Mode<String>("filterNames", String.class)
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, "filterNames", getValue().equals(".") ? "disabled" : getValue());
+			}
+
+			@Override
+			public String getValue()
+			{
+				return filterNames;
+			}
+
+			@Override
+			public void setValue(final CommandSender sender, final String... args) throws CrazyException
+			{
+				String newFilter = ChatHelper.listingString(" ", args);
+				if (newFilter.equalsIgnoreCase("false") || newFilter.equalsIgnoreCase("0") || newFilter.equalsIgnoreCase("off"))
+					newFilter = ".";
+				else if (newFilter.equalsIgnoreCase("true") || newFilter.equalsIgnoreCase("1") || newFilter.equalsIgnoreCase("on"))
+					newFilter = "[a-zA-Z0-9_]";
+				setValue(newFilter);
+			}
+
+			@Override
+			public void setValue(final String newValue) throws CrazyException
+			{
+				filterNames = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("blockDifferentNameCases")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return blockDifferentNameCases;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				blockDifferentNameCases = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("minNameLength")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() + " characters");
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return minNameLength;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				minNameLength = Math.min(Math.max(newValue, 1), 16);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("maxNameLength")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() + " characters");
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return maxNameLength;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				maxNameLength = Math.min(Math.max(newValue, 1), 16);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("saveDatabaseOnShutdown")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return saveDatabaseOnShutdown;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				saveDatabaseOnShutdown = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new Mode<Encryptor>("algorithm", Encryptor.class)
+		{
+
+			@Override
+			public Encryptor getValue()
+			{
+				return encryptor;
+			}
+
+			@Override
+			public void setValue(final CommandSender sender, final String... args) throws CrazyException
+			{
+				setValue(EncryptHelper.getEncryptor(plugin, args[0].toLowerCase(), ChatHelperExtended.shiftArray(args, 1)));
+			}
+
+			@Override
+			public void setValue(final Encryptor newValue) throws CrazyException
+			{
+				if (encryptor.equals(newValue))
+					encryptor = newValue;
+				else
+					encryptor = new ChangedAlgorithmEncryptor(plugin, newValue, encryptor);
+			}
+		});
+	}
+
+	private void registerFilter()
+	{
+		playerDataFilters.add(new PlayerDataNameFilter<LoginData>());
+		playerDataFilters.add(new PlayerDataFilter<LoginData>("ip", new String[] { "ip" })
+		{
+
+			@Override
+			public FilterInstance getInstance()
+			{
+				return new FilterInstance()
+				{
+
+					private String ip = null;
+
+					@Override
+					public void setParameter(final String parameter) throws CrazyException
+					{
+						ip = parameter;
+					}
+
+					@Override
+					public void filter(final Collection<? extends LoginData> datas)
+					{
+						if (ip != null)
+							super.filter(datas);
+					}
+
+					@Override
+					public boolean filter(final LoginData data)
+					{
+						return data.hasIP(ip);
+					}
+				};
+			}
+		});
+		playerDataFilters.add(new PlayerDataFilter<LoginData>("online", new String[] { "on", "online" })
+		{
+
+			@Override
+			public FilterInstance getInstance()
+			{
+				return new FilterInstance()
+				{
+
+					private Boolean online = null;
+
+					@Override
+					public void setParameter(String parameter) throws CrazyException
+					{
+						parameter = parameter.toLowerCase();
+						if (parameter.equals("true"))
+							online = true;
+						else if (parameter.equals("1"))
+							online = true;
+						else if (parameter.equals("y"))
+							online = true;
+						else if (parameter.equals("yes"))
+							online = true;
+						else if (parameter.equals("false"))
+							online = false;
+						else if (parameter.equals("0"))
+							online = false;
+						else if (parameter.equals("n"))
+							online = false;
+						else if (parameter.equals("no"))
+							online = false;
+						else if (parameter.equals("*"))
+							online = null;
+						else
+							throw new CrazyCommandParameterException(0, "Boolean (false/true/*)");
+					}
+
+					@Override
+					public void filter(final Collection<? extends LoginData> datas)
+					{
+						if (online != null)
+							super.filter(datas);
+					}
+
+					@Override
+					public boolean filter(final LoginData data)
+					{
+						return online.equals(data.isOnline());
+					}
+				};
+			}
+		});
+	}
+
+	private void registerSorters()
+	{
+		playerDataSorters.put("ip", new LoginDataIPComparator());
+		final LoginDataComparator lastAction = new LoginDataLastActionComparator();
+		playerDataSorters.put("last", lastAction);
+		playerDataSorters.put("action", lastAction);
+		playerDataSorters.put("lastaction", lastAction);
+		playerDataSorters.put("online", lastAction);
+		playerDataSorters.put("time", lastAction);
+	}
+
+	private void registerCommands()
+	{
+		final CrazyLoginCommandExecutor passwordCommand = new CrazyLoginCommandPassword(this);
+		getCommand("login").setExecutor(new CrazyLoginCommandLogin(this));
+		getCommand("adminlogin").setExecutor(new CrazyLoginCommandAdminLogin(this, playerListener));
+		getCommand("logout").setExecutor(new CrazyLoginCommandLogout(this));
+		getCommand("register").setExecutor(passwordCommand);
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, playerCommand), "player", "players", "account", "accounts");
+		mainCommand.addSubCommand(passwordCommand, "password");
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, modeCommand), "mode");
+		mainCommand.addSubCommand(new CrazyLoginCommandMainCommands(this), "commands");
+		mainCommand.addSubCommand(new CrazyLoginCommandMainDropOldData(this), "dropolddata");
+		playerCommand.addSubCommand(new CrazyLoginCommandPlayerCreate(this), "create");
+		playerCommand.addSubCommand(new CrazyLoginCommandPlayerPassword(this), "chgpw", "changepassword");
+		playerCommand.addSubCommand(new CrazyLoginCommandPlayerDetachIP(this), "detachip");
+	}
+
+	private void registerHooks()
+	{
+		final String mcVersion = Bukkit.getVersion().split("-", 4)[2];
+		if (mcVersion.equals("1.2.5"))
+			this.playerListener = new CrazyLoginPlayerListener_125(this);
+		else
+			this.playerListener = new CrazyLoginPlayerListener(this);
+		this.vehicleListener = new CrazyLoginVehicleListener(this);
+		this.crazylistener = new CrazyLoginCrazyListener(this, playerListener);
+		final PluginManager pm = this.getServer().getPluginManager();
+		pm.registerEvents(playerListener, this);
+		pm.registerEvents(vehicleListener, this);
+		pm.registerEvents(crazylistener, this);
+		this.messageListener = new CrazyLoginMessageListener(this);
+		final Messenger ms = getServer().getMessenger();
+		ms.registerIncomingPluginChannel(this, "CrazyLogin", messageListener);
+		ms.registerOutgoingPluginChannel(this, "CrazyLogin");
+	}
+
+	@Override
+	public PlayerDataDatabase<LoginPlayerData> getCrazyDatabase()
+	{
+		return database;
+	}
+
+	@Override
+	public void onLoad()
+	{
+		LoginPlugin.LOGINPLUGINPROVIDER.setPlugin(this);
+		plugin = this;
+		super.onLoad();
 	}
 
 	@Override
 	public void onEnable()
 	{
-		plugin = this;
 		registerHooks();
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new ScheduledCheckTask(this), 30 * 60 * 20, 15 * 60 * 20);
 		super.onEnable();
+		registerCommands();
 		// OnlinePlayer
 		for (final Player player : Bukkit.getOnlinePlayers())
 			playerListener.PlayerJoin(player);
@@ -149,25 +957,9 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		super.onDisable();
 	}
 
-	public void registerHooks()
-	{
-		this.playerListener = new CrazyLoginPlayerListener(this);
-		this.vehicleListener = new CrazyLoginVehicleListener(this);
-		this.crazylistener = new CrazyLoginCrazyListener(this, playerListener);
-		final PluginManager pm = this.getServer().getPluginManager();
-		pm.registerEvents(playerListener, this);
-		pm.registerEvents(vehicleListener, this);
-		pm.registerEvents(crazylistener, this);
-		this.messageListener = new CrazyLoginMessageListener(this);
-		final Messenger ms = getServer().getMessenger();
-		ms.registerIncomingPluginChannel(this, "CrazyLogin", messageListener);
-		ms.registerOutgoingPluginChannel(this, "CrazyLogin");
-	}
-
 	@Override
-	public void load()
+	public void loadConfiguration()
 	{
-		super.load();
 		final ConfigurationSection config = getConfig();
 		autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
@@ -188,13 +980,23 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		doNotSpamRegisterRequests = config.getBoolean("doNotSpamRegisterRequests", false);
 		antiRequestSpamTable.clear();
 		commandWhiteList = config.getStringList("commandWhitelist");
-		if (commandWhiteList.size() == 0)
+		if (isInstalled)
 		{
-			commandWhiteList.add("/login");
-			commandWhiteList.add("/register");
-			commandWhiteList.add("/crazylogin password");
+			commandWhiteList.add("/login .*");
+			commandWhiteList.add("/register .*");
+			commandWhiteList.add("/language [a-z][a-z]_[a-z][a-z]");
+			commandWhiteList.add("/language select.*");
+			commandWhiteList.add("/language list.*");
 			commandWhiteList.add("/worldedit cui");
 		}
+		else if (isUpdated)
+			if (VersionComparator.compareVersions(previousVersion, "8") == -1)
+			{
+				final List<String> temp = new ArrayList<String>(commandWhiteList);
+				commandWhiteList.clear();
+				for (final String entry : temp)
+					commandWhiteList.add(entry + ".*");
+			}
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
 		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
@@ -216,50 +1018,26 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		maxNameLength = Math.min(Math.max(config.getInt("maxNameLength", 16), minNameLength), 16);
 		uniqueIDKey = config.getString("uniqueIDKey");
 		pluginCommunicationEnabled = config.getBoolean("pluginCommunicationEnabled", false);
-		final String algorithm = config.getString("algorithm", "CrazyCrypt1");
-		if (algorithm.equalsIgnoreCase("CrazyCrypt1"))
+		// Encryptor
+		if (isUpdated && !isInstalled && VersionComparator.compareVersions(previousVersion, "7") == -1)
 		{
-			encryptor = new CrazyCrypt1();
-		}
-		else if (algorithm.equalsIgnoreCase("Whirlpool"))
-		{
-			encryptor = new WhirlPoolCrypt();
-		}
-		else if (algorithm.equalsIgnoreCase("Plaintext"))
-		{
-			encryptor = new PlainCrypt();
-		}
-		else if (algorithm.equalsIgnoreCase("AuthMe"))
-		{
-			encryptor = new AuthMeCrypt();
-		}
-		else if (algorithm.equalsIgnoreCase("Custom"))
-		{
-			final String encryption = config.getString("customEncryptor.class");
-			if (config.getConfigurationSection("customEncryptor") == null)
-				config.createSection("customEncryptor");
-			encryptor = ObjectSaveLoadHelper.load(encryption, CustomEncryptor.class, new Class[] { LoginPlugin.class, ConfigurationSection.class }, new Object[] { this, config.getConfigurationSection("customEncryptor") });
+			String algorithm = config.getString("algorithm");
+			if (algorithm.startsWith("MD") || algorithm.startsWith("SHA"))
+				algorithm = "Seeded" + algorithm;
+			encryptor = EncryptHelper.getEncryptor(plugin, algorithm, config.getConfigurationSection("customEncryptor"));
+			config.set("algorithm", null);
+			config.set("customEncryptor", null);
 		}
 		else
-		{
-			try
-			{
-				encryptor = new DefaultCrypt(algorithm);
-			}
-			catch (final NoSuchAlgorithmException e)
-			{
-				broadcastLocaleMessage(true, "crazylogin.warnalgorithm", "ALGORITHM.MISSING", algorithm);
-				encryptor = new CrazyCrypt1();
-			}
-		}
+			encryptor = EncryptHelper.getEncryptor(plugin, config.getConfigurationSection("encryptor"));
+		if (encryptor == null)
+			encryptor = new CrazyCrypt1(plugin, config);
 		// Logger
 		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
-		// Database
-		setupDatabase();
-		dropInactiveAccounts();
 	}
 
-	public void setupDatabase()
+	@Localized({ "CRAZYLOGIN.DATABASE.ACCESSWARN $SaveType$", "CRAZYLOGIN.DATABASE.LOADED $EntryCount$" })
+	public void loadDatabase()
 	{
 		final ConfigurationSection config = getConfig();
 		final String saveType = config.getString("database.saveType", "FLAT").toUpperCase();
@@ -270,75 +1048,44 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		}
 		catch (final Exception e)
 		{
-			System.out.println("NO SUCH SAVETYPE " + saveType);
-			type = null;
+			consoleLog(ChatColor.RED + "NO SUCH SAVETYPE " + saveType);
 		}
-		final String tableName = config.getString("database.tableName", "CrazyLogin_players");
-		config.set("database.tableName", tableName);
-		try
+		if (type == DatabaseType.CONFIG)
+			database = new CrazyLoginConfigurationDatabase(this, config.getConfigurationSection("database.CONFIG"));
+		else if (type == DatabaseType.MYSQL)
+			database = new CrazyLoginMySQLDatabase(config.getConfigurationSection("database.MYSQL"));
+		else if (type == DatabaseType.FLAT)
+			database = new CrazyLoginFlatDatabase(this, config.getConfigurationSection("database.FLAT"));
+		if (database != null)
+			try
+			{
+				database.save(config, "database.");
+				database.initialize();
+			}
+			catch (final Exception e)
+			{
+				e.printStackTrace();
+				database = null;
+			}
+		if (database == null)
 		{
-			if (type == DatabaseType.CONFIG)
+			broadcastLocaleMessage(true, "crazylogin.warndatabase", "DATABASE.ACCESSWARN", saveType);
+			Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable()
 			{
-				database = new CrazyLoginConfigurationDatabase(tableName, config, this);
-			}
-			else if (type == DatabaseType.MYSQL)
-			{
-				database = new CrazyLoginMySQLDatabase(tableName, config);
-			}
-			else if (type == DatabaseType.FLAT)
-			{
-				final File file = new File(getDataFolder().getPath() + "/" + tableName + ".db");
-				database = new CrazyLoginFlatDatabase(tableName, config, file);
-			}
-		}
-		catch (final Exception e)
-		{
-			e.printStackTrace();
-			database = null;
-		}
-		finally
-		{
-			if (database == null)
-				broadcastLocaleMessage(true, "crazylogin.warndatabase", "DATABASE.ACCESSWARN", saveType);
-			else
-			{
-				database.loadAllEntries();
-				sendLocaleMessage("DATABASE.LOADED", Bukkit.getConsoleSender(), database.getAllEntries().size());
-			}
-		}
-	}
 
-	@Override
-	public int dropInactiveAccounts()
-	{
-		if (autoDelete != -1)
-			return dropInactiveAccounts(autoDelete);
-		return -1;
-	}
-
-	protected int dropInactiveAccounts(final long age)
-	{
-		final Date compare = new Date();
-		compare.setTime(compare.getTime() - age * 1000 * 60 * 60 * 24);
-		return dropInactiveAccounts(compare);
-	}
-
-	protected synchronized int dropInactiveAccounts(final Date limit)
-	{
-		final LinkedList<String> deletions = new LinkedList<String>();
-		final Iterator<LoginPlayerData> it = database.getAllEntries().iterator();
-		while (it.hasNext())
-		{
-			final LoginPlayerData data = it.next();
-			if (data.getLastActionTime().before(limit))
-				deletions.add(data.getName());
+				@Override
+				public void run()
+				{
+					if (database == null)
+						broadcastLocaleMessage(true, "crazylogin.warndatabase", "DATABASE.ACCESSWARN", saveType);
+				}
+			}, 600, 600);
 		}
-		for (final String name : deletions)
+		else
 		{
-			database.deleteEntry(name);
-			new CrazyPlayerRemoveEvent(this, name).callAsyncEvent();
+			dropInactiveAccounts();
+			sendLocaleMessage("DATABASE.LOADED", Bukkit.getConsoleSender(), database.getAllEntries().size());
 		}
-		return deletions.size();
 	}
 
 	@Override
@@ -352,6 +1099,10 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	public void saveConfiguration()
 	{
 		final ConfigurationSection config = getConfig();
+		if (database != null)
+			database.save(config, "database.");
+		config.set("encryptor", null);
+		encryptor.save(config, "encryptor.");
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
@@ -369,7 +1120,6 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		config.set("doNotSpamRegisterRequests", doNotSpamRegisterRequests);
 		config.set("commandWhitelist", commandWhiteList);
 		config.set("uniqueIDKey", uniqueIDKey);
-		config.set("algorithm", encryptor.getAlgorithm());
 		config.set("autoDelete", autoDelete);
 		config.set("forceSingleSession", forceSingleSession);
 		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
@@ -390,42 +1140,37 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	}
 
 	@Override
-	public boolean command(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
+	public int dropInactiveAccounts()
 	{
-		if (commandLabel.equalsIgnoreCase("login"))
-		{
-			commandLogin(sender, args);
-			return true;
-		}
-		if (commandLabel.equalsIgnoreCase("logout"))
-		{
-			commandLogout(sender, args);
-			return true;
-		}
-		if (commandLabel.equalsIgnoreCase("register"))
-		{
-			commandMainPassword(sender, args);
-			return true;
-		}
-		return false;
+		if (autoDelete != -1)
+			return dropInactiveAccounts(autoDelete);
+		return -1;
 	}
 
-	public void commandLogin(final CommandSender sender, final String[] args) throws CrazyCommandException
+	public int dropInactiveAccounts(final long age)
 	{
-		if (sender instanceof ConsoleCommandSender)
-			throw new CrazyCommandExecutorException(false);
-		if (!sender.hasPermission("crazylogin.login.command"))
-			throw new CrazyCommandPermissionException();
-		if (args.length == 0)
-			throw new CrazyCommandUsageException("/login <Passwort...>");
-		final Player player = (Player) sender;
-		final String password = ChatHelper.listingString(args);
-		playerLogin(player, password);
+		final Date compare = new Date();
+		compare.setTime(compare.getTime() - age * 1000 * 60 * 60 * 24);
+		return dropInactiveAccounts(compare);
+	}
+
+	protected synchronized int dropInactiveAccounts(final Date limit)
+	{
+		final LinkedList<String> deletions = new LinkedList<String>();
+		for (final LoginPlayerData data : database.getAllEntries())
+			if (data.getLastActionTime().before(limit))
+				deletions.add(data.getName());
+		for (final String name : deletions)
+			new CrazyPlayerRemoveEvent(this, name).checkAndCallEvent();
+		return deletions.size();
 	}
 
 	@Override
-	public void playerLogin(final Player player, final String password)
+	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$", "CRAZYLOGIN.LOGIN.SUCCESS" })
+	public void playerLogin(final Player player, final String password) throws CrazyCommandException
 	{
+		if (database == null)
+			throw new CrazyCommandCircumstanceException("when database is accessible");
 		final LoginPlayerData data = database.getEntry(player);
 		final CrazyLoginPreLoginEvent<LoginPlayerData> event = new CrazyLoginPreLoginEvent<LoginPlayerData>(this, player, data);
 		event.callEvent();
@@ -464,31 +1209,25 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		}
 		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callAsyncEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
-		logger.log("Login", player.getName() + " logged in successfully");
+		logger.log("Login", player.getName() + " logged in successfully.");
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
 		loginFailures.remove(player.getName().toLowerCase());
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
+		if (encryptor instanceof ChangedAlgorithmEncryptor)
+			data.setPassword(password);
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		data.notifyAction();
-		if (database != null)
-			database.save(data);
-	}
-
-	public void commandLogout(final CommandSender sender, final String[] args) throws CrazyCommandException
-	{
-		if (sender instanceof ConsoleCommandSender)
-			throw new CrazyCommandExecutorException(false);
-		final Player player = (Player) sender;
-		if (!player.hasPermission("crazylogin.logout.command"))
-			throw new CrazyCommandPermissionException();
-		playerLogout(player);
+		database.save(data);
 	}
 
 	@Override
+	@Localized("CRAZYLOGIN.LOGOUT.SUCCESS")
 	public void playerLogout(final Player player) throws CrazyCommandException
 	{
+		if (database == null)
+			throw new CrazyCommandCircumstanceException("when database is accessible");
 		if (!isLoggedIn(player))
 			throw new CrazyCommandPermissionException();
 		final LoginPlayerData data = getPlayerData(player);
@@ -496,97 +1235,24 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		{
 			data.notifyAction();
 			data.logout();
-			if (database != null)
-				database.save(data);
+			database.save(data);
 		}
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
 		logger.log("Logout", player.getName() + " logged out");
 	}
 
 	@Override
-	public boolean commandMain(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
-	{
-		if (commandLabel.equalsIgnoreCase("password"))
-		{
-			commandMainPassword(sender, args);
-			return true;
-		}
-		// Commands which requires login
-		if (sender instanceof Player)
-		{
-			if (!isLoggedIn((Player) sender))
-				throw new CrazyCommandPermissionException();
-		}
-		if (commandLabel.equals("account") || commandLabel.equals("accounts"))
-		{
-			if (args.length == 0)
-			{
-				commandPlayerInfo(sender, args);
-				return true;
-			}
-			try
-			{
-				final String[] newArgs = ChatHelper.shiftArray(args, 1);
-				if (!commandPlayer(sender, args[0].toLowerCase(), newArgs))
-					commandPlayerInfo(sender, newArgs);
-				return true;
-			}
-			catch (final CrazyCommandException e)
-			{
-				e.shiftCommandIndex();
-				throw e;
-			}
-		}
-		if (commandLabel.equals("admin"))
-		{
-			commandMainAdmin(sender, args);
-			return true;
-		}
-		if (commandLabel.equals("list") || commandLabel.equals("accounts"))
-		{
-			commandMainList(sender, args);
-			return true;
-		}
-		if (commandLabel.equals("dropolddata"))
-		{
-			commandMainDropOldData(sender, args);
-			return true;
-		}
-		if (commandLabel.equals("mode"))
-		{
-			commandMainMode(sender, args);
-			return true;
-		}
-		if (commandLabel.equals("commands"))
-		{
-			commandMainCommands(sender, args);
-			return true;
-		}
-		return super.commandMain(sender, commandLabel, args);
-	}
-
-	public void commandMainPassword(final CommandSender sender, final String[] args) throws CrazyException
-	{
-		if (sender instanceof ConsoleCommandSender)
-			throw new CrazyCommandExecutorException(false);
-		final Player player = (Player) sender;
-		if (!isLoggedIn(player) && hasPlayerData(player))
-			throw new CrazyCommandPermissionException();
-		if (!hasPlayerData(player))
-			if (!player.hasPermission("crazylogin.register.command"))
-				throw new CrazyCommandPermissionException();
-		playerPassword(player, ChatHelper.listingString(" ", args));
-	}
-
-	@Override
+	@Localized({ "CRAZYLOGIN.PASSWORDDELETE.SUCCESS", "CRAZYLOGIN.PASSWORDCHANGE.SUCCESS" })
 	public void playerPassword(final Player player, final String password) throws CrazyCommandException, CrazyLoginException
 	{
 		if (disableRegistrations)
 			throw new CrazyLoginRegistrationsDisabled();
+		if (database == null)
+			throw new CrazyCommandCircumstanceException("when database is accessible");
 		if (password.length() == 0)
 		{
 			if (alwaysNeedPassword)
-				throw new CrazyCommandUsageException("/crazylogin password <Passwort...>");
+				throw new CrazyCommandUsageException("<Passwort...>");
 			playerListener.removeFromMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", player);
 			deletePlayerData(player);
@@ -617,872 +1283,6 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 		database.save(data);
 	}
 
-	private void commandMainAdmin(final CommandSender sender, final String[] args) throws CrazyCommandException
-	{
-		if (!sender.hasPermission("crazylogin.admin"))
-			throw new CrazyCommandPermissionException();
-		switch (args.length)
-		{
-			case 0:
-				throw new CrazyCommandUsageException("/crazylogin admin <Player> <Passwort...>");
-			case 1:
-				OfflinePlayer target = getServer().getPlayerExact(args[0]);
-				if (target == null)
-				{
-					target = getServer().getPlayer(args[0]);
-					if (target == null)
-						target = getServer().getOfflinePlayer(args[0]);
-				}
-				if (target == null)
-					throw new CrazyCommandNoSuchException("Player", args[0]);
-				playerListener.removeFromMovementBlocker(target);
-				sendLocaleMessage("PASSWORDDELETE.SUCCESS", sender);
-				deletePlayerData(target);
-				return;
-			default:
-				target = getServer().getPlayerExact(args[0]);
-				if (target == null)
-				{
-					target = getServer().getPlayer(args[0]);
-					if (target == null)
-						target = getServer().getOfflinePlayer(args[0]);
-				}
-				if (target == null)
-					throw new CrazyCommandNoSuchException("Player", args[0]);
-				final LoginPlayerData data = getPlayerData(target);
-				if (data == null)
-					throw new CrazyCommandNoSuchException("Player", args[0]);
-				final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
-				data.setPassword(password);
-				sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
-				if (database != null)
-					database.save(data);
-				return;
-		}
-	}
-
-	private void commandMainList(final CommandSender sender, final String[] args) throws CrazyCommandException
-	{
-		if (!sender.hasPermission("crazylogin.list"))
-			throw new CrazyCommandPermissionException();
-		int page = 1;
-		int amount = 10;
-		final int length = args.length;
-		String nameFilter = null;
-		String IPFilter = null;
-		Boolean registeredFilter = true;
-		Boolean onlineFilter = null;
-		LoginDataComparator comparator = new LoginDataNameComparator();
-		String[] pipe = null;
-		for (int i = 0; i < length; i++)
-		{
-			final String arg = args[i].toLowerCase();
-			if (arg.startsWith("page:"))
-				try
-				{
-					page = Integer.parseInt(arg.substring(5));
-					if (page < 0)
-						throw new CrazyCommandParameterException(i, "positive Integer");
-				}
-				catch (final NumberFormatException e)
-				{
-					throw new CrazyCommandParameterException(i, "page:Integer");
-				}
-			else if (arg.startsWith("amount:"))
-			{
-				if (arg.substring(7).equals("*"))
-					amount = -1;
-				else
-					try
-					{
-						amount = Integer.parseInt(arg.substring(7));
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(i, "amount:Integer");
-					}
-			}
-			else if (arg.startsWith("name:"))
-			{
-				if (arg.substring(5).equals("*"))
-					nameFilter = null;
-				else
-					nameFilter = arg.substring(5).toLowerCase();
-			}
-			else if (arg.startsWith("ip:"))
-			{
-				if (arg.substring(3).equals("*"))
-					IPFilter = null;
-				else
-					IPFilter = arg.substring(3);
-			}
-			else if (arg.startsWith("registered:"))
-			{
-				final String temp = arg.substring(11);
-				if (temp.equals("*"))
-					registeredFilter = null;
-				else if (temp.equalsIgnoreCase("true") || temp.equals("1"))
-					registeredFilter = true;
-				else
-					registeredFilter = false;
-			}
-			else if (arg.startsWith("online:"))
-			{
-				final String temp = arg.substring(7);
-				if (temp.equals("*"))
-					onlineFilter = null;
-				else if (temp.equalsIgnoreCase("true") || temp.equals("1"))
-					onlineFilter = true;
-				else
-					onlineFilter = false;
-			}
-			else if (arg.startsWith("sort:"))
-			{
-				final String temp = arg.substring(5);
-				if (temp.equals("name"))
-					comparator = new LoginDataNameComparator();
-				else if (temp.equals("ip"))
-					comparator = new LoginDataIPComparator();
-				else if (temp.equals("date") || temp.equals("time"))
-					comparator = new LoginDataLastActionComparator();
-				else
-					throw new CrazyCommandParameterException(i, "sortType", "sort:Name/IP/Date");
-			}
-			else if (arg.equals(">"))
-			{
-				pipe = ChatHelper.shiftArray(args, i + 1);
-				break;
-			}
-			else if (arg.equals("*"))
-			{
-				page = Integer.MIN_VALUE;
-			}
-			else
-				try
-				{
-					page = Integer.parseInt(arg);
-				}
-				catch (final NumberFormatException e)
-				{
-					throw new CrazyCommandUsageException("/crazylogin list [name:Player] [ip:IP] [registered:True/False/*] [online:True/False/*] [amount:Integer] [sort:Name/IP/Date] [[page:]Integer] [> Pipe]");
-				}
-		}
-		final ArrayList<LoginData> dataList = new ArrayList<LoginData>();
-		if (registeredFilter == null)
-		{
-			dataList.addAll(getPlayerData());
-			for (final OfflinePlayer offline : getServer().getOfflinePlayers())
-				if (!hasPlayerData(offline))
-					dataList.add(new LoginUnregisteredPlayerData(offline));
-		}
-		else if (registeredFilter.equals(true))
-		{
-			dataList.addAll(getPlayerData());
-		}
-		else
-		{
-			for (final OfflinePlayer offline : getServer().getOfflinePlayers())
-				if (!hasPlayerData(offline))
-					dataList.add(new LoginUnregisteredPlayerData(offline));
-		}
-		if (IPFilter != null)
-		{
-			final Iterator<LoginData> it = dataList.iterator();
-			while (it.hasNext())
-				if (!it.next().hasIP(IPFilter))
-					it.remove();
-		}
-		if (nameFilter != null)
-		{
-			Pattern pattern = null;
-			try
-			{
-				pattern = Pattern.compile(nameFilter);
-			}
-			catch (final PatternSyntaxException e)
-			{
-				throw new CrazyCommandErrorException(e);
-			}
-			final Iterator<LoginData> it = dataList.iterator();
-			while (it.hasNext())
-				if (!pattern.matcher(it.next().getName().toLowerCase()).matches())
-					it.remove();
-		}
-		if (onlineFilter != null)
-		{
-			final Iterator<LoginData> it = dataList.iterator();
-			while (it.hasNext())
-				if (!onlineFilter.equals(it.next().isOnline()))
-					it.remove();
-		}
-		Collections.sort(dataList, comparator);
-		if (pipe != null)
-		{
-			final ArrayList<ParameterData> datas = new ArrayList<ParameterData>(dataList);
-			CrazyPipe.pipe(sender, datas, pipe);
-			return;
-		}
-		sendListMessage(sender, "PLAYERDATA.LISTHEAD", amount, page, dataList, new ToStringDataGetter());
-	}
-
-	protected void commandMainDropOldData(final CommandSender sender, final String[] args) throws CrazyCommandException
-	{
-		if (!sender.hasPermission("crazylogin.dropOldData"))
-		{
-			String days = "(-)";
-			if (args.length != 0)
-				days = args[0];
-			broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETEWARN", sender.getName(), days);
-			throw new CrazyCommandPermissionException();
-		}
-		if (args.length < 2)
-			if (sender instanceof ConsoleCommandSender)
-				throw new CrazyCommandUsageException("/crazylogin dropOldData <DaysToKeep> CONSOLE_CONFIRM");
-			else
-				throw new CrazyCommandUsageException("/crazylogin dropOldData <DaysToKeep> <Password>");
-		int days = 0;
-		try
-		{
-			days = Integer.parseInt(args[0]);
-		}
-		catch (final NumberFormatException e)
-		{
-			throw new CrazyCommandParameterException(0, "Integer");
-		}
-		if (days < 0)
-			return;
-		final String password = ChatHelper.listingString(" ", (Object[]) ChatHelper.shiftArray(args, 1));
-		if (sender instanceof ConsoleCommandSender)
-		{
-			if (!password.equals("CONSOLE_CONFIRM"))
-				throw new CrazyCommandUsageException("/crazylogin dropOldData <DaysToKeep> CONSOLE_CONFIRM");
-		}
-		else
-		{
-			if (!getPlayerData((Player) sender).isPassword(password))
-				throw new CrazyCommandUsageException("/crazylogin dropOldData <DaysToKeep> <Password>");
-		}
-		final int amount = dropInactiveAccounts(days);
-		broadcastLocaleMessage(true, "crazylogin.warndelete", "ACCOUNTS.DELETED", sender.getName(), days, amount);
-	}
-
-	private void commandMainMode(final CommandSender sender, final String[] args) throws CrazyCommandException
-	{
-		if (!sender.hasPermission("crazylogin.mode"))
-			throw new CrazyCommandPermissionException();
-		switch (args.length)
-		{
-			case 2:
-				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					alwaysNeedPassword = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "alwaysNeedPassword", alwaysNeedPassword ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("forceSaveLogin"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					forceSaveLogin = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "forceSaveLogin", forceSaveLogin ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("hideInventory"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					hideInventory = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "hideInventory", hideInventory ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("disableRegistrations"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					disableRegistrations = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "disableRegistrations", disableRegistrations ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("doNotSpamRequests"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					doNotSpamRequests = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "doNotSpamRequests", doNotSpamRequests ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("doNotSpamRegisterRequests"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					doNotSpamRegisterRequests = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "doNotSpamRegisterRequests", doNotSpamRegisterRequests ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("forceSingleSession"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					forceSingleSession = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSession", forceSingleSession ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("forceSingleSessionSameIPBypass"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					forceSingleSessionSameIPBypass = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoLogout"))
-				{
-					int newValue = autoLogout;
-					try
-					{
-						newValue = Integer.parseInt(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "0 = instant", "1... time in seconds");
-					}
-					autoLogout = Math.max(newValue, -1);
-					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout == -1 ? "disabled" : autoLogout + " seconds");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoKick"))
-				{
-					int time = autoKick;
-					try
-					{
-						time = Integer.parseInt(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds > 60");
-					}
-					autoKick = time;
-					sendLocaleMessage("MODE.CHANGE", sender, "autoKick", autoKick == -1 ? "disabled" : autoKick + " seconds");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoTempBan"))
-				{
-					long time = autoTempBan;
-					try
-					{
-						time = Long.parseLong(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds > 60");
-					}
-					autoTempBan = time;
-					sendLocaleMessage("MODE.CHANGE", sender, "autoTempBan", autoTempBan == -1 ? "disabled" : autoTempBan + " seconds");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoKickUnregistered"))
-				{
-					int time = autoKickUnregistered;
-					try
-					{
-						time = Integer.parseInt(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds");
-					}
-					autoKickUnregistered = Math.max(time, -1);
-					sendLocaleMessage("MODE.CHANGE", sender, "autoKickUnregistered", autoKickUnregistered == -1 ? "disabled" : autoKickUnregistered + " seconds");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoKickLoginFailer"))
-				{
-					int tries = autoKickLoginFailer;
-					try
-					{
-						tries = Integer.parseInt(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "tries");
-					}
-					autoKickLoginFailer = Math.max(tries, -1);
-					sendLocaleMessage("MODE.CHANGE", sender, "autoKickLoginFailer", autoKickLoginFailer == -1 ? "disabled" : autoKickUnregistered + " tries");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoTempBanLoginFailer"))
-				{
-					long time = autoTempBanLoginFailer;
-					try
-					{
-						time = Long.parseLong(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Seconds > 60");
-					}
-					autoTempBanLoginFailer = time;
-					sendLocaleMessage("MODE.CHANGE", sender, "autoTempBanLoginFailer", autoTempBanLoginFailer == -1 ? "disabled" : autoTempBanLoginFailer + " seconds");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoKickCommandUsers"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					autoKickCommandUsers = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "autoKickCommandUsers", autoKickCommandUsers ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("blockGuestCommands"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					blockGuestCommands = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestCommands", blockGuestCommands ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("blockGuestChat"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					blockGuestChat = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestChat", blockGuestChat ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("blockGuestJoin"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					blockGuestJoin = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestJoin", blockGuestJoin ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("removeGuestData"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					removeGuestData = newValue;
-					if (removeGuestData)
-						playerListener.clearMovementBlocker(true);
-					sendLocaleMessage("MODE.CHANGE", sender, "removeGuestData", removeGuestData ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("maxRegistrationsPerIP"))
-				{
-					int newValue = maxRegistrationsPerIP;
-					try
-					{
-						newValue = Integer.parseInt(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled");
-					}
-					maxRegistrationsPerIP = Math.max(newValue, -1);
-					sendLocaleMessage("MODE.CHANGE", sender, "maxRegistrationsPerIP", maxRegistrationsPerIP);
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("maxOnlinesPerIP"))
-				{
-					int newValue = maxOnlinesPerIP;
-					try
-					{
-						newValue = Integer.parseInt(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled");
-					}
-					maxOnlinesPerIP = Math.max(newValue, -1);
-					sendLocaleMessage("MODE.CHANGE", sender, "maxOnlinesPerIP", maxOnlinesPerIP);
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("saveType"))
-				{
-					final String saveType = args[1];
-					DatabaseType type = null;
-					try
-					{
-						type = DatabaseType.valueOf(saveType.toUpperCase());
-					}
-					catch (final Exception e)
-					{
-						type = null;
-					}
-					if (type == null)
-						throw new CrazyCommandNoSuchException("SaveType", saveType);
-					sendLocaleMessage("MODE.CHANGE", sender, "saveType", saveType);
-					if (type == database.getType())
-						return;
-					final Collection<LoginPlayerData> datas = database.getAllEntries();
-					getConfig().set("database.saveType", type.toString());
-					setupDatabase();
-					database.saveAll(datas);
-					save();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoDelete"))
-				{
-					int time = autoDelete;
-					try
-					{
-						time = Integer.parseInt(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer", "-1 = disabled", "Time in Days");
-					}
-					autoDelete = Math.max(time, -1);
-					sendLocaleMessage("MODE.CHANGE", sender, "autoDelete", autoDelete == -1 ? "disabled" : autoDelete + " days");
-					saveConfiguration();
-					if (autoDelete != -1)
-						getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("moveRange"))
-				{
-					double range = moveRange;
-					try
-					{
-						range = Double.parseDouble(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer");
-					}
-					moveRange = Math.max(range, 0);
-					sendLocaleMessage("MODE.CHANGE", sender, "moveRange", moveRange + " blocks");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("filterNames"))
-				{
-					String newFilter = filterNames;
-					newFilter = args[0];
-					if (newFilter.equalsIgnoreCase("false") || newFilter.equalsIgnoreCase("0") || newFilter.equalsIgnoreCase("off"))
-						newFilter = ".";
-					else if (newFilter.equalsIgnoreCase("true") || newFilter.equalsIgnoreCase("1") || newFilter.equalsIgnoreCase("on"))
-						newFilter = "[a-zA-Z0-9_]";
-					filterNames = newFilter;
-					sendLocaleMessage("MODE.CHANGE", sender, "filterNames", filterNames.equals(".") ? "disabled" : filterNames);
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("blockDifferentNameCases"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					blockDifferentNameCases = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "blockDifferentNameCases", blockDifferentNameCases ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("minNameLength"))
-				{
-					int length = minNameLength;
-					try
-					{
-						length = Integer.parseInt(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer");
-					}
-					minNameLength = Math.min(Math.max(length, 1), 16);
-					sendLocaleMessage("MODE.CHANGE", sender, "minNameLength", minNameLength + " characters");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("maxNameLength"))
-				{
-					int length = maxNameLength;
-					try
-					{
-						length = Integer.parseInt(args[1]);
-					}
-					catch (final NumberFormatException e)
-					{
-						throw new CrazyCommandParameterException(1, "Integer");
-					}
-					maxNameLength = Math.min(Math.max(length, 1), 16);
-					sendLocaleMessage("MODE.CHANGE", sender, "maxNameLength", maxNameLength + " characters");
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("saveDatabaseOnShutdown"))
-				{
-					boolean newValue = false;
-					if (args[1].equalsIgnoreCase("1") || args[1].equalsIgnoreCase("true") || args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("yes"))
-						newValue = true;
-					saveDatabaseOnShutdown = newValue;
-					sendLocaleMessage("MODE.CHANGE", sender, "saveDatabaseOnShutdown", saveDatabaseOnShutdown ? "True" : "False");
-					saveConfiguration();
-					return;
-				}
-				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "disableRegistrations", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "blockDifferentNameCases", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm (Read only)");
-			case 1:
-				if (args[0].equalsIgnoreCase("alwaysNeedPassword"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "alwaysNeedPassword", alwaysNeedPassword ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("forceSaveLogin"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "forceSaveLogin", forceSaveLogin ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("hideInventory"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "hideInventory", hideInventory ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("disableRegistrations"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "disableRegistrations", disableRegistrations ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("doNotSpamRequests"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "doNotSpamRequests", doNotSpamRequests ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("doNotSpamRegisterRequests"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "doNotSpamRegisterRequests", doNotSpamRegisterRequests ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("forceSingleSession"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSession", forceSingleSession ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("forceSingleSessionSameIPBypass"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoLogout"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoLogout", autoLogout == -1 ? "disabled" : autoLogout + " seconds");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoKick"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoKick", autoKick == -1 ? "disabled" : autoKick + " seconds");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoTempBan"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoTempBan", autoTempBan == -1 ? "disabled" : autoTempBan + " seconds");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoKickUnregistered"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoKickUnregistered", autoKickUnregistered == -1 ? "disabled" : autoKickUnregistered + " seconds");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoKickLoginFailer"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoKickLoginFailer", autoKickLoginFailer == -1 ? "disabled" : autoKickUnregistered + " tries");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoTempBanLoginFailer"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoTempBanLoginFailer", autoTempBanLoginFailer == -1 ? "disabled" : autoTempBanLoginFailer + " seconds");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoKickCommandUsers"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoKickCommandUsers", autoKickCommandUsers ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("blockGuestCommands"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestCommands", blockGuestCommands ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("blockGuestChat"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestChat", blockGuestChat ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("blockGuestJoin"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "blockGuestJoin", blockGuestJoin ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("removeGuestData"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "removeGuestData", removeGuestData ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("maxRegistrationsPerIP"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "maxRegistrationsPerIP", maxRegistrationsPerIP);
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("maxOnlinesPerIP"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "maxOnlinesPerIP", maxOnlinesPerIP);
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("saveType"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "saveType", database.getType().toString());
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("autoDelete"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "autoDelete", autoDelete == -1 ? "disabled" : autoKick + " days");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("moveRange"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "moveRange", moveRange + " blocks");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("filterNames"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "filterNames", filterNames.equals(".") ? "disabled" : filterNames);
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("blockDifferentNameCases"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "blockDifferentNameCases", blockDifferentNameCases ? "True" : "False");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("minNameLength"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "minNameLength", minNameLength + " characters");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("maxNameLength"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "maxNameLength", maxNameLength + " characters");
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("algorithm"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "algorithm", encryptor.getAlgorithm());
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("saveDatabaseOnShutdown"))
-				{
-					sendLocaleMessage("MODE.CHANGE", sender, "saveDatabaseOnShutdown", saveDatabaseOnShutdown ? "True" : "False");
-					return;
-				}
-				throw new CrazyCommandNoSuchException("Mode", args[0], "alwaysNeedPassword", "forceSaveLogin", "hideInventory", "disableRegistrations", "doNotSpamRequests", "doNotSpamRegisterRequests", "forceSingleSession", "forceSingleSessionSameIPBypass", "autoLogout", "autoKick", "autoTempBan", "autoKickUnregistered", "autoKickLoginFailer", "autoTempBanLoginFailer", "autoKickCommandUsers", "blockGuestCommands", "blockGuestChat", "blockGuestJoin", "removeGuestData", "maxRegistrationsPerIP", "maxOnlinesPerIP", "saveType", "autoDelete", "moveRange", "filterNames", "blockDifferentNameCases", "minNameLength", "maxNameLength", "saveDatabaseOnShutdown", "algorithm");
-			default:
-				throw new CrazyCommandUsageException("/crazylogin mode <Mode> [Value]");
-		}
-	}
-
-	private void commandMainCommands(final CommandSender sender, final String[] args) throws CrazyCommandException
-	{
-		if (!sender.hasPermission("crazylogin.commands"))
-			throw new CrazyCommandPermissionException();
-		int page = 1;
-		switch (args.length)
-		{
-			case 1:
-				page = 1;
-				try
-				{
-					page = Integer.parseInt(args[0]);
-				}
-				catch (final NumberFormatException e)
-				{
-					throw new CrazyCommandParameterException(1, "Integer");
-				}
-			case 0:
-				sendListMessage(sender, "COMMAND.LISTHEAD", 10, page, commandWhiteList, new ToStringDataGetter());
-				return;
-			default:
-				final String[] newArgs = ChatHelper.shiftArray(args, 1);
-				final String command = ChatHelper.listingString(" ", newArgs);
-				if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("set"))
-				{
-					if (!commandWhiteList.contains(command))
-						commandWhiteList.add(command);
-					sendLocaleMessage("COMMAND.ADDED", sender);
-					saveConfiguration();
-					return;
-				}
-				else if (args[0].equalsIgnoreCase("del") || args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("rem") || args[0].equalsIgnoreCase("remove"))
-				{
-					commandWhiteList.remove(command);
-					sendLocaleMessage("COMMAND.REMOVED", sender);
-					saveConfiguration();
-					return;
-				}
-				throw new CrazyCommandUsageException("/crazylogin command [Page]", "/crazylogin command <add/del> command...");
-		}
-	}
-
-	@Override
-	public boolean commandPlayer(final CommandSender sender, final String commandLabel, final String[] args) throws CrazyException
-	{
-		if (commandLabel.equals("create"))
-		{
-			commandPlayerCreate(sender, args);
-			return true;
-		}
-		return super.commandPlayer(sender, commandLabel, args);
-	}
-
-	protected void commandPlayerCreate(final CommandSender sender, final String[] args) throws CrazyCommandException
-	{
-		if (!sender.hasPermission("crazylogin.player.create"))
-			throw new CrazyCommandPermissionException();
-		if (args.length < 2)
-			throw new CrazyCommandUsageException("/crazylogin player create <Name> <Password>");
-		final String name = args[0];
-		if (hasPlayerData(name))
-			throw new CrazyCommandAlreadyExistsException("Account", name);
-		final LoginPlayerData data = new LoginPlayerData(name);
-		final String password = ChatHelper.listingString(ChatHelper.shiftArray(args, 1));
-		data.setPassword(password);
-		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", sender);
-		database.save(data);
-	}
-
 	@Override
 	public boolean isLoggedIn(final Player player)
 	{
@@ -1493,21 +1293,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	}
 
 	@Override
-	public void updateAccount(final String name)
-	{
-		if (database.isStaticDatabase())
-			return;
-		LoginPlayerData data = getPlayerData(name);
-		boolean online = false;
-		if (data != null)
-			online = data.isLoggedIn();
-		data = database.loadEntry(name);
-		if (data == null)
-			return;
-		data.setOnline(online);
-	}
-
-	@Override
+	@Localized({ "CRAZYLOGIN.LOGIN.REQUEST", "CRAZYLOGIN.REGISTER.REQUEST" })
 	public void requestLogin(final Player player)
 	{
 		if (doNotSpamRequests)
@@ -1551,13 +1337,29 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 
 	public void checkTimeOuts()
 	{
-		if (autoLogout > 0)
-		{
-			final Date timeOut = new Date();
-			timeOut.setTime(timeOut.getTime() - autoLogout * 1000);
-			for (final LoginPlayerData data : getPlayerData())
-				data.checkTimeOut(this, timeOut, true);
-		}
+		if (database != null)
+			if (autoLogout > 0)
+			{
+				final Date timeOut = new Date();
+				timeOut.setTime(timeOut.getTime() - autoLogout * 1000);
+				if (database.isCachedDatabase())
+				{
+					for (final LoginPlayerData data : getPlayerData())
+						if (!data.isOnline())
+							data.checkTimeOut(timeOut);
+				}
+				else
+				{
+					final HashSet<LoginPlayerData> dropping = new HashSet<LoginPlayerData>();
+					for (final LoginPlayerData data : getPlayerData())
+						if (!data.isOnline())
+							if (!data.checkTimeOut(timeOut) || !data.isLoggedIn())
+								dropping.add(data);
+					for (final LoginPlayerData data : dropping)
+						database.unloadEntry(data.getName());
+					dropping.clear();
+				}
+			}
 	}
 
 	@Override
@@ -1640,19 +1442,19 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	{
 		final Date date = getTempBanned(IP);
 		if (date == null)
-			return DateFormat.format(new Date(0));
-		return DateFormat.format(date);
+			return DATETIMEFORMAT.format(new Date(0));
+		return DATETIMEFORMAT.format(date);
 	}
 
 	public void setTempBanned(final Player player, final long duration)
 	{
-		setTempBanned(player.getAddress().getAddress().getHostAddress(), duration * 1000);
+		setTempBanned(player.getAddress().getAddress().getHostAddress(), duration);
 	}
 
 	public void setTempBanned(final String IP, final long duration)
 	{
 		final Date until = new Date();
-		until.setTime(until.getTime() + autoTempBan * 1000);
+		until.setTime(until.getTime() + duration * 1000);
 		tempBans.put(IP, until);
 	}
 
@@ -1791,15 +1593,7 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 	public String getUniqueIDKey()
 	{
 		if (uniqueIDKey == null)
-			try
-			{
-				uniqueIDKey = new CrazyCrypt1().encrypt(getServer().getName(), null, "randomKeyGen" + (Math.random() * Integer.MAX_VALUE) + "V:" + getServer().getBukkitVersion() + "'_+'#");
-			}
-			catch (final Exception e)
-			{
-				e.printStackTrace();
-				return null;
-			}
+			uniqueIDKey = new CrazyCrypt1(this, (String[]) null).encrypt(getServer().getName(), null, "randomKeyGen" + (Math.random() * Double.MAX_VALUE) + "V:" + getServer().getBukkitVersion() + "'_+'#");
 		return uniqueIDKey;
 	}
 
@@ -1861,5 +1655,48 @@ public class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData
 					continue;
 			sendLocaleMessage(locale, player, args);
 		}
+	}
+
+	@Override
+	public ListOptionsModder<LoginData> getPlayerDataListModder()
+	{
+		return new ListOptionsModder<LoginData>()
+		{
+
+			private final BooleanParamitrisable registered = new BooleanParamitrisable(true)
+			{
+
+				@Override
+				public void setParameter(final String parameter) throws CrazyException
+				{
+					if (parameter.equals("*"))
+						value = null;
+					else
+						super.setParameter(parameter);
+				}
+			};
+
+			@Override
+			public void modListPreOptions(final Map<String, Paramitrisable> params, final List<LoginData> datas)
+			{
+				params.put("reg", registered);
+				params.put("register", registered);
+				params.put("registered", registered);
+			}
+
+			@Override
+			public String[] modListPostOptions(final List<LoginData> datas, final String[] pipeArgs)
+			{
+				if (Boolean.FALSE.equals(registered.getValue()))
+					datas.clear();
+				if (!Boolean.TRUE.equals(registered.getValue()))
+				{
+					for (final OfflinePlayer offline : getServer().getOfflinePlayers())
+						if (!hasPlayerData(offline))
+							datas.add(new LoginUnregisteredPlayerData(offline));
+				}
+				return pipeArgs;
+			}
+		};
 	}
 }

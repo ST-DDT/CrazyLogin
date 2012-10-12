@@ -5,9 +5,14 @@ import org.bukkit.event.Listener;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.LoginPlugin;
+import de.st_ddt.crazylogin.data.LoginPlayerData;
+import de.st_ddt.crazyplugin.events.CrazyPlayerAssociatesEvent;
+import de.st_ddt.crazyplugin.events.CrazyPlayerIPsConnectedToNameEvent;
+import de.st_ddt.crazyplugin.events.CrazyPlayerNamesConnectedToIPEvent;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
+import de.st_ddt.crazyutil.Named;
 
-public class CrazyLoginCrazyListener implements Listener
+public final class CrazyLoginCrazyListener implements Listener
 {
 
 	protected final CrazyLogin plugin;
@@ -29,10 +34,37 @@ public class CrazyLoginCrazyListener implements Listener
 	public void CrazyPlayerRemoveEvent(final CrazyPlayerRemoveEvent event)
 	{
 		if (plugin.deletePlayerData(event.getPlayer()))
-			event.markDeletion(plugin);
+			event.markDeletion((Named) plugin);
 		if (playerListener.removeFromMovementBlocker(event.getPlayer()))
-			event.markDeletion(plugin);
+			event.markDeletion((Named) plugin);
 		if (playerListener.dropPlayerData(event.getPlayer()))
-			event.markDeletion(plugin);
+			event.markDeletion((Named) plugin);
+	}
+
+	@EventHandler
+	public void CrazyPlayerAssociatesEvent(CrazyPlayerAssociatesEvent event)
+	{
+		LoginPlayerData data = plugin.getPlayerData(event.getSearchedName());
+		if (data == null)
+			return;
+		for (String ip : data.getIPs())
+			for (LoginPlayerData players : plugin.getPlayerDatasPerIP(ip))
+				event.add(players.getName());
+	}
+
+	@EventHandler
+	public void CrazyPlayerIPsConnectedToNameEvent(CrazyPlayerIPsConnectedToNameEvent event)
+	{
+		LoginPlayerData data = plugin.getPlayerData(event.getSearchedName());
+		if (data == null)
+			return;
+		event.addAll(data.getIPs());
+	}
+
+	@EventHandler
+	public void CrazyPlayerNamesConnectedToIPEvent(CrazyPlayerNamesConnectedToIPEvent event)
+	{
+		for (LoginPlayerData players : plugin.getPlayerDatasPerIP(event.getSearchedIP()))
+			event.add(players.getName());
 	}
 }

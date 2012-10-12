@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import de.st_ddt.crazylogin.data.LoginData;
 import de.st_ddt.crazyutil.ChatHelper;
+import de.st_ddt.crazyutil.locales.Localized;
 
 public class CrazyLoginExceedingMaxRegistrationsPerIPException extends CrazyLoginException
 {
@@ -47,6 +48,7 @@ public class CrazyLoginExceedingMaxRegistrationsPerIPException extends CrazyLogi
 	}
 
 	@Override
+	@Localized("CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH $MaxAllowed$ $Associates$")
 	public void print(final CommandSender sender, final String header)
 	{
 		ChatHelper.sendMessage(sender, header, locale, maxCount, ChatHelper.listingString(associates));

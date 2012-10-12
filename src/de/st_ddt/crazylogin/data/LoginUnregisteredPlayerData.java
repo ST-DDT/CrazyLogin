@@ -9,13 +9,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
-import de.st_ddt.crazyplugin.CrazyPluginInterface;
+import de.st_ddt.crazyplugin.CrazyLightPluginInterface;
 import de.st_ddt.crazyplugin.data.PlayerData;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
+import de.st_ddt.crazyutil.locales.Localized;
 
-public class LoginUnregisteredPlayerData extends PlayerData<LoginUnregisteredPlayerData> implements LoginData
+public final class LoginUnregisteredPlayerData extends PlayerData<LoginUnregisteredPlayerData> implements LoginData
 {
 
 	public LoginUnregisteredPlayerData(final String name)
@@ -138,22 +139,28 @@ public class LoginUnregisteredPlayerData extends PlayerData<LoginUnregisteredPla
 		String IP = getLatestIP();
 		if (!IP.equals(""))
 			IP = " @" + IP;
-		return (isOnline() ? ChatColor.DARK_GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyPluginInterface.DateFormat.format(getLastActionTime()) + IP;
+		return (isOnline() ? ChatColor.DARK_GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(getLastActionTime()) + IP;
 	}
 
 	@Override
-	public String getParameter(final int index)
+	public String getParameter(final CommandSender sender, final int index)
 	{
 		switch (index)
 		{
 			case 0:
 				return getName();
 			case 1:
-				return CrazyPluginInterface.DateFormat.format(new Date());
+				return CrazyLightPluginInterface.DATETIMEFORMAT.format(new Date());
 			case 2:
 				return isOnline() ? "Online" : "Offline";
 			case 3:
 				return getLatestIP();
+			case 4:
+				return "-";
+			case 5:
+				return isOnline() ? ChatColor.YELLOW.toString() : ChatColor.WHITE.toString();
+			case 6:
+				return ChatColor.DARK_GREEN.toString();
 		}
 		return "";
 	}
@@ -182,13 +189,15 @@ public class LoginUnregisteredPlayerData extends PlayerData<LoginUnregisteredPla
 	}
 
 	@Override
-	public void showDetailed(CommandSender target, String chatHeader)
+	@Localized({ "CRAZYLOGIN.PLAYERINFO.IPADDRESS $IP$", "CRAZYLOGIN.PLAYERINFO.ASSOCIATES $Associates$" })
+	public void showDetailed(final CommandSender target, final String chatHeader)
 	{
 		if (!isOnline())
 			return;
 		final CrazyLocale locale = CrazyLocale.getLocaleHead().getSecureLanguageEntry("CRAZYLOGIN.PLAYERINFO");
-		HashSet<String> associates = new HashSet<String>();
-		for (LoginPlayerData data : getPlugin().getPlayerDatasPerIP(getLatestIP()))
+		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("IPADDRESS"), getLatestIP());
+		final HashSet<String> associates = new HashSet<String>();
+		for (final LoginPlayerData data : getPlugin().getPlayerDatasPerIP(getLatestIP()))
 			associates.add(data.getName());
 		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("ASSOCIATES"), ChatHelper.listingString(associates));
 	}

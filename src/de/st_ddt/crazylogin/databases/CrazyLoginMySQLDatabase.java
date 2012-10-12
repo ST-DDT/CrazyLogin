@@ -1,22 +1,25 @@
 package de.st_ddt.crazylogin.databases;
 
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyutil.databases.MySQLColumn;
-import de.st_ddt.crazyutil.databases.MySQLDatabase;
-import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
+import de.st_ddt.crazyutil.databases.MySQLPlayerDataDatabase;
 
-public class CrazyLoginMySQLDatabase extends MySQLDatabase<LoginPlayerData> implements PlayerDataDatabase<LoginPlayerData>
+public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<LoginPlayerData>
 {
 
-	public CrazyLoginMySQLDatabase(final String tableName, final ConfigurationSection config) throws Exception
+	public CrazyLoginMySQLDatabase(final ConfigurationSection config)
 	{
-		super(LoginPlayerData.class, tableName, config, getColumns(config), 0);
+		super(LoginPlayerData.class, getLoginColumns(), "CrazyLogin_accounts", config);
 	}
 
-	private static MySQLColumn[] getColumns(final ConfigurationSection config)
+	public CrazyLoginMySQLDatabase(final String tableName, final String[] columnNames, final String host, final String port, final String database, final String user, final String password, final boolean cached)
+	{
+		super(LoginPlayerData.class, getLoginColumns(), tableName, columnNames, host, port, database, user, password, cached);
+	}
+
+	private static MySQLColumn[] getLoginColumns()
 	{
 		final MySQLColumn[] columns = new MySQLColumn[4];
 		columns[0] = new MySQLColumn("name", "CHAR(50)", true, false);
@@ -27,20 +30,16 @@ public class CrazyLoginMySQLDatabase extends MySQLDatabase<LoginPlayerData> impl
 	}
 
 	@Override
-	public LoginPlayerData getEntry(final OfflinePlayer player)
+	public LoginPlayerData updateEntry(final String key)
 	{
-		return getEntry(player.getName());
-	}
-
-	@Override
-	public boolean hasEntry(final OfflinePlayer player)
-	{
-		return hasEntry(player.getName());
-	}
-
-	@Override
-	public boolean deleteEntry(final OfflinePlayer player)
-	{
-		return deleteEntry(player.getName());
+		LoginPlayerData data = getEntry(key);
+		if (data == null)
+			return loadEntry(key);
+		boolean online = false;
+		online = data.isLoggedIn();
+		data = loadEntry(key);
+		if (data != null)
+			data.setOnline(online);
+		return data;
 	}
 }
