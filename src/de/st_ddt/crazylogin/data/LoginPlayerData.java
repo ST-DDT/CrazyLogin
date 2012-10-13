@@ -37,9 +37,9 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 	public LoginPlayerData(final String name)
 	{
 		super(name);
+		password = "FAILEDLOADING";
 		online = false;
 		lastAction = new Date();
-		password = "FAILEDLOADING";
 	}
 
 	public LoginPlayerData(final String name, final String ip)
@@ -52,6 +52,15 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 	{
 		this(player.getName(), player.getAddress().getAddress().getHostAddress());
 		online = true;
+	}
+
+	// Used for Imports
+	public LoginPlayerData(final String name, final String password, final Date lastAction)
+	{
+		super(name);
+		this.password = password;
+		this.online = false;
+		this.lastAction = lastAction;
 	}
 
 	// aus Config-Datenbank laden
