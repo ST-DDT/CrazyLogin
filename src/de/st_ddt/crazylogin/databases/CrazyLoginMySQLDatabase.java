@@ -22,7 +22,7 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 	private static MySQLColumn[] getLoginColumns()
 	{
 		final MySQLColumn[] columns = new MySQLColumn[4];
-		columns[0] = new MySQLColumn("name", "CHAR(50)", true, false);
+		columns[0] = new MySQLColumn("name", "CHAR(255)", true, false);
 		columns[1] = new MySQLColumn("password", "CHAR(255)", null, false, false);
 		columns[2] = new MySQLColumn("ips", "CHAR(255)", null, false, false);
 		columns[3] = new MySQLColumn("lastAction", "TIMESTAMP", null, false, false);

@@ -740,7 +740,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			@Override
 			public void setValue(final Integer newValue) throws CrazyException
 			{
-				maxNameLength = Math.min(Math.max(newValue, 1), 16);
+				maxNameLength = Math.min(Math.max(newValue, 1), 255);
 				saveConfiguration();
 			}
 		});
@@ -1015,7 +1015,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			filterNames = "[a-zA-Z0-9_]";
 		blockDifferentNameCases = config.getBoolean("blockDifferentNameCases", false);
 		minNameLength = Math.min(Math.max(config.getInt("minNameLength", 3), 1), 16);
-		maxNameLength = Math.min(Math.max(config.getInt("maxNameLength", 16), minNameLength), 16);
+		maxNameLength = Math.min(Math.max(config.getInt("maxNameLength", 16), minNameLength), 255);
 		uniqueIDKey = config.getString("uniqueIDKey");
 		pluginCommunicationEnabled = config.getBoolean("pluginCommunicationEnabled", false);
 		// Encryptor
