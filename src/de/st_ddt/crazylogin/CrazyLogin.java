@@ -29,7 +29,6 @@ import de.st_ddt.crazylogin.commands.CrazyLoginCommandPassword;
 import de.st_ddt.crazylogin.commands.CrazyLoginCommandPlayerCreate;
 import de.st_ddt.crazylogin.commands.CrazyLoginCommandPlayerDetachIP;
 import de.st_ddt.crazylogin.commands.CrazyLoginCommandPlayerPassword;
-import de.st_ddt.crazylogin.crypt.AuthMeCrypt;
 import de.st_ddt.crazylogin.crypt.ChangedAlgorithmEncryptor;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt2;
@@ -46,6 +45,7 @@ import de.st_ddt.crazylogin.crypt.SeededMD5Crypt;
 import de.st_ddt.crazylogin.crypt.SeededSHA_1Crypt;
 import de.st_ddt.crazylogin.crypt.SeededSHA_256Crypt;
 import de.st_ddt.crazylogin.crypt.SeededSHA_512Crypt;
+import de.st_ddt.crazylogin.crypt.UpdatingEncryptor;
 import de.st_ddt.crazylogin.crypt.WebCrypt;
 import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
 import de.st_ddt.crazylogin.data.LoginData;
@@ -154,7 +154,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		EncryptHelper.registerAlgorithm("SeededSHA-512", SeededSHA_512Crypt.class);
 		EncryptHelper.registerAlgorithm("CrazyCrypt1", CrazyCrypt1.class);
 		EncryptHelper.registerAlgorithm("CrazyCrypt2", CrazyCrypt2.class);
-		EncryptHelper.registerAlgorithm("AuthMe", AuthMeCrypt.class);
 		EncryptHelper.registerAlgorithm("WebCrypt", WebCrypt.class);
 		EncryptHelper.registerAlgorithm("Whirlpool", WhirlPoolCrypt.class);
 	}
@@ -932,6 +931,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public void onLoad()
 	{
 		LoginPlugin.LOGINPLUGINPROVIDER.setPlugin(this);
+		org.bukkit.common.login.LoginPlugin.LOGINPROVIDER.setLoginPlugin(new CommonLoginAPIBridge(this));
 		plugin = this;
 		super.onLoad();
 	}
@@ -1036,6 +1036,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
 	}
 
+	@Override
 	@Localized({ "CRAZYLOGIN.DATABASE.ACCESSWARN $SaveType$", "CRAZYLOGIN.DATABASE.LOADED $EntryCount$" })
 	public void loadDatabase()
 	{
@@ -1215,7 +1216,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerListener.disableHidenInventory(player);
 		loginFailures.remove(player.getName().toLowerCase());
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
-		if (encryptor instanceof ChangedAlgorithmEncryptor)
+		if (encryptor instanceof UpdatingEncryptor)
 			data.setPassword(password);
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		data.notifyAction();

@@ -196,7 +196,7 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 	@Override
 	public void setPassword(final String password) throws CrazyCommandException
 	{
-		this.password = CrazyLogin.getPlugin().getEncryptor().encrypt(name, genSeed(), password);
+		this.password = getPlugin().getEncryptor().encrypt(name, genSeed(), password);
 	}
 
 	private String genSeed()
