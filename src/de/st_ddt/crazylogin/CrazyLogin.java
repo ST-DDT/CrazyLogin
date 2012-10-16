@@ -771,7 +771,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			@Override
 			public void setValue(final CommandSender sender, final String... args) throws CrazyException
 			{
-				setValue(EncryptHelper.getEncryptor(plugin, args[0].toLowerCase(), ChatHelperExtended.shiftArray(args, 1)));
+				Encryptor encryptor = EncryptHelper.getEncryptor(plugin, args[0], ChatHelperExtended.shiftArray(args, 1));
+				if (encryptor == null)
+					throw new CrazyCommandNoSuchException("Encryptor", args[0], EncryptHelper.getAlgorithms());
+				setValue(encryptor);
 			}
 
 			@Override
@@ -931,7 +934,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public void onLoad()
 	{
 		LoginPlugin.LOGINPLUGINPROVIDER.setPlugin(this);
-		org.bukkit.common.login.LoginPlugin.LOGINPROVIDER.setLoginPlugin(new CommonLoginAPIBridge(this));
+		// org.bukkit.common.login.LoginPlugin.LOGINPROVIDER.setLoginPlugin(new CommonLoginAPIBridge(this));
 		plugin = this;
 		super.onLoad();
 	}
