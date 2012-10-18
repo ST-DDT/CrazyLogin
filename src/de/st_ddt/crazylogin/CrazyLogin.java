@@ -785,6 +785,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					encryptor = newValue;
 				else
 					encryptor = new ChangedAlgorithmEncryptor(plugin, newValue, encryptor);
+				saveConfiguration();
 			}
 		});
 	}
