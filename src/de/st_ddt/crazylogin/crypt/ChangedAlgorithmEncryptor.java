@@ -64,6 +64,7 @@ public class ChangedAlgorithmEncryptor extends AbstractEncryptor implements Upda
 	public void save(final ConfigurationSection config, final String path)
 	{
 		super.save(config, path);
+		config.set(path + "type", getClass().getName());
 		current.save(config, path + "current.");
 		old.save(config, path + "old.");
 	}
