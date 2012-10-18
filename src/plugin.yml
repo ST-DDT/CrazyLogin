@@ -43,16 +43,15 @@ permissions:
       crazylogin.adminlogin: true
       crazylogin.logout.command: true
       crazylogin.logout.channel: true
-      crazylogin.list: true
       crazylogin.commands: true
-      crazylogin.dropOldData: true
+      crazylogin.dropolddata: true
       crazylogin.player.info: true
       crazylogin.player.info.self: true
       crazylogin.player.info.other: true
       crazylogin.player.create: true
       crazylogin.player.password: true
       crazylogin.player.delete: true
-      crazylogin.list: true
+      crazylogin.player.list: true
   crazylogin.admin:
     description: Allow changing account data for other players
     default: op
@@ -72,14 +71,14 @@ permissions:
       crazylogin.logout.command: true
       crazylogin.logout.channel: true
       crazylogin.commands: true
-      crazylogin.list: true
-      crazylogin.dropOldData: true
+      crazylogin.dropolddata: true
       crazylogin.player.info: true
       crazylogin.player.info.self: true
       crazylogin.player.info.other: true
       crazylogin.player.create: true
       crazylogin.player.password: true
       crazylogin.player.delete: true
+      crazylogin.player.list: true
   crazylogin.ensureregistration:
     description: This player can always register an account.
     default: op
@@ -140,10 +139,7 @@ permissions:
   crazylogin.commands:
     description: Allow viewing and editing command whitelist.
     default: op
-  crazylogin.list:
-    description: List all player accounts.
-    default: op
-  crazylogin.dropOldData:
+  crazylogin.dropolddata:
     description: Allow deleting old accounts.
     default: op
     children:
@@ -168,4 +164,7 @@ permissions:
     default: op
   crazylogin.player.delete:
     description: Allow deleting player data
+    default: op
+  crazylogin.player.list:
+    description: List all player accounts.
     default: op

@@ -28,7 +28,7 @@ public class CrazyLoginCommandMainDropOldData extends CrazyLoginCommandExecutor
 		if (sender instanceof Player)
 			if (!plugin.isLoggedIn((Player) sender))
 				throw new CrazyCommandPermissionException();
-		if (!sender.hasPermission("crazylogin.dropOldData"))
+		if (!sender.hasPermission("crazylogin.dropolddata"))
 		{
 			String days = "(-)";
 			if (args.length != 0)
