@@ -1,7 +1,7 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.0.3
+version: 7.0.4
 # requires CrazyCore v9 or later
 depend: [CrazyCore]
 description: >

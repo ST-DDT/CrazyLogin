@@ -5,19 +5,42 @@ version: X.Y
 # required plugins +version can be found there
 # https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/plugin.yml
 database:
-# the table/file/section name of the database
-  tableName: CrazyLogin_players
-# column names (does not affect FLAT databases)
-  columns:
-    name: name
-    password: password
-    ips: ips
-    lastAction: lastAction
 # database saveTypes can be MYSQL, FLAT and CONFIG
-# additional information about MYSQL can be fould here http://dev.bukkit.org/server-mods/crazycore/pages/mys-ql/
   saveType: FLAT
 # whether the database should be saved on shutdown
   saveOnShutdown: true
+# FLAT Database options
+  FLAT:
+# path relativ to PluginFolder for the flat database.
+    filePath: accounts.db
+# MYSQL Database options
+# additional information about MYSQL can be fould here http://dev.bukkit.org/server-mods/crazycore/pages/mys-ql/
+  MYSQL:
+    connection:
+      host: localhost
+      port: '3306'
+      dbname: Crazy
+      user: root
+      password: ''
+    tableName: CrazyLogin_accounts
+# whether all data are loaded on startup and remain loaded when player isn't online. 
+# this may reduce the plugins RAM usage
+# This is a beta option. There may be bugs.
+    cached: true
+    columns:
+      name: name
+      password: password
+      ips: ips
+      lastAction: lastAction
+# CONFIG Database options
+  CONFIG:
+# path inside config.yml
+    path: accounts
+    columns:
+      name: name
+      password: password
+      ips: ips
+      lastAction: lastAction
 # if true you have to create a password, if false having a password is optional
 alwaysNeedPassword: true
 # you have to login again after being inactive/offline for at least x seconds
@@ -56,11 +79,9 @@ commandWhitelist:
 - /login .*
 - /register .*
 - /worldedit cui
-# the encryption alogrithm used to encrypt your passwords. View plugin main page for more information
+# the encryption alogrithm used to encrypt your passwords. http://dev.bukkit.org/server-mods/crazylogin/pages/encryption/
 encryptor:
-# don't forget to delete name or type when changing encryption algorithm (or change both)
   name: CrazyCrypt1
-  type: de.st_ddt.crazylogin.crypt.CrazyCrypt1
 # automatically delete accounts that haven't been used for x days(-1=disabled)
 # WARNING: deletes all data belonging to this player (including those saved in other plugins; equals "/crazycore delete Player")
 autoDelete: -1

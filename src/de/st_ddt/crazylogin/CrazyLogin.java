@@ -995,7 +995,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			commandWhiteList.add("/worldedit cui");
 		}
 		else if (isUpdated)
-			if (VersionComparator.compareVersions(previousVersion, "8") == -1)
+			if (VersionComparator.compareVersions(previousVersion, "7") == -1)
 			{
 				final List<String> temp = new ArrayList<String>(commandWhiteList);
 				commandWhiteList.clear();
