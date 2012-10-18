@@ -775,6 +775,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				if (encryptor == null)
 					throw new CrazyCommandNoSuchException("Encryptor", args[0], EncryptHelper.getAlgorithms());
 				setValue(encryptor);
+				showValue(sender);
 			}
 
 			@Override
@@ -1290,6 +1291,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	@Override
 	public boolean isLoggedIn(final Player player)
 	{
+		if (player.hasMetadata("NPC"))
+			return true;
 		final LoginPlayerData data = getPlayerData(player);
 		if (data == null)
 			return !alwaysNeedPassword;
