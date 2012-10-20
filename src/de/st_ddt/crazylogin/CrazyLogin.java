@@ -985,16 +985,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		doNotSpamRegisterRequests = config.getBoolean("doNotSpamRegisterRequests", false);
 		antiRequestSpamTable.clear();
 		commandWhiteList = config.getStringList("commandWhitelist");
-		if (isInstalled)
-		{
-			commandWhiteList.add("/login .*");
-			commandWhiteList.add("/register .*");
-			commandWhiteList.add("/language [a-z][a-z]_[a-z][a-z]");
-			commandWhiteList.add("/language select.*");
-			commandWhiteList.add("/language list.*");
-			commandWhiteList.add("/worldedit cui");
-		}
-		else if (isUpdated)
+		if (isUpdated && !isInstalled)
 			if (VersionComparator.compareVersions(previousVersion, "7") == -1)
 			{
 				final List<String> temp = new ArrayList<String>(commandWhiteList);

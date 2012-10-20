@@ -78,6 +78,9 @@ doNotSpamRegisterRequests: false
 commandWhitelist:
 - /login .*
 - /register .*
+- /language [a-z][a-z]_[a-z][a-z]
+- /language select.*
+- /language list.*
 - /worldedit cui
 # the encryption alogrithm used to encrypt your passwords. http://dev.bukkit.org/server-mods/crazylogin/pages/encryption/
 encryptor:
@@ -116,28 +119,28 @@ minNameLength: 3
 # maximum length of player names (minecraft max is 16)
 maxNameLength: 16
 # additional information about logging can be found here http://dev.bukkit.org/server-mods/crazycore/pages/logging/
-logs:
-  Login:
-    path: false
-    console: false
-  ChatBlocked:
-    path: false
-    console: false
-  CommandBlocked:
-    path: false
-    console: false
-  Logout:
-    path: false
-    console: false
-  AccessDenied:
-    path: false
-    console: false
-  Quit:
-    path: false
-    console: false
-  Join:
-    path: false
-    console: false
-  LoginFail:
-    path: false
-    console: false
+#logs:
+#  Login:
+#    path: false
+#    console: false
+#  ChatBlocked:
+#    path: false
+#    console: false
+#  CommandBlocked:
+#    path: false
+#    console: false
+#  Logout:
+#    path: false
+#    console: false
+#  AccessDenied:
+#    path: false
+#    console: false
+#  Quit:
+#    path: false
+#    console: false
+#  Join:
+#    path: false
+#    console: false
+#  LoginFail:
+#    path: false
+#    console: false
