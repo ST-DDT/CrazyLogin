@@ -171,7 +171,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		registerSorters();
 	}
 
-	@Localized("CRAZYLOGIN.MODE.CHANGE")
+	@Localized("CRAZYLOGIN.MODE.CHANGE $Name$ $Value$")
 	private void registerModes()
 	{
 		modeCommand.addMode(modeCommand.new BooleanFalseMode("alwaysNeedPassword")

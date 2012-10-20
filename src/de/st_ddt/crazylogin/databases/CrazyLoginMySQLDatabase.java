@@ -14,9 +14,9 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 		super(LoginPlayerData.class, getLoginColumns(), "CrazyLogin_accounts", config);
 	}
 
-	public CrazyLoginMySQLDatabase(final String tableName, final String[] columnNames, final String host, final String port, final String database, final String user, final String password, final boolean cached)
+	public CrazyLoginMySQLDatabase(final String tableName, final String[] columnNames, final String host, final String port, final String database, final String user, final String password, final boolean cached, final boolean doNotUpdate)
 	{
-		super(LoginPlayerData.class, getLoginColumns(), tableName, columnNames, host, port, database, user, password, cached);
+		super(LoginPlayerData.class, getLoginColumns(), tableName, columnNames, host, port, database, user, password, cached, doNotUpdate);
 	}
 
 	private static MySQLColumn[] getLoginColumns()
@@ -32,6 +32,8 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 	@Override
 	public LoginPlayerData updateEntry(final String key)
 	{
+		if (isStaticDatabase())
+			return getEntry(key);
 		LoginPlayerData data = getEntry(key);
 		if (data == null)
 			return loadEntry(key);
