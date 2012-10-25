@@ -84,6 +84,42 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 		config.set(path + columnNames[3], lastAction);
 	}
 
+	// aus Flat-Datenbank laden
+	public LoginPlayerData(final String[] rawData)
+	{
+		super(rawData[0]);
+		this.password = rawData[1];
+		try
+		{
+			if (!rawData[2].equals("."))
+			{
+				final String[] ips = rawData[2].split(",");
+				for (final String ip : ips)
+					this.ips.add(ip);
+			}
+			lastAction = ObjectSaveLoadHelper.StringToDate(rawData[3], new Date());
+		}
+		catch (final IndexOutOfBoundsException e)
+		{
+			lastAction = new Date();
+		}
+		online = false;
+	}
+
+	// in Flat-Datenbank speichern
+	@Override
+	public String[] saveToFlatDatabase()
+	{
+		final String[] strings = new String[4];
+		strings[0] = name;
+		strings[1] = password;
+		strings[2] = ChatHelper.listingString(",", ips);
+		if (strings[2].equals(""))
+			strings[2] = ".";
+		strings[3] = ObjectSaveLoadHelper.DateToString(lastAction);
+		return strings;
+	}
+
 	// aus MySQL-Datenbank laden
 	public LoginPlayerData(final ResultSet rawData, final String[] columnNames)
 	{
@@ -130,42 +166,6 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());
 		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "'";
-	}
-
-	// aus Flat-Datenbank laden
-	public LoginPlayerData(final String[] rawData)
-	{
-		super(rawData[0]);
-		this.password = rawData[1];
-		try
-		{
-			if (!rawData[2].equals("."))
-			{
-				final String[] ips = rawData[2].split(",");
-				for (final String ip : ips)
-					this.ips.add(ip);
-			}
-			lastAction = ObjectSaveLoadHelper.StringToDate(rawData[3], new Date());
-		}
-		catch (final IndexOutOfBoundsException e)
-		{
-			lastAction = new Date();
-		}
-		online = false;
-	}
-
-	// in Flat-Datenbank speichern
-	@Override
-	public String[] saveToFlatDatabase()
-	{
-		final String[] strings = new String[4];
-		strings[0] = name;
-		strings[1] = password;
-		strings[2] = ChatHelper.listingString(",", ips);
-		if (strings[2].equals(""))
-			strings[2] = ".";
-		strings[3] = ObjectSaveLoadHelper.DateToString(lastAction);
-		return strings;
 	}
 
 	protected String getPassword()

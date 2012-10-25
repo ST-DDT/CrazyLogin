@@ -965,6 +965,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	@Override
 	public void loadConfiguration()
 	{
+		super.loadConfiguration();
 		final ConfigurationSection config = getConfig();
 		autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
