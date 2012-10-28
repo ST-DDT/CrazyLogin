@@ -42,29 +42,29 @@ public final class CrazyLoginCrazyListener implements Listener
 	}
 
 	@EventHandler
-	public void CrazyPlayerAssociatesEvent(CrazyPlayerAssociatesEvent event)
+	public void CrazyPlayerAssociatesEvent(final CrazyPlayerAssociatesEvent event)
 	{
-		LoginPlayerData data = plugin.getPlayerData(event.getSearchedName());
+		final LoginPlayerData data = plugin.getPlayerData(event.getSearchedName());
 		if (data == null)
 			return;
-		for (String ip : data.getIPs())
-			for (LoginPlayerData players : plugin.getPlayerDatasPerIP(ip))
+		for (final String ip : data.getIPs())
+			for (final LoginPlayerData players : plugin.getPlayerDatasPerIP(ip))
 				event.add(players.getName());
 	}
 
 	@EventHandler
-	public void CrazyPlayerIPsConnectedToNameEvent(CrazyPlayerIPsConnectedToNameEvent event)
+	public void CrazyPlayerIPsConnectedToNameEvent(final CrazyPlayerIPsConnectedToNameEvent event)
 	{
-		LoginPlayerData data = plugin.getPlayerData(event.getSearchedName());
+		final LoginPlayerData data = plugin.getPlayerData(event.getSearchedName());
 		if (data == null)
 			return;
 		event.addAll(data.getIPs());
 	}
 
 	@EventHandler
-	public void CrazyPlayerNamesConnectedToIPEvent(CrazyPlayerNamesConnectedToIPEvent event)
+	public void CrazyPlayerNamesConnectedToIPEvent(final CrazyPlayerNamesConnectedToIPEvent event)
 	{
-		for (LoginPlayerData players : plugin.getPlayerDatasPerIP(event.getSearchedIP()))
+		for (final LoginPlayerData players : plugin.getPlayerDatasPerIP(event.getSearchedIP()))
 			event.add(players.getName());
 	}
 }
