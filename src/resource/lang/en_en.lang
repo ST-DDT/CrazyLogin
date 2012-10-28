@@ -32,7 +32,7 @@ CRAZYLOGIN.MODE.CHANGE=Mode "$0$"="$1$" set
 CRAZYLOGIN.PASSWORDCHANGE.SUCCESS=Password changed!
 CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Password deleted!
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&EAssociates: &5$0$
-CRAZYLOGIN.PLAYERINFO.IPADDRESS=&EIPAddress: &5$1$
+CRAZYLOGIN.PLAYERINFO.IPADDRESS=&EIPAddress: &5$0$
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&ELastAction: &5$0$
 CRAZYLOGIN.REGISTER.HEADER=For security reasons you need to specify a personal password!\nUse /crazylogin password <Password...> to create/change it!
 CRAZYLOGIN.REGISTER.HEADER2=You can create a password if you wish.\nUse /crazylogin password <Password...> to create/change it!
