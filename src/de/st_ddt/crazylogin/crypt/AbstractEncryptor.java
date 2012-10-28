@@ -9,7 +9,7 @@ import de.st_ddt.crazylogin.data.LoginData;
 
 public abstract class AbstractEncryptor implements Encryptor
 {
-	
+
 	protected final Charset charset = Charset.forName("UTF-8");
 
 	public AbstractEncryptor(final LoginPlugin<? extends LoginData> plugin, final ConfigurationSection config)

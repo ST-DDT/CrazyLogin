@@ -11,12 +11,12 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 public class SHA_1Crypt extends DefaultCrypt
 {
 
-	public SHA_1Crypt(LoginPlugin<? extends LoginData> plugin, ConfigurationSection config) throws NoSuchAlgorithmException
+	public SHA_1Crypt(final LoginPlugin<? extends LoginData> plugin, final ConfigurationSection config) throws NoSuchAlgorithmException
 	{
 		super(plugin, config);
 	}
 
-	public SHA_1Crypt(LoginPlugin<? extends LoginData> plugin, String[] args) throws CrazyException
+	public SHA_1Crypt(final LoginPlugin<? extends LoginData> plugin, final String[] args) throws CrazyException
 	{
 		super(plugin, args);
 	}

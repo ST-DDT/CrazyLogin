@@ -11,12 +11,12 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 public class MD5Crypt extends DefaultCrypt
 {
 
-	public MD5Crypt(LoginPlugin<? extends LoginData> plugin, ConfigurationSection config) throws NoSuchAlgorithmException
+	public MD5Crypt(final LoginPlugin<? extends LoginData> plugin, final ConfigurationSection config) throws NoSuchAlgorithmException
 	{
 		super(plugin, config);
 	}
 
-	public MD5Crypt(LoginPlugin<? extends LoginData> plugin, String[] args) throws CrazyException
+	public MD5Crypt(final LoginPlugin<? extends LoginData> plugin, final String[] args) throws CrazyException
 	{
 		super(plugin, args);
 	}

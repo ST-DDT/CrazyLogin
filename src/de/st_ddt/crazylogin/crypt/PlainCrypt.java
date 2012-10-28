@@ -8,12 +8,12 @@ import de.st_ddt.crazylogin.data.LoginData;
 public final class PlainCrypt extends AbstractEncryptor
 {
 
-	public PlainCrypt(LoginPlugin<? extends LoginData> plugin, ConfigurationSection config)
+	public PlainCrypt(final LoginPlugin<? extends LoginData> plugin, final ConfigurationSection config)
 	{
 		super(plugin, config);
 	}
 
-	public PlainCrypt(LoginPlugin<? extends LoginData> plugin, String[] args)
+	public PlainCrypt(final LoginPlugin<? extends LoginData> plugin, final String[] args)
 	{
 		super(plugin, args);
 	}

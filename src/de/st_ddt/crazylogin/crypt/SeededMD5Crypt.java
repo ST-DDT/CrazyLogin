@@ -11,12 +11,12 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 public class SeededMD5Crypt extends SeededDefaultCrypt
 {
 
-	public SeededMD5Crypt(LoginPlugin<? extends LoginData> plugin, ConfigurationSection config) throws NoSuchAlgorithmException
+	public SeededMD5Crypt(final LoginPlugin<? extends LoginData> plugin, final ConfigurationSection config) throws NoSuchAlgorithmException
 	{
 		super(plugin, config);
 	}
 
-	public SeededMD5Crypt(LoginPlugin<? extends LoginData> plugin, String[] args) throws CrazyException
+	public SeededMD5Crypt(final LoginPlugin<? extends LoginData> plugin, final String[] args) throws CrazyException
 	{
 		super(plugin, args);
 	}
