@@ -15,6 +15,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
+import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
 public class CrazyLoginCommandAdminLogin extends CrazyLoginCommandExecutor
 {
@@ -34,8 +35,6 @@ public class CrazyLoginCommandAdminLogin extends CrazyLoginCommandExecutor
 		if (sender instanceof ConsoleCommandSender)
 			throw new CrazyCommandExecutorException(false);
 		final Player player = (Player) sender;
-		if (player.hasPermission("crazylogin.blockadminlogin"))
-			throw new CrazyCommandPermissionException();
 		final LoginPlayerData playerData = plugin.getPlayerData(player);
 		if (playerData == null)
 			throw new CrazyCommandCircumstanceException("when this player is protected by a password!");
@@ -64,5 +63,11 @@ public class CrazyLoginCommandAdminLogin extends CrazyLoginCommandExecutor
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
+	}
+
+	@Override
+	public boolean hasAccessPermission(final CommandSender sender)
+	{
+		return PermissionModule.hasPermission(sender, "crazylogin.blockadminlogin");
 	}
 }

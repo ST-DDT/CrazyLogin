@@ -7,11 +7,11 @@ import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyplugin.commands.CrazyCommandListEditor;
-import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ListFormat;
 import de.st_ddt.crazyutil.locales.Localized;
+import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
 public class CrazyLoginCommandMainCommands extends CrazyCommandListEditor<CrazyLogin, String>
 {
@@ -45,14 +45,12 @@ public class CrazyLoginCommandMainCommands extends CrazyCommandListEditor<CrazyL
 	}
 
 	@Override
-	public void command(final CommandSender sender, final String[] args) throws CrazyException
+	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		if (sender instanceof Player)
 			if (!plugin.isLoggedIn((Player) sender))
-				throw new CrazyCommandPermissionException();
-		if (!sender.hasPermission("crazylogin.commands"))
-			throw new CrazyCommandPermissionException();
-		super.command(sender, args);
+				return false;
+		return PermissionModule.hasPermission(sender, "crazylogin.commands");
 	}
 
 	@Override

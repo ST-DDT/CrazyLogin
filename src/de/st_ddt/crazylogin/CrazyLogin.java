@@ -93,6 +93,7 @@ import de.st_ddt.crazyutil.databases.DatabaseType;
 import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
 import de.st_ddt.crazyutil.locales.Localized;
+import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.BooleanParamitrisable;
 import de.st_ddt.crazyutil.paramitrisable.Paramitrisable;
 
@@ -109,6 +110,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private CrazyLoginCrazyListener crazylistener;
 	private CrazyLoginMessageListener messageListener;
 	private boolean alwaysNeedPassword;
+	private boolean confirmPassword;
 	private int autoLogout;
 	private int autoKick;
 	private long autoTempBan;
@@ -187,6 +189,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				alwaysNeedPassword = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("confirmPassword")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return confirmPassword;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				confirmPassword = newValue;
 				saveConfiguration();
 			}
 		});
@@ -771,7 +789,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			@Override
 			public void setValue(final CommandSender sender, final String... args) throws CrazyException
 			{
-				Encryptor encryptor = EncryptHelper.getEncryptor(plugin, args[0], ChatHelperExtended.shiftArray(args, 1));
+				final Encryptor encryptor = EncryptHelper.getEncryptor(plugin, args[0], ChatHelperExtended.shiftArray(args, 1));
 				if (encryptor == null)
 					throw new CrazyCommandNoSuchException("Encryptor", args[0], EncryptHelper.getAlgorithms());
 				setValue(encryptor);
@@ -969,6 +987,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final ConfigurationSection config = getConfig();
 		autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
+		confirmPassword = config.getBoolean("confirmPassword", false);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
 		autoTempBan = Math.max(config.getInt("autoTempBan", -1), -1);
 		tempBans.clear();
@@ -1102,6 +1121,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("encryptor", null);
 		encryptor.save(config, "encryptor.");
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
+		config.set("confirmPassword", confirmPassword);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
 		config.set("autoTempBan", autoTempBan);
@@ -1250,7 +1270,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (password.length() == 0)
 		{
 			if (alwaysNeedPassword)
-				throw new CrazyCommandUsageException("<Passwort...>");
+				throw new CrazyCommandUsageException("<Passwort>" + (confirmPassword ? " <Passwort>" : ""));
 			playerListener.removeFromMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", player);
 			deletePlayerData(player);
@@ -1261,7 +1281,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		{
 			final String ip = player.getAddress().getAddress().getHostAddress();
 			final HashSet<LoginPlayerData> associates = getPlayerDatasPerIP(ip);
-			if (!player.hasPermission("crazylogin.ensureregistration"))
+			if (!PermissionModule.hasPermission(player, "crazylogin.ensureregistration"))
 				if (maxRegistrationsPerIP != -1)
 					if (associates.size() >= maxRegistrationsPerIP)
 						throw new CrazyLoginExceedingMaxRegistrationsPerIPException(maxRegistrationsPerIP, associates);
@@ -1315,6 +1335,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public boolean isAlwaysNeedPassword()
 	{
 		return alwaysNeedPassword;
+	}
+
+	public boolean isConfirmPasswordEnabled()
+	{
+		return confirmPassword;
 	}
 
 	@Override
@@ -1648,7 +1673,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		Player: for (final Player player : Bukkit.getOnlinePlayers())
 		{
 			for (final String permission : permissions)
-				if (!player.hasPermission(permission))
+				if (!PermissionModule.hasPermission(player, permission))
 					continue Player;
 			if (loggedInOnly)
 				if (!isLoggedIn(player))

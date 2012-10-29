@@ -7,8 +7,11 @@ import org.bukkit.entity.Player;
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
+import de.st_ddt.crazyutil.ChatHelperExtended;
+import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
 public class CrazyLoginCommandPassword extends CrazyLoginCommandExecutor
 {
@@ -27,8 +30,20 @@ public class CrazyLoginCommandPassword extends CrazyLoginCommandExecutor
 		if (!plugin.isLoggedIn(player) && plugin.hasPlayerData(player))
 			throw new CrazyCommandPermissionException();
 		if (!plugin.hasPlayerData(player))
-			if (!player.hasPermission("crazylogin.register.command"))
+			if (!PermissionModule.hasPermission(player, "crazylogin.register.command"))
 				throw new CrazyCommandPermissionException();
-		plugin.playerPassword(player, ChatHelper.listingString(" ", args));
+		String password = null;
+		if (plugin.isConfirmPasswordEnabled())
+		{
+			if (args.length % 2 == 1)
+				throw new CrazyCommandUsageException("<Password> <Password>");
+			password = ChatHelper.listingString(" ", ChatHelperExtended.cutArray(args, args.length / 2));
+			if (args.length > 0)
+				if (!password.equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(args, args.length / 2))))
+					throw new CrazyCommandUsageException("<Password> <Password>");
+		}
+		else
+			password = ChatHelper.listingString(" ", args);
+		plugin.playerPassword(player, password);
 	}
 }

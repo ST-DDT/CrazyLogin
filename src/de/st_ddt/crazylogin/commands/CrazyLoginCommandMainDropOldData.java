@@ -12,6 +12,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
+import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
 public class CrazyLoginCommandMainDropOldData extends CrazyLoginCommandExecutor
 {
@@ -25,10 +26,7 @@ public class CrazyLoginCommandMainDropOldData extends CrazyLoginCommandExecutor
 	@Localized({ "CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN $Name$ $KeptDays$", "CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED $DropCauser$ $KeptDays$ $DroppedAmount$" })
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
-		if (sender instanceof Player)
-			if (!plugin.isLoggedIn((Player) sender))
-				throw new CrazyCommandPermissionException();
-		if (!sender.hasPermission("crazylogin.dropolddata"))
+		if (!PermissionModule.hasPermission(sender, "crazylogin.dropolddata"))
 		{
 			String days = "(-)";
 			if (args.length != 0)
@@ -66,5 +64,14 @@ public class CrazyLoginCommandMainDropOldData extends CrazyLoginCommandExecutor
 		final int amount = plugin.dropInactiveAccounts(days);
 		plugin.broadcastLocaleMessage(true, "crazylogin.warndelete", true, "COMMAND.DROPOLDDATA.DELETED", sender.getName(), days, amount);
 		return;
+	}
+
+	@Override
+	public boolean hasAccessPermission(final CommandSender sender)
+	{
+		if (sender instanceof Player)
+			if (!plugin.isLoggedIn((Player) sender))
+				return false;
+		return true;
 	}
 }
