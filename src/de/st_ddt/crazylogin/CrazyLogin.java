@@ -1204,6 +1204,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			sendLocaleMessage("REGISTER.HEADER", player);
 			return;
 		}
+		boolean wasOnline = data.isLoggedIn();
 		if (!data.login(password))
 		{
 			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.WRONG_PASSWORD).callAsyncEvent();
@@ -1228,6 +1229,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callAsyncEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
 		logger.log("Login", player.getName() + " logged in successfully.");
+		if (!wasOnline)
+			player.setFireTicks(0);
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
