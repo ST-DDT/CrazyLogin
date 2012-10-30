@@ -11,6 +11,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
+import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
 public class CrazyLoginCommandPassword extends CrazyLoginCommandExecutor
@@ -22,6 +23,7 @@ public class CrazyLoginCommandPassword extends CrazyLoginCommandExecutor
 	}
 
 	@Override
+	@Localized("CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED")
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
 		if (sender instanceof ConsoleCommandSender)
@@ -38,12 +40,15 @@ public class CrazyLoginCommandPassword extends CrazyLoginCommandExecutor
 			if (args.length % 2 == 1)
 				throw new CrazyCommandUsageException("<Password> <Password>");
 			password = ChatHelper.listingString(" ", ChatHelperExtended.cutArray(args, args.length / 2));
-			if (args.length > 0)
-				if (!password.equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(args, args.length / 2))))
-					throw new CrazyCommandUsageException("<Password> <Password>");
+			if (!password.equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(args, args.length / 2))))
+				throw new CrazyCommandUsageException("<Password> <Password>");
 		}
 		else
 			password = ChatHelper.listingString(" ", args);
 		plugin.playerPassword(player, password);
+		if (!plugin.isConfirmPasswordEnabled())
+			if (args.length % 2 == 0)
+				if (ChatHelper.listingString(" ", ChatHelperExtended.cutArray(args, args.length / 2)).equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(args, args.length / 2))))
+					plugin.sendLocaleMessage("COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED", player);
 	}
 }

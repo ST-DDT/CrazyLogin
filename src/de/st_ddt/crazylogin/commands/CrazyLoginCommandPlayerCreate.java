@@ -28,7 +28,7 @@ public class CrazyLoginCommandPlayerCreate extends CrazyLoginCommandExecutor
 	}
 
 	@Override
-	@Localized("CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS $Name$")
+	@Localized({ "CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS $Name$", "CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED" })
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
 		if (plugin.getCrazyDatabase() == null)
@@ -55,6 +55,10 @@ public class CrazyLoginCommandPlayerCreate extends CrazyLoginCommandExecutor
 		data.setPassword(password);
 		plugin.sendLocaleMessage("COMMAND.PLAYER.CREATE.SUCCESS", sender, name);
 		plugin.getCrazyDatabase().save(data);
+		if (!plugin.isConfirmPasswordEnabled())
+			if (passwordArgs.length % 2 == 0)
+				if (ChatHelper.listingString(" ", ChatHelperExtended.cutArray(passwordArgs, passwordArgs.length / 2)).equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(passwordArgs, passwordArgs.length / 2))))
+					plugin.sendLocaleMessage("COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED", sender);
 	}
 
 	@Override
