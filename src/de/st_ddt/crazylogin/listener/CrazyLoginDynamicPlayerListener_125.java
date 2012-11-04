@@ -9,12 +9,12 @@ import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 
 @SuppressWarnings("deprecation")
-public class CrazyLoginPlayerListener_125 extends CrazyLoginPlayerListener_132
+public class CrazyLoginDynamicPlayerListener_125 extends CrazyLoginDynamicPlayerListener_132
 {
 
-	public CrazyLoginPlayerListener_125(final CrazyLogin plugin)
+	public CrazyLoginDynamicPlayerListener_125(CrazyLogin plugin, CrazyLoginPlayerListener playerListener)
 	{
-		super(plugin);
+		super(plugin, playerListener);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)

@@ -25,7 +25,6 @@ database:
     tableName: CrazyLogin_accounts
 # whether all data are loaded on startup and remain loaded when player isn't online. 
 # this may reduce the plugins RAM usage
-# This is a beta option. There may be bugs.
     cached: true
 # if static is true playerdata will not be updated on player join, 
 # this may cause sync problems in databases used by more than one server.
@@ -46,6 +45,12 @@ database:
       lastAction: lastAction
 # if true you have to create a password, if false having a password is optional
 alwaysNeedPassword: true
+# whether passwords have to be confirmed
+# Ex: /register <Password> <Password>
+confirmPassword: false
+# if true if everyone is logged in protection will be disabled to decrease overall performance usage, 
+# but increase join, login and quit performance 
+dynamicProtection: false
 # you have to login again after being inactive/offline for at least x seconds
 # when using a new ip you are logged out automatically
 autoLogout: 3600

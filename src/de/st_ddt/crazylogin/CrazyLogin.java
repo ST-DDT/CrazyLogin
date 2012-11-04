@@ -15,6 +15,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.messaging.Messenger;
 
@@ -67,11 +68,12 @@ import de.st_ddt.crazylogin.exceptions.CrazyLoginExceedingMaxRegistrationsPerIPE
 import de.st_ddt.crazylogin.exceptions.CrazyLoginException;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginRegistrationsDisabled;
 import de.st_ddt.crazylogin.listener.CrazyLoginCrazyListener;
+import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener;
+import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener_125;
+import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener_132;
+import de.st_ddt.crazylogin.listener.CrazyLoginDynamicVehicleListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
-import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener_125;
-import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener_132;
-import de.st_ddt.crazylogin.listener.CrazyLoginVehicleListener;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazylogin.tasks.ScheduledCheckTask;
 import de.st_ddt.crazyplugin.CrazyPlayerDataPlugin;
@@ -107,11 +109,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private final HashMap<String, Date> tempBans = new HashMap<String, Date>();
 	private final CrazyPluginCommandMainMode modeCommand = new CrazyPluginCommandMainMode(this);
 	private CrazyLoginPlayerListener playerListener;
-	private CrazyLoginVehicleListener vehicleListener;
-	private CrazyLoginCrazyListener crazylistener;
-	private CrazyLoginMessageListener messageListener;
+	private CrazyLoginDynamicPlayerListener dynamicPlayerListener;
+	private CrazyLoginDynamicVehicleListener dynamicVehicleListener;
+	private boolean dynamicHooksRegistered;
+	// plugin config
 	private boolean alwaysNeedPassword;
 	private boolean confirmPassword;
+	private boolean dynamicProtection;
 	private int autoLogout;
 	private int autoKick;
 	private long autoTempBan;
@@ -206,6 +210,26 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				confirmPassword = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("dynamicProtection")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return dynamicProtection;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				dynamicProtection = newValue;
+				if (dynamicProtection)
+					unregisterDynamicHooks();
+				else
+					registerDynamicHooks();
 				saveConfiguration();
 			}
 		});
@@ -928,23 +952,47 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	private void registerHooks()
 	{
+		this.playerListener = new CrazyLoginPlayerListener(this);
 		final String mcVersion = Bukkit.getVersion().split("-", 4)[2];
 		if (VersionComparator.compareVersions(mcVersion, "1.3.2") == 1)
-			this.playerListener = new CrazyLoginPlayerListener(this);
+			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener(this, playerListener);
 		else if (VersionComparator.compareVersions(mcVersion, "1.2.5") == 1)
-			this.playerListener = new CrazyLoginPlayerListener_132(this);
+			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener_132(this, playerListener);
 		else
-			this.playerListener = new CrazyLoginPlayerListener_125(this);
-		this.vehicleListener = new CrazyLoginVehicleListener(this);
-		this.crazylistener = new CrazyLoginCrazyListener(this, playerListener);
-		final PluginManager pm = this.getServer().getPluginManager();
+			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener_125(this, playerListener);
+		this.dynamicVehicleListener = new CrazyLoginDynamicVehicleListener(this);
+		final CrazyLoginCrazyListener crazylistener = new CrazyLoginCrazyListener(this, playerListener);
+		final PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(playerListener, this);
-		pm.registerEvents(vehicleListener, this);
 		pm.registerEvents(crazylistener, this);
-		this.messageListener = new CrazyLoginMessageListener(this);
+		registerDynamicHooks();
+		final CrazyLoginMessageListener messageListener = new CrazyLoginMessageListener(this);
 		final Messenger ms = getServer().getMessenger();
 		ms.registerIncomingPluginChannel(this, "CrazyLogin", messageListener);
 		ms.registerOutgoingPluginChannel(this, "CrazyLogin");
+	}
+
+	public void registerDynamicHooks()
+	{
+		if (dynamicHooksRegistered)
+			return;
+		dynamicHooksRegistered = true;
+		final PluginManager pm = Bukkit.getPluginManager();
+		pm.registerEvents(dynamicPlayerListener, this);
+		pm.registerEvents(dynamicVehicleListener, this);
+	}
+
+	public void unregisterDynamicHooks()
+	{
+		if (!dynamicProtection)
+			return;
+		if (!dynamicHooksRegistered)
+			return;
+		if (!everyoneLoggedIn())
+			return;
+		dynamicHooksRegistered = false;
+		HandlerList.unregisterAll(dynamicPlayerListener);
+		HandlerList.unregisterAll(dynamicVehicleListener);
 	}
 
 	@Override
@@ -991,6 +1039,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		confirmPassword = config.getBoolean("confirmPassword", false);
+		dynamicProtection = config.getBoolean("dynamicProtection", false);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
 		autoTempBan = Math.max(config.getInt("autoTempBan", -1), -1);
 		tempBans.clear();
@@ -1125,6 +1174,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		encryptor.save(config, "encryptor.");
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("confirmPassword", confirmPassword);
+		config.set("dynamicProtection", dynamicProtection);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
 		config.set("autoTempBan", autoTempBan);
@@ -1207,7 +1257,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			sendLocaleMessage("REGISTER.HEADER", player);
 			return;
 		}
-		boolean wasOnline = data.isLoggedIn();
+		final boolean wasOnline = data.isLoggedIn();
 		if (!data.login(password))
 		{
 			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.WRONG_PASSWORD).callAsyncEvent();
@@ -1244,6 +1294,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		data.notifyAction();
 		database.save(data);
+		unregisterDynamicHooks();
 	}
 
 	@Override
@@ -1686,6 +1737,19 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					continue;
 			sendLocaleMessage(locale, player, args);
 		}
+	}
+
+	public boolean isDynamicProtectionEnabled()
+	{
+		return dynamicProtection;
+	}
+
+	public boolean everyoneLoggedIn()
+	{
+		for (final Player player : Bukkit.getOnlinePlayers())
+			if (!hasPlayerData(player) || !isLoggedIn(player))
+				return false;
+		return true;
 	}
 
 	@Override

@@ -9,12 +9,12 @@ import org.bukkit.event.painting.PaintingPlaceEvent;
 import de.st_ddt.crazylogin.CrazyLogin;
 
 @SuppressWarnings("deprecation")
-public class CrazyLoginPlayerListener_132 extends CrazyLoginPlayerListener
+public class CrazyLoginDynamicPlayerListener_132 extends CrazyLoginDynamicPlayerListener
 {
 
-	public CrazyLoginPlayerListener_132(final CrazyLogin plugin)
+	public CrazyLoginDynamicPlayerListener_132(CrazyLogin plugin, CrazyLoginPlayerListener playerListener)
 	{
-		super(plugin);
+		super(plugin, playerListener);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
