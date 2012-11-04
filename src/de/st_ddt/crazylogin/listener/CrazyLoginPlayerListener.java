@@ -14,6 +14,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -336,7 +338,28 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.requestLogin(player);
 	}
 
-	// EDIT Painting Break replace with HangingEntity
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void HangingPlace(HangingPlaceEvent event)
+	{
+		if (!(event.getEntity() instanceof Player))
+			return;
+		final Player player = (Player) event.getEntity();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+	public void HangingBreak(HangingBreakByEntityEvent event)
+	{
+		if (!(event.getEntity() instanceof Player))
+			return;
+		final Player player = (Player) event.getEntity();
+		if (plugin.isLoggedIn(player))
+			return;
+		event.setCancelled(true);
+	}
+
 	@EventHandler(priority = EventPriority.HIGH)
 	public void PlayerMove(final PlayerMoveEvent event)
 	{
