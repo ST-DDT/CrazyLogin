@@ -27,6 +27,9 @@ database:
 # this may reduce the plugins RAM usage
 # This is a beta option. There may be bugs.
     cached: true
+# if static is true playerdata will not be updated on player join, 
+# this may cause sync problems in databases used by more than one server.
+    static: false
     columns:
       name: name
       password: password
