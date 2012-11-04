@@ -980,6 +980,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(dynamicPlayerListener, this);
 		pm.registerEvents(dynamicVehicleListener, this);
+		//EDIT QA required?
+		HandlerList.bakeAll();
 	}
 
 	public void unregisterDynamicHooks()
@@ -993,6 +995,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		dynamicHooksRegistered = false;
 		HandlerList.unregisterAll(dynamicPlayerListener);
 		HandlerList.unregisterAll(dynamicVehicleListener);
+		HandlerList.bakeAll();
 	}
 
 	@Override
