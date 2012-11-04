@@ -70,6 +70,7 @@ import de.st_ddt.crazylogin.listener.CrazyLoginCrazyListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener_125;
+import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener_132;
 import de.st_ddt.crazylogin.listener.CrazyLoginVehicleListener;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazylogin.tasks.ScheduledCheckTask;
@@ -928,10 +929,12 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private void registerHooks()
 	{
 		final String mcVersion = Bukkit.getVersion().split("-", 4)[2];
-		if (mcVersion.equals("1.2.5"))
-			this.playerListener = new CrazyLoginPlayerListener_125(this);
-		else
+		if (VersionComparator.compareVersions(mcVersion, "1.3.2") == 1)
 			this.playerListener = new CrazyLoginPlayerListener(this);
+		else if (VersionComparator.compareVersions(mcVersion, "1.2.5") == 1)
+			this.playerListener = new CrazyLoginPlayerListener_132(this);
+		else
+			this.playerListener = new CrazyLoginPlayerListener_125(this);
 		this.vehicleListener = new CrazyLoginVehicleListener(this);
 		this.crazylistener = new CrazyLoginCrazyListener(this, playerListener);
 		final PluginManager pm = this.getServer().getPluginManager();
