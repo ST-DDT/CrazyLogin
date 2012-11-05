@@ -12,11 +12,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -128,28 +125,6 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 			return;
 		event.setCancelled(true);
 		plugin.requestLogin(player);
-	}
-
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-	public void HangingPlace(final HangingPlaceEvent event)
-	{
-		if (!(event.getEntity() instanceof Player))
-			return;
-		final Player player = (Player) event.getEntity();
-		if (plugin.isLoggedIn(player))
-			return;
-		event.setCancelled(true);
-	}
-
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-	public void HangingBreak(final HangingBreakByEntityEvent event)
-	{
-		if (!(event.getEntity() instanceof Player))
-			return;
-		final Player player = (Player) event.getEntity();
-		if (plugin.isLoggedIn(player))
-			return;
-		event.setCancelled(true);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -332,27 +307,5 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 			}
 			plugin.broadcastLocaleMessage(true, "crazylogin.warncommandexploits", true, "COMMAND.EXPLOITWARN", player.getName(), IP, event.getMessage().replaceAll("\\$", "_"));
 		}
-	}
-
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerChat(final AsyncPlayerChatEvent event)
-	{
-		final Player player = event.getPlayer();
-		if (plugin.hasPlayerData(player))
-		{
-			final LoginPlayerData playerdata = plugin.getPlayerData(player);
-			if (playerdata != null)
-				if (playerdata.isLoggedIn())
-				{
-					playerdata.notifyAction();
-					plugin.getCrazyDatabase().save(playerdata);
-					return;
-				}
-		}
-		else if (!plugin.isBlockingGuestChatEnabled())
-			return;
-		plugin.getCrazyLogger().log("ChatBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to execute", event.getMessage());
-		event.setCancelled(true);
-		plugin.requestLogin(event.getPlayer());
 	}
 }

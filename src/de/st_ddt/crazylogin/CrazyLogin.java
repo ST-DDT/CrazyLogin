@@ -71,6 +71,7 @@ import de.st_ddt.crazylogin.listener.CrazyLoginCrazyListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener_125;
 import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener_132;
+import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener_142;
 import de.st_ddt.crazylogin.listener.CrazyLoginDynamicVehicleListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
@@ -955,7 +956,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		this.playerListener = new CrazyLoginPlayerListener(this);
 		final String mcVersion = Bukkit.getVersion().split("-", 4)[2];
 		if (VersionComparator.compareVersions(mcVersion, "1.3.2") == 1)
-			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener(this, playerListener);
+			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener_142(this, playerListener);
 		else if (VersionComparator.compareVersions(mcVersion, "1.2.5") == 1)
 			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener_132(this, playerListener);
 		else
@@ -972,7 +973,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		ms.registerOutgoingPluginChannel(this, "CrazyLogin");
 	}
 
-	public void registerDynamicHooks()
+	public synchronized void registerDynamicHooks()
 	{
 		if (dynamicHooksRegistered)
 			return;
@@ -980,11 +981,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(dynamicPlayerListener, this);
 		pm.registerEvents(dynamicVehicleListener, this);
-		//EDIT QA required?
 		HandlerList.bakeAll();
 	}
 
-	public void unregisterDynamicHooks()
+	public synchronized void unregisterDynamicHooks()
 	{
 		if (!dynamicProtection)
 			return;

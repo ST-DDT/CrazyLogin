@@ -3,6 +3,7 @@ package de.st_ddt.crazylogin.listener;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -196,7 +197,15 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerQuit(final PlayerQuitEvent event)
 	{
 		PlayerQuit(event.getPlayer());
-		plugin.unregisterDynamicHooks();
+		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				plugin.unregisterDynamicHooks();
+			}
+		}, 5);
 	}
 
 	public void PlayerQuit(final Player player)
