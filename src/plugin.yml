@@ -1,7 +1,7 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.2
+version: 7.2.1
 # requires CrazyCore v9.1 or later
 depend: [CrazyCore]
 description: >
@@ -10,6 +10,7 @@ commands:
   login:
     description: Login using a password
     usage: /<command> <Password...>
+    aliases: [l]
   adminlogin:
     description: Login into another account using an admin account.
     usage: /<command> <Admin> <AdminPassword...>
