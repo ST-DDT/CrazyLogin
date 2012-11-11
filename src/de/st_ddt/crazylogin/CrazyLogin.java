@@ -1,5 +1,6 @@
 package de.st_ddt.crazylogin;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -97,6 +98,9 @@ import de.st_ddt.crazyutil.databases.DatabaseType;
 import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
 import de.st_ddt.crazyutil.locales.Localized;
+import de.st_ddt.crazyutil.metrics.Metrics;
+import de.st_ddt.crazyutil.metrics.Metrics.Graph;
+import de.st_ddt.crazyutil.metrics.Metrics.Plotter;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.BooleanParamitrisable;
 import de.st_ddt.crazyutil.paramitrisable.Paramitrisable;
@@ -718,6 +722,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				else if (newFilter.equalsIgnoreCase("true") || newFilter.equalsIgnoreCase("1") || newFilter.equalsIgnoreCase("on"))
 					newFilter = "[a-zA-Z0-9_]";
 				setValue(newFilter);
+				showValue(sender);
 			}
 
 			@Override
@@ -954,7 +959,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private void registerHooks()
 	{
 		this.playerListener = new CrazyLoginPlayerListener(this);
-		final String mcVersion = Bukkit.getVersion().split("-", 4)[2];
+		final String mcVersion = ChatHelper.getMinecraftVersion();
 		if (VersionComparator.compareVersions(mcVersion, "1.3.2") == 1)
 			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener_142(this, playerListener);
 		else if (VersionComparator.compareVersions(mcVersion, "1.2.5") == 1)
@@ -998,6 +1003,72 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		HandlerList.bakeAll();
 	}
 
+	private void registerMetrics()
+	{
+		final boolean metricsEnabled = getConfig().getBoolean("metrics.enabled", true);
+		getConfig().set("metrics.enabled", metricsEnabled);
+		if (!metricsEnabled)
+			return;
+		try
+		{
+			final Metrics metrics = new Metrics(this);
+			final Graph playerstats = metrics.createGraph("Player Stats");
+			playerstats.addPlotter(new Plotter("players total")
+			{
+
+				@Override
+				public int getValue()
+				{
+					return Bukkit.getOfflinePlayers().length;
+				}
+			});
+			playerstats.addPlotter(new Plotter("accounts total")
+			{
+
+				@Override
+				public int getValue()
+				{
+					return getPlayerData().size();
+				}
+			});
+			final Graph passwordMode = metrics.createGraph("Password Mode");
+			passwordMode.addPlotter(new Plotter("alwaysNeedPassword")
+			{
+
+				@Override
+				public int getValue()
+				{
+					return alwaysNeedPassword ? 1 : 0;
+				}
+			});
+			passwordMode.addPlotter(new Plotter("maybePassword")
+			{
+
+				@Override
+				public int getValue()
+				{
+					return alwaysNeedPassword ? 0 : 1;
+				}
+			});
+			final Graph databaseType = metrics.createGraph("Database Type");
+			for (final DatabaseType type : DatabaseType.values())
+				databaseType.addPlotter(new Plotter(type.toString())
+				{
+
+					@Override
+					public int getValue()
+					{
+						return (type == database.getType()) ? 1 : 0;
+					}
+				});
+			metrics.start();
+		}
+		catch (final IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public PlayerDataDatabase<LoginPlayerData> getCrazyDatabase()
 	{
@@ -1020,6 +1091,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new ScheduledCheckTask(this), 30 * 60 * 20, 15 * 60 * 20);
 		super.onEnable();
 		registerCommands();
+		registerMetrics();
 		// OnlinePlayer
 		for (final Player player : Bukkit.getOnlinePlayers())
 			playerListener.PlayerJoin(player);
