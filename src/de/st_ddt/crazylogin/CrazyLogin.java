@@ -135,6 +135,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private List<String> commandWhiteList;
 	private String uniqueIDKey;
 	private boolean disableRegistrations;
+	private boolean disableAdminLogin;
 	private boolean doNotSpamRequests;
 	private boolean doNotSpamRegisterRequests;
 	private boolean forceSingleSession;
@@ -283,6 +284,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				disableRegistrations = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanTrueMode("disableAdminLogin")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return disableAdminLogin;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				disableAdminLogin = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1128,6 +1145,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		blockGuestJoin = config.getBoolean("blockGuestJoin", false);
 		removeGuestData = config.getBoolean("removeGuestData", false);
 		disableRegistrations = config.getBoolean("disableRegistrations", false);
+		disableAdminLogin = config.getBoolean("disableAdminLogin", false);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		doNotSpamRegisterRequests = config.getBoolean("doNotSpamRegisterRequests", false);
 		antiRequestSpamTable.clear();
@@ -1262,6 +1280,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("blockGuestJoin", blockGuestJoin);
 		config.set("removeGuestData", removeGuestData);
 		config.set("disableRegistrations", disableRegistrations);
+		config.set("disableAdminLogin", disableAdminLogin);
 		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("doNotSpamRegisterRequests", doNotSpamRegisterRequests);
 		config.set("commandWhitelist", commandWhiteList);
@@ -1817,6 +1836,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public boolean isDynamicProtectionEnabled()
 	{
 		return dynamicProtection;
+	}
+
+	public boolean isAdminLoginDisabled()
+	{
+		return disableAdminLogin;
 	}
 
 	public boolean everyoneLoggedIn()

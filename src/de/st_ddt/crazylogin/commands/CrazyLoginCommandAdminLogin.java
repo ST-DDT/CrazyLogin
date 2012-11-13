@@ -67,6 +67,6 @@ public class CrazyLoginCommandAdminLogin extends CrazyLoginCommandExecutor
 	@Override
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return PermissionModule.hasPermission(sender, "crazylogin.blockadminlogin");
+		return !PermissionModule.hasPermission(sender, "crazylogin.blockadminlogin") && !plugin.isAdminLoginDisabled();
 	}
 }
