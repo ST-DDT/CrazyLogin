@@ -57,7 +57,8 @@ public class CrazyLoginDynamicPlayerListener_142 extends CrazyLoginDynamicPlayer
 		}
 		else if (!plugin.isBlockingGuestChatEnabled())
 			return;
-		plugin.getCrazyLogger().log("ChatBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to execute", event.getMessage());
+		if (event.getMessage() != null)
+			plugin.getCrazyLogger().log("ChatBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to execute", event.getMessage());
 		event.setCancelled(true);
 		plugin.requestLogin(event.getPlayer());
 	}
