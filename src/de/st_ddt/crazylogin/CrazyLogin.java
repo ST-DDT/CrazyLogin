@@ -101,6 +101,8 @@ import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.metrics.Metrics;
 import de.st_ddt.crazyutil.metrics.Metrics.Graph;
 import de.st_ddt.crazyutil.metrics.Metrics.Plotter;
+import de.st_ddt.crazyutil.modules.login.CrazyLoginSystem;
+import de.st_ddt.crazyutil.modules.login.LoginModule;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.BooleanParamitrisable;
 import de.st_ddt.crazyutil.paramitrisable.Paramitrisable;
@@ -169,6 +171,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		EncryptHelper.registerAlgorithm("CrazyCrypt2", CrazyCrypt2.class);
 		EncryptHelper.registerAlgorithm("WebCrypt", WebCrypt.class);
 		EncryptHelper.registerAlgorithm("Whirlpool", WhirlPoolCrypt.class);
+		LoginModule.LOGINSYSTEMS.add(0, CrazyLoginSystem.class);
 	}
 
 	public static CrazyLogin getPlugin()
