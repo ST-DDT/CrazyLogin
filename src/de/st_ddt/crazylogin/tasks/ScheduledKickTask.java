@@ -43,19 +43,20 @@ public class ScheduledKickTask implements Runnable
 	@Override
 	public void run()
 	{
+		final CrazyLogin plugin = CrazyLogin.getPlugin();
 		if (!player.isOnline())
 			return;
 		if (requireAccount)
-			if (!CrazyLogin.getPlugin().hasPlayerData(player))
+			if (!plugin.hasPlayerData(player))
 			{
 				player.kickPlayer(locale.getLanguageText(player));
 				if (tempBan > 0)
-					CrazyLogin.getPlugin().setTempBanned(player, tempBan);
+					plugin.setTempBanned(player, tempBan);
 				return;
 			}
-		if (!CrazyLogin.getPlugin().isLoggedIn(player))
+		if (!plugin.isLoggedIn(player))
 			player.kickPlayer(locale.getLanguageText(player));
 		if (tempBan > 0)
-			CrazyLogin.getPlugin().setTempBanned(player, tempBan);
+			plugin.setTempBanned(player, tempBan);
 	}
 }
