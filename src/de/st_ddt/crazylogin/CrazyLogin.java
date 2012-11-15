@@ -1500,16 +1500,19 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
-		if (wasGuest && alwaysNeedPassword)
+		if (wasGuest)
 		{
-			player.setFireTicks(0);
-			if (hideJoinQuitMessages)
-				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+			if (alwaysNeedPassword)
+			{
+				player.setFireTicks(0);
+				if (hideJoinQuitMessages)
+					ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+			}
+			if (hidePlayer)
+				for (final Player other : Bukkit.getOnlinePlayers())
+					if (player != other)
+						other.showPlayer(player);
 		}
-		if (hidePlayer)
-			for (final Player other : Bukkit.getOnlinePlayers())
-				if (player != other)
-					other.showPlayer(player);
 		playerListener.removeFromMovementBlocker(player);
 		database.save(data);
 	}
