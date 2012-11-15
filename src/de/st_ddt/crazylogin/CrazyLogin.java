@@ -1462,7 +1462,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.PASSWORDDELETE.SUCCESS", "CRAZYLOGIN.PASSWORDCHANGE.SUCCESS" })
+	@Localized({ "CRAZYLOGIN.PASSWORDDELETE.SUCCESS", "CRAZYLOGIN.PASSWORDCHANGE.SUCCESS", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
 	public void playerPassword(final Player player, final String password) throws CrazyCommandException, CrazyLoginException
 	{
 		if (disableRegistrations)
@@ -1479,7 +1479,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return;
 		}
 		LoginPlayerData data = getPlayerData(player);
-		if (data == null)
+		final boolean wasGuest = (data == null);
+		if (wasGuest)
 		{
 			final String ip = player.getAddress().getAddress().getHostAddress();
 			final HashSet<LoginPlayerData> associates = getPlayerDatasPerIP(ip);
@@ -1499,6 +1500,16 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
+		if (wasGuest)
+		{
+			player.setFireTicks(0);
+			if (hideJoinQuitMessages)
+				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+		}
+		if (hidePlayer)
+			for (final Player other : Bukkit.getOnlinePlayers())
+				if (player != other)
+					other.showPlayer(player);
 		playerListener.removeFromMovementBlocker(player);
 		database.save(data);
 	}
