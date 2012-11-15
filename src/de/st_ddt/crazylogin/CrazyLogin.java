@@ -1416,11 +1416,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callAsyncEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
-		if (hideJoinQuitMessages)
-			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
 		logger.log("Login", player.getName() + " logged in successfully.");
 		if (!wasOnline)
+		{
 			player.setFireTicks(0);
+			if (hideJoinQuitMessages)
+				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+		}
 		if (hidePlayer)
 			for (final Player other : Bukkit.getOnlinePlayers())
 				if (player != other)
