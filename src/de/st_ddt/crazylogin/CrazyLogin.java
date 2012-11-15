@@ -1500,7 +1500,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		data.setPassword(password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
-		if (wasGuest)
+		if (wasGuest && alwaysNeedPassword)
 		{
 			player.setFireTicks(0);
 			if (hideJoinQuitMessages)
