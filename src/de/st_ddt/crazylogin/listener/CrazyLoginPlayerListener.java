@@ -155,9 +155,21 @@ public class CrazyLoginPlayerListener implements Listener
 		{
 			if (plugin.isAlwaysNeedPassword())
 			{
-				plugin.sendLocaleMessage("REGISTER.HEADER", player);
+				if (plugin.isHidingPlayerEnabled())
+					for (Player other : Bukkit.getOnlinePlayers())
+						if (player != other)
+							other.hidePlayer(player);
+				Location location = player.getLocation().clone();
+				if (plugin.isForceSaveLoginEnabled())
+				{
+					triggerSaveLogin(player);
+					location = player.getWorld().getSpawnLocation().clone();
+				}
+				if (plugin.isHidingInventoryEnabled())
+					triggerHidenInventory(player);
 				if (movementBlocker.get(player.getName().toLowerCase()) == null)
-					movementBlocker.put(player.getName().toLowerCase(), player.getLocation());
+					movementBlocker.put(player.getName().toLowerCase(), location);
+				plugin.sendLocaleMessage("REGISTER.HEADER", player);
 			}
 			else if (!plugin.isAvoidingSpammedRegisterRequestsEnabled() || new Date().getTime() - player.getFirstPlayed() < 60000)
 				plugin.sendLocaleMessage("REGISTER.HEADER2", player);
@@ -165,6 +177,7 @@ public class CrazyLoginPlayerListener implements Listener
 			if (autoKick != -1)
 				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("REGISTER.REQUEST"), true), autoKick * 20);
 			plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server (No Account)");
+			plugin.registerDynamicHooks();
 			return;
 		}
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
@@ -173,6 +186,10 @@ public class CrazyLoginPlayerListener implements Listener
 		playerdata.checkTimeOut();
 		if (plugin.isLoggedIn(player))
 			return;
+		if (plugin.isHidingPlayerEnabled())
+			for (Player other : Bukkit.getOnlinePlayers())
+				if (player != other)
+					other.hidePlayer(player);
 		Location location = player.getLocation().clone();
 		if (plugin.isForceSaveLoginEnabled())
 		{
@@ -180,9 +197,7 @@ public class CrazyLoginPlayerListener implements Listener
 			location = player.getWorld().getSpawnLocation().clone();
 		}
 		if (plugin.isHidingInventoryEnabled())
-		{
 			triggerHidenInventory(player);
-		}
 		if (movementBlocker.get(player.getName().toLowerCase()) == null)
 			movementBlocker.put(player.getName().toLowerCase(), location);
 		plugin.sendLocaleMessage("LOGIN.REQUEST", player);

@@ -144,6 +144,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean forceSingleSessionSameIPBypass;
 	private boolean forceSaveLogin;
 	private boolean hideInventory;
+	private boolean hidePlayer;
 	private Encryptor encryptor;
 	private int autoDelete;
 	private int maxOnlinesPerIP;
@@ -271,6 +272,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				hideInventory = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("hidePlayer")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return hidePlayer;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				hidePlayer = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1165,6 +1182,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
 		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
 		hideInventory = config.getBoolean("hideInventory", false);
+		hidePlayer = config.getBoolean("hidePlayer", false);
 		maxOnlinesPerIP = config.getInt("maxOnlinesPerIP", 3);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
@@ -1293,6 +1311,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
 		config.set("forceSaveLogin", forceSaveLogin);
 		config.set("hideInventory", hideInventory);
+		config.set("hidePlayer", hidePlayer);
 		config.set("maxOnlinesPerIP", maxOnlinesPerIP);
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
@@ -1381,6 +1400,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		logger.log("Login", player.getName() + " logged in successfully.");
 		if (!wasOnline)
 			player.setFireTicks(0);
+		if (hidePlayer)
+			for (Player other : Bukkit.getOnlinePlayers())
+				if (player != other)
+					other.showPlayer(player);
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
@@ -1675,6 +1698,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public boolean isHidingInventoryEnabled()
 	{
 		return hideInventory;
+	}
+
+	public boolean isHidingPlayerEnabled()
+	{
+		return hidePlayer;
 	}
 
 	@Override
