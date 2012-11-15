@@ -145,6 +145,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean forceSaveLogin;
 	private boolean hideInventory;
 	private boolean hidePlayer;
+	private boolean hideJoinQuitMessages;
 	private Encryptor encryptor;
 	private int autoDelete;
 	private int maxOnlinesPerIP;
@@ -288,6 +289,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				hidePlayer = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("hideJoinQuitMessages")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return hideJoinQuitMessages;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				hideJoinQuitMessages = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1183,6 +1200,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
 		hideInventory = config.getBoolean("hideInventory", false);
 		hidePlayer = config.getBoolean("hidePlayer", false);
+		hideJoinQuitMessages = config.getBoolean("hideJoinQuitMessages", hideJoinQuitMessages);
 		maxOnlinesPerIP = config.getInt("maxOnlinesPerIP", 3);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
@@ -1312,6 +1330,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("forceSaveLogin", forceSaveLogin);
 		config.set("hideInventory", hideInventory);
 		config.set("hidePlayer", hidePlayer);
+		config.set("hideJoinQuitMessages", hideJoinQuitMessages);
 		config.set("maxOnlinesPerIP", maxOnlinesPerIP);
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
@@ -1353,7 +1372,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$", "CRAZYLOGIN.LOGIN.SUCCESS" })
+	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
 	public void playerLogin(final Player player, final String password) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1397,11 +1416,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callAsyncEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
+		if (hideJoinQuitMessages)
+			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
 		logger.log("Login", player.getName() + " logged in successfully.");
 		if (!wasOnline)
 			player.setFireTicks(0);
 		if (hidePlayer)
-			for (Player other : Bukkit.getOnlinePlayers())
+			for (final Player other : Bukkit.getOnlinePlayers())
 				if (player != other)
 					other.showPlayer(player);
 		playerListener.removeFromMovementBlocker(player);
@@ -1418,7 +1439,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized("CRAZYLOGIN.LOGOUT.SUCCESS")
+	@Localized({ "CRAZYLOGIN.LOGOUT.SUCCESS", "CRAZYLOGIN.BROADCAST.QUIT $Name$" })
 	public void playerLogout(final Player player) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1432,6 +1453,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			data.logout();
 			database.save(data);
 		}
+		if (hideJoinQuitMessages)
+			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName());
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
 		logger.log("Logout", player.getName() + " logged out");
 	}
@@ -1700,9 +1723,16 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return hideInventory;
 	}
 
+	@Override
 	public boolean isHidingPlayerEnabled()
 	{
 		return hidePlayer;
+	}
+
+	@Override
+	public boolean isHidingJoinQuitMessagesEnabled()
+	{
+		return hideJoinQuitMessages;
 	}
 
 	@Override

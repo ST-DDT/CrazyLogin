@@ -14,7 +14,7 @@ import de.st_ddt.crazylogin.data.LoginPlayerData;
 public class CrazyLoginDynamicPlayerListener_132 extends CrazyLoginDynamicPlayerListener
 {
 
-	public CrazyLoginDynamicPlayerListener_132(CrazyLogin plugin, CrazyLoginPlayerListener playerListener)
+	public CrazyLoginDynamicPlayerListener_132(final CrazyLogin plugin, final CrazyLoginPlayerListener playerListener)
 	{
 		super(plugin, playerListener);
 	}

@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -20,6 +21,7 @@ import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazylogin.tasks.ScheduledKickTask;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
+import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.PlayerSaver;
 import de.st_ddt.crazyutil.locales.Localized;
 
@@ -141,9 +143,17 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+	@Localized("CRAZYLOGIN.BROADCAST.JOIN $Name$")
 	public void PlayerJoin(final PlayerJoinEvent event)
 	{
-		PlayerJoin(event.getPlayer());
+		final Player player = event.getPlayer();
+		PlayerJoin(player);
+		if (plugin.isHidingJoinQuitMessagesEnabled())
+		{
+			event.setJoinMessage(null);
+			if (plugin.isLoggedIn(player))
+				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+		}
 	}
 
 	@Localized({ "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.REGISTER.HEADER2", "CRAZYLOGIN.REGISTER.REQUEST", "CRAZYLOGIN.LOGIN.REQUEST" })
@@ -156,7 +166,7 @@ public class CrazyLoginPlayerListener implements Listener
 			if (plugin.isAlwaysNeedPassword())
 			{
 				if (plugin.isHidingPlayerEnabled())
-					for (Player other : Bukkit.getOnlinePlayers())
+					for (final Player other : Bukkit.getOnlinePlayers())
 						if (player != other)
 							other.hidePlayer(player);
 				Location location = player.getLocation().clone();
@@ -187,7 +197,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		if (plugin.isHidingPlayerEnabled())
-			for (Player other : Bukkit.getOnlinePlayers())
+			for (final Player other : Bukkit.getOnlinePlayers())
 				if (player != other)
 					other.hidePlayer(player);
 		Location location = player.getLocation().clone();
@@ -209,9 +219,40 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler
+	@Localized("CRAZYLOGIN.BROADCAST.QUIT $Name$")
 	public void PlayerQuit(final PlayerQuitEvent event)
 	{
-		PlayerQuit(event.getPlayer());
+		final Player player = event.getPlayer();
+		if (plugin.isHidingJoinQuitMessagesEnabled())
+		{
+			event.setQuitMessage(null);
+			if (plugin.isLoggedIn(player))
+				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName());
+		}
+		PlayerQuit(player);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				plugin.unregisterDynamicHooks();
+			}
+		}, 5);
+	}
+
+	@EventHandler
+	@Localized("CRAZYLOGIN.BROADCAST.KICK $Name$")
+	public void PlayerKick(final PlayerKickEvent event)
+	{
+		final Player player = event.getPlayer();
+		if (plugin.isHidingJoinQuitMessagesEnabled())
+		{
+			event.setLeaveMessage(null);
+			if (plugin.isLoggedIn(player))
+				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName());
+		}
+		PlayerQuit(player);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 		{
 
