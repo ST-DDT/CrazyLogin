@@ -1372,7 +1372,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		{
 			for (final LoginPlayerData data : database.getAllEntries())
 				if (data.getLastActionTime().before(limit))
-					deletions.add(data.getName());
+					if (!data.isOnline())
+						deletions.add(data.getName());
 		}
 		for (final String name : deletions)
 			new CrazyPlayerRemoveEvent(this, name).checkAndCallEvent();
@@ -1594,17 +1595,23 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				timeOut.setTime(timeOut.getTime() - autoLogout * 1000);
 				if (database.isCachedDatabase())
 				{
-					for (final LoginPlayerData data : getPlayerData())
-						if (!data.isOnline())
-							data.checkTimeOut(timeOut);
+					synchronized (database.getDatabaseLock())
+					{
+						for (final LoginPlayerData data : database.getAllEntries())
+							if (!data.isOnline())
+								data.checkTimeOut(timeOut);
+					}
 				}
 				else
 				{
 					final HashSet<LoginPlayerData> dropping = new HashSet<LoginPlayerData>();
-					for (final LoginPlayerData data : getPlayerData())
-						if (!data.isOnline())
-							if (!data.checkTimeOut(timeOut) || !data.isLoggedIn())
-								dropping.add(data);
+					synchronized (database.getDatabaseLock())
+					{
+						for (final LoginPlayerData data : database.getAllEntries())
+							if (!data.isOnline())
+								if (!data.checkTimeOut(timeOut) || !data.isLoggedIn())
+									dropping.add(data);
+					}
 					for (final LoginPlayerData data : dropping)
 						database.unloadEntry(data.getName());
 					dropping.clear();
@@ -1863,9 +1870,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public HashSet<LoginPlayerData> getPlayerDatasPerIP(final String IP)
 	{
 		final HashSet<LoginPlayerData> res = new HashSet<LoginPlayerData>();
-		for (final LoginPlayerData data : getPlayerData())
-			if (data.hasIP(IP))
-				res.add(data);
+		if (database == null)
+			return res;
+		synchronized (database.getDatabaseLock())
+		{
+			for (final LoginPlayerData data : database.getAllEntries())
+				if (data.hasIP(IP))
+					res.add(data);
+		}
 		return res;
 	}
 
