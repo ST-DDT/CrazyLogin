@@ -147,6 +147,8 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerJoin(final PlayerJoinEvent event)
 	{
 		final Player player = event.getPlayer();
+		if (player.hasMetadata("NPC"))
+			return;
 		PlayerJoin(player);
 		if (plugin.isHidingJoinQuitMessagesEnabled())
 		{
@@ -161,10 +163,51 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		if (movementBlocker.get(player.getName().toLowerCase()) != null)
 			player.teleport(movementBlocker.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
-		if (!plugin.hasPlayerData(player))
+		if (plugin.hasPlayerData(player))
 		{
+			// Registered
+			// Session active?
+			final LoginPlayerData playerdata = plugin.getPlayerData(player);
+			if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))
+				playerdata.logout();
+			playerdata.checkTimeOut();
+			if (playerdata.isLoggedIn())
+			{
+				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server (Verified)");
+				return;
+			}
+			else
+				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server");
+			// Default Protection
+			if (plugin.isHidingPlayerEnabled())
+				for (final Player other : Bukkit.getOnlinePlayers())
+					if (player != other)
+						other.hidePlayer(player);
+			Location location = player.getLocation().clone();
+			if (plugin.isForceSaveLoginEnabled())
+			{
+				triggerSaveLogin(player);
+				location = player.getWorld().getSpawnLocation().clone();
+			}
+			if (plugin.isHidingInventoryEnabled())
+				triggerHidenInventory(player);
+			if (movementBlocker.get(player.getName().toLowerCase()) == null)
+				movementBlocker.put(player.getName().toLowerCase(), location);
+			// Message
+			plugin.sendLocaleMessage("LOGIN.REQUEST", player);
+			// AutoKick
+			final int autoKick = plugin.getAutoKick();
+			if (autoKick >= 10)
+				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST"), plugin.getAutoTempBan()), autoKick * 20);
+			plugin.registerDynamicHooks();
+		}
+		else
+		{
+			// Unregistered
+			plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server (No Account)");
 			if (plugin.isAlwaysNeedPassword())
 			{
+				// Default Protection
 				if (plugin.isHidingPlayerEnabled())
 					for (final Player other : Bukkit.getOnlinePlayers())
 						if (player != other)
@@ -179,43 +222,17 @@ public class CrazyLoginPlayerListener implements Listener
 					triggerHidenInventory(player);
 				if (movementBlocker.get(player.getName().toLowerCase()) == null)
 					movementBlocker.put(player.getName().toLowerCase(), location);
+				// Message
 				plugin.sendLocaleMessage("REGISTER.HEADER", player);
 			}
 			else if (!plugin.isAvoidingSpammedRegisterRequestsEnabled() || new Date().getTime() - player.getFirstPlayed() < 60000)
 				plugin.sendLocaleMessage("REGISTER.HEADER2", player);
+			// AutoKick
 			final int autoKick = plugin.getAutoKickUnregistered();
 			if (autoKick != -1)
 				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("REGISTER.REQUEST"), true), autoKick * 20);
-			plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server (No Account)");
 			plugin.registerDynamicHooks();
-			return;
 		}
-		final LoginPlayerData playerdata = plugin.getPlayerData(player);
-		if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))
-			playerdata.logout();
-		playerdata.checkTimeOut();
-		if (plugin.isLoggedIn(player))
-			return;
-		if (plugin.isHidingPlayerEnabled())
-			for (final Player other : Bukkit.getOnlinePlayers())
-				if (player != other)
-					other.hidePlayer(player);
-		Location location = player.getLocation().clone();
-		if (plugin.isForceSaveLoginEnabled())
-		{
-			triggerSaveLogin(player);
-			location = player.getWorld().getSpawnLocation().clone();
-		}
-		if (plugin.isHidingInventoryEnabled())
-			triggerHidenInventory(player);
-		if (movementBlocker.get(player.getName().toLowerCase()) == null)
-			movementBlocker.put(player.getName().toLowerCase(), location);
-		plugin.sendLocaleMessage("LOGIN.REQUEST", player);
-		plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server");
-		final int autoKick = plugin.getAutoKick();
-		if (autoKick >= 10)
-			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST"), plugin.getAutoTempBan()), autoKick * 20);
-		plugin.registerDynamicHooks();
 	}
 
 	@EventHandler
@@ -223,6 +240,8 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerQuit(final PlayerQuitEvent event)
 	{
 		final Player player = event.getPlayer();
+		if (player.hasMetadata("NPC"))
+			return;
 		if (plugin.isHidingJoinQuitMessagesEnabled())
 		{
 			event.setQuitMessage(null);
@@ -246,6 +265,8 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerKick(final PlayerKickEvent event)
 	{
 		final Player player = event.getPlayer();
+		if (player.hasMetadata("NPC"))
+			return;
 		if (plugin.isHidingJoinQuitMessagesEnabled())
 		{
 			event.setLeaveMessage(null);
