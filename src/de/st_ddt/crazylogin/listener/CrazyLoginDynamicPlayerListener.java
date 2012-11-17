@@ -73,15 +73,7 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 			return;
 		final Player player = (Player) event.getWhoClicked();
 		if (plugin.isLoggedIn(player))
-		{
-			final LoginPlayerData playerdata = plugin.getPlayerData(player);
-			if (playerdata != null)
-			{
-				playerdata.notifyAction();
-				plugin.getCrazyDatabase().save(playerdata);
-			}
 			return;
-		}
 		event.setCancelled(true);
 		player.closeInventory();
 		plugin.requestLogin(player);
