@@ -702,7 +702,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				if (database == null)
 					database = oldDatabase;
 				else if (oldDatabase != null)
-					database.saveAll(oldDatabase.getAllEntries());
+					synchronized (oldDatabase.getDatabaseLock())
+					{
+						database.saveAll(oldDatabase.getAllEntries());
+					}
 				save();
 			}
 		});
@@ -1233,7 +1236,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (encryptor == null)
 			encryptor = new CrazyCrypt1(plugin, config);
 		// Logger
-		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
+		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Register", "Login", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
 	}
 
 	@Override
@@ -1360,12 +1363,17 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return dropInactiveAccounts(compare);
 	}
 
-	protected synchronized int dropInactiveAccounts(final Date limit)
+	protected int dropInactiveAccounts(final Date limit)
 	{
+		if (database == null)
+			return 0;
 		final LinkedList<String> deletions = new LinkedList<String>();
-		for (final LoginPlayerData data : database.getAllEntries())
-			if (data.getLastActionTime().before(limit))
-				deletions.add(data.getName());
+		synchronized (database.getDatabaseLock())
+		{
+			for (final LoginPlayerData data : database.getAllEntries())
+				if (data.getLastActionTime().before(limit))
+					deletions.add(data.getName());
+		}
 		for (final String name : deletions)
 			new CrazyPlayerRemoveEvent(this, name).checkAndCallEvent();
 		return deletions.size();
@@ -1416,7 +1424,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callAsyncEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
-		logger.log("Login", player.getName() + " logged in successfully.");
+		logger.log("Login", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " logged in successfully.");
 		if (!wasOnline)
 		{
 			player.setFireTicks(0);
@@ -1494,6 +1502,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				throw new CrazyCommandPermissionException();
 			data = new LoginPlayerData(player);
 			tempBans.remove(player.getAddress().getAddress().getHostAddress());
+			logger.log("Register", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " registered successfully.");
 		}
 		if (pluginCommunicationEnabled)
 			new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password).callAsyncEvent();
