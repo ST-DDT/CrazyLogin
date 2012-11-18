@@ -1,4 +1,4 @@
-CRAZYLOGIN=CrazyLogin
+﻿CRAZYLOGIN=CrazyLogin
 CRAZYLOGIN.ADMINLOGIN.FAILEDWARN=&CAVISO! Autorización errónea de un admin! $0$ @ $1$
 CRAZYLOGIN.BROADCAST.JOIN=&E$0$ ha entrado al servidor.
 CRAZYLOGIN.BROADCAST.KICK=&E$0$ ha salido del servidor.
