@@ -1824,7 +1824,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	@Override
 	public boolean checkNameChars(final String name)
 	{
-		return name.matches(filterNames + "*");
+		return name.matches(filterNames + "+");
 	}
 
 	@Override
