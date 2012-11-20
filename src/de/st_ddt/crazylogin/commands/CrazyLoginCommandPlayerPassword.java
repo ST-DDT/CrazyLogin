@@ -1,11 +1,7 @@
 package de.st_ddt.crazylogin.commands;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import de.st_ddt.crazylogin.CrazyLogin;
@@ -17,6 +13,7 @@ import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
+import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 
 public class CrazyLoginCommandPlayerPassword extends CrazyLoginCommandExecutor
 {
@@ -62,13 +59,7 @@ public class CrazyLoginCommandPlayerPassword extends CrazyLoginCommandExecutor
 	{
 		if (args.length != 1)
 			return null;
-		final List<String> res = new ArrayList<String>();
-		final Pattern pattern = Pattern.compile(args[0], Pattern.CASE_INSENSITIVE);
-		for (final OfflinePlayer player : Bukkit.getOfflinePlayers())
-			if (pattern.matcher(player.getName()).find())
-				if (plugin.hasPlayerData(player))
-					res.add(player.getName());
-		return res;
+		return PlayerDataParamitrisable.tabHelp(plugin, args[0]);
 	}
 
 	@Override

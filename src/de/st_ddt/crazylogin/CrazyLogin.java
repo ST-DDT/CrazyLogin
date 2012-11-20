@@ -708,6 +708,16 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					}
 				save();
 			}
+
+			@Override
+			public List<String> tab(final String... args)
+			{
+				final List<String> res = new ArrayList<String>();
+				res.add("CONFIG");
+				res.add("FLAT");
+				res.add("MYSQL");
+				return res;
+			}
 		});
 		modeCommand.addMode(modeCommand.new IntegerMode("autoDelete")
 		{
@@ -892,6 +902,19 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				else
 					encryptor = new ChangedAlgorithmEncryptor(plugin, newValue, encryptor);
 				saveConfiguration();
+			}
+
+			@Override
+			public List<String> tab(String... args)
+			{
+				if (args.length != 1)
+					return null;
+				List<String> res = new LinkedList<String>();
+				String arg = args[0].toLowerCase();
+				for (String algo : EncryptHelper.getAlgorithms())
+					if (algo.toLowerCase().startsWith(arg))
+						res.add(algo);
+				return res;
 			}
 		});
 	}
@@ -1594,14 +1617,12 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				final Date timeOut = new Date();
 				timeOut.setTime(timeOut.getTime() - autoLogout * 1000);
 				if (database.isCachedDatabase())
-				{
 					synchronized (database.getDatabaseLock())
 					{
 						for (final LoginPlayerData data : database.getAllEntries())
 							if (!data.isOnline())
 								data.checkTimeOut(timeOut);
 					}
-				}
 				else
 				{
 					final HashSet<LoginPlayerData> dropping = new HashSet<LoginPlayerData>();
@@ -1982,11 +2003,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				if (Boolean.FALSE.equals(registered.getValue()))
 					datas.clear();
 				if (!Boolean.TRUE.equals(registered.getValue()))
-				{
 					for (final OfflinePlayer offline : getServer().getOfflinePlayers())
 						if (!hasPlayerData(offline))
 							datas.add(new LoginUnregisteredPlayerData(offline));
-				}
 				return pipeArgs;
 			}
 		};

@@ -56,11 +56,8 @@ public class CrazyLoginCommandMainDropOldData extends CrazyLoginCommandExecutor
 			if (!password.equals("CONSOLE_CONFIRM"))
 				throw new CrazyCommandUsageException("<DaysToKeep> CONSOLE_CONFIRM");
 		}
-		else
-		{
-			if (!plugin.getPlayerData((Player) sender).isPassword(password))
-				throw new CrazyCommandUsageException("<DaysToKeep> <Password>");
-		}
+		else if (!plugin.getPlayerData((Player) sender).isPassword(password))
+			throw new CrazyCommandUsageException("<DaysToKeep> <Password>");
 		final int amount = plugin.dropInactiveAccounts(days);
 		plugin.broadcastLocaleMessage(true, "crazylogin.warndelete", true, "COMMAND.DROPOLDDATA.DELETED", sender.getName(), days, amount);
 		return;
