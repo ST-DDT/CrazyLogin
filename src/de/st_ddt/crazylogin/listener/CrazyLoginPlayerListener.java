@@ -2,6 +2,9 @@ package de.st_ddt.crazylogin.listener;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -29,9 +32,10 @@ public class CrazyLoginPlayerListener implements Listener
 {
 
 	protected final CrazyLogin plugin;
-	private final HashMap<String, Location> movementBlocker = new HashMap<String, Location>();
-	private final HashMap<String, Location> savelogin = new HashMap<String, Location>();
-	private final HashMap<String, PlayerSaver> hidenInventory = new HashMap<String, PlayerSaver>();
+	private final Map<String, Location> movementBlocker = new HashMap<String, Location>();
+	private final Map<String, Location> savelogin = new HashMap<String, Location>();
+	private final Map<String, PlayerSaver> hiddenInventory = new HashMap<String, PlayerSaver>();
+	private final Map<Player, Set<Player>> hiddenPlayers = new HashMap<Player, Set<Player>>();
 
 	public CrazyLoginPlayerListener(final CrazyLogin plugin)
 	{
@@ -180,9 +184,7 @@ public class CrazyLoginPlayerListener implements Listener
 				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server");
 			// Default Protection
 			if (plugin.isHidingPlayerEnabled())
-				for (final Player other : Bukkit.getOnlinePlayers())
-					if (player != other)
-						other.hidePlayer(player);
+				hidePlayer(player);
 			Location location = player.getLocation().clone();
 			if (plugin.isForceSaveLoginEnabled())
 			{
@@ -209,9 +211,7 @@ public class CrazyLoginPlayerListener implements Listener
 			{
 				// Default Protection
 				if (plugin.isHidingPlayerEnabled())
-					for (final Player other : Bukkit.getOnlinePlayers())
-						if (player != other)
-							other.hidePlayer(player);
+					hidePlayer(player);
 				Location location = player.getLocation().clone();
 				if (plugin.isForceSaveLoginEnabled())
 				{
@@ -290,6 +290,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server");
 		disableSaveLogin(player);
 		disableHidenInventory(player);
+		unhidePlayer(player);
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
 		if (playerdata == null)
 		{
@@ -356,7 +357,7 @@ public class CrazyLoginPlayerListener implements Listener
 			movementBlocker.clear();
 	}
 
-	public HashMap<String, Location> getMovementBlocker()
+	public Map<String, Location> getMovementBlocker()
 	{
 		return movementBlocker;
 	}
@@ -378,16 +379,16 @@ public class CrazyLoginPlayerListener implements Listener
 
 	public void triggerHidenInventory(final Player player)
 	{
-		if (hidenInventory.get(player.getName().toLowerCase()) == null)
+		if (hiddenInventory.get(player.getName().toLowerCase()) == null)
 		{
 			final PlayerSaver saver = new PlayerSaver(player, true);
-			hidenInventory.put(player.getName().toLowerCase(), saver);
+			hiddenInventory.put(player.getName().toLowerCase(), saver);
 		}
 	}
 
 	public void disableHidenInventory(final Player player)
 	{
-		final PlayerSaver saver = hidenInventory.remove(player.getName().toLowerCase());
+		final PlayerSaver saver = hiddenInventory.remove(player.getName().toLowerCase());
 		if (saver == null)
 			return;
 		saver.restore(player);
@@ -395,6 +396,45 @@ public class CrazyLoginPlayerListener implements Listener
 
 	public boolean dropPlayerData(final String player)
 	{
-		return (savelogin.remove(player.toLowerCase()) != null) || (hidenInventory.remove(player.toLowerCase()) != null);
+		return (savelogin.remove(player.toLowerCase()) != null) || (hiddenInventory.remove(player.toLowerCase()) != null);
+	}
+
+	public void hidePlayer(Player player)
+	{
+		Set<Player> hides = new HashSet<Player>();
+		synchronized (hiddenPlayers)
+		{
+			hiddenPlayers.put(player, hides);
+			for (final Player other : Bukkit.getOnlinePlayers())
+				if (player != other)
+				{
+					if (other.canSee(player))
+					{
+						other.hidePlayer(player);
+						hides.add(other);
+					}
+					if (!plugin.isLoggedIn(other))
+						if (player.canSee(other))
+						{
+							Set<Player> hides2 = hiddenPlayers.get(other);
+							if (hides2 != null)
+							{
+								player.hidePlayer(other);
+								hides2.add(player);
+							}
+						}
+				}
+		}
+	}
+
+	public void unhidePlayer(Player player)
+	{
+		synchronized (hiddenPlayers)
+		{
+			Set<Player> hides = hiddenPlayers.remove(player);
+			if (hides != null)
+				for (final Player other : hides)
+					other.showPlayer(player);
+		}
 	}
 }

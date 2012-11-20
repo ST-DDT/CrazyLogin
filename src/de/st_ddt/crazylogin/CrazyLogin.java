@@ -1455,13 +1455,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			if (hideJoinQuitMessages)
 				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
 		}
-		if (hidePlayer)
-			for (final Player other : Bukkit.getOnlinePlayers())
-				if (player != other)
-					other.showPlayer(player);
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
+		playerListener.unhidePlayer(player);
 		loginFailures.remove(player.getName().toLowerCase());
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		if (encryptor instanceof UpdatingEncryptor)
@@ -1534,19 +1531,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
 		if (wasGuest)
-		{
 			if (alwaysNeedPassword)
 			{
 				player.setFireTicks(0);
 				if (hideJoinQuitMessages)
 					ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
 			}
-			if (hidePlayer)
-				for (final Player other : Bukkit.getOnlinePlayers())
-					if (player != other)
-						other.showPlayer(player);
-		}
 		playerListener.removeFromMovementBlocker(player);
+		playerListener.unhidePlayer(player);
 		database.save(data);
 	}
 
