@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -167,6 +168,8 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		if (movementBlocker.get(player.getName().toLowerCase()) != null)
 			player.teleport(movementBlocker.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
+		if (plugin.isHidingPlayerEnabled())
+			hidePlayer(player);
 		if (plugin.hasPlayerData(player))
 		{
 			// Registered
@@ -183,8 +186,6 @@ public class CrazyLoginPlayerListener implements Listener
 			else
 				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server");
 			// Default Protection
-			if (plugin.isHidingPlayerEnabled())
-				hidePlayer(player);
 			Location location = player.getLocation().clone();
 			if (plugin.isForceSaveLoginEnabled())
 			{
@@ -210,8 +211,6 @@ public class CrazyLoginPlayerListener implements Listener
 			if (plugin.isAlwaysNeedPassword())
 			{
 				// Default Protection
-				if (plugin.isHidingPlayerEnabled())
-					hidePlayer(player);
 				Location location = player.getLocation().clone();
 				if (plugin.isForceSaveLoginEnabled())
 				{
@@ -290,7 +289,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server");
 		disableSaveLogin(player);
 		disableHidenInventory(player);
-		unhidePlayer(player);
+		unhidePlayerQuit(player);
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
 		if (playerdata == null)
 		{
@@ -313,6 +312,7 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server");
 		disableSaveLogin(player);
 		disableHidenInventory(player);
+		unhidePlayer(player);
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
 		if (playerdata != null)
 		{
@@ -399,42 +399,66 @@ public class CrazyLoginPlayerListener implements Listener
 		return (savelogin.remove(player.toLowerCase()) != null) || (hiddenInventory.remove(player.toLowerCase()) != null);
 	}
 
-	public void hidePlayer(Player player)
+	public void hidePlayer(final Player player)
 	{
-		Set<Player> hides = new HashSet<Player>();
-		synchronized (hiddenPlayers)
-		{
-			hiddenPlayers.put(player, hides);
-			for (final Player other : Bukkit.getOnlinePlayers())
-				if (player != other)
-				{
-					if (other.canSee(player))
+		final Set<Player> hides = new HashSet<Player>();
+		final boolean loggedIn = plugin.isLoggedIn(player);
+		if (loggedIn)
+			synchronized (hiddenPlayers)
+			{
+				for (final Player other : Bukkit.getOnlinePlayers())
+					if (player != other)
 					{
-						other.hidePlayer(player);
-						hides.add(other);
-					}
-					if (!plugin.isLoggedIn(other))
-						if (player.canSee(other))
-						{
-							Set<Player> hides2 = hiddenPlayers.get(other);
-							if (hides2 != null)
+						final Set<Player> hides2 = hiddenPlayers.get(other);
+						if (hides2 != null)
+							if (player.canSee(other))
 							{
 								player.hidePlayer(other);
 								hides2.add(player);
 							}
+					}
+			}
+		else
+			synchronized (hiddenPlayers)
+			{
+				hiddenPlayers.put(player, hides);
+				for (final Player other : Bukkit.getOnlinePlayers())
+					if (player != other)
+					{
+						if (other.canSee(player))
+						{
+							other.hidePlayer(player);
+							hides.add(other);
 						}
-				}
-		}
+						final Set<Player> hides2 = hiddenPlayers.get(other);
+						if (hides2 != null)
+							if (player.canSee(other))
+							{
+								player.hidePlayer(other);
+								hides2.add(player);
+							}
+					}
+			}
 	}
 
-	public void unhidePlayer(Player player)
+	public void unhidePlayer(final Player player)
 	{
 		synchronized (hiddenPlayers)
 		{
-			Set<Player> hides = hiddenPlayers.remove(player);
+			final Set<Player> hides = hiddenPlayers.remove(player);
 			if (hides != null)
 				for (final Player other : hides)
 					other.showPlayer(player);
+		}
+	}
+
+	public void unhidePlayerQuit(final Player player)
+	{
+		synchronized (hiddenPlayers)
+		{
+			hiddenPlayers.remove(player);
+			for (final Entry<Player, Set<Player>> hides : hiddenPlayers.entrySet())
+				hides.getValue().remove(player);
 		}
 	}
 }
