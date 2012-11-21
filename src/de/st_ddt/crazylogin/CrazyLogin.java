@@ -905,13 +905,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			}
 
 			@Override
-			public List<String> tab(String... args)
+			public List<String> tab(final String... args)
 			{
 				if (args.length != 1)
 					return null;
-				List<String> res = new LinkedList<String>();
-				String arg = args[0].toLowerCase();
-				for (String algo : EncryptHelper.getAlgorithms())
+				final List<String> res = new LinkedList<String>();
+				final String arg = args[0].toLowerCase();
+				for (final String algo : EncryptHelper.getAlgorithms())
 					if (algo.toLowerCase().startsWith(arg))
 						res.add(algo);
 				return res;
