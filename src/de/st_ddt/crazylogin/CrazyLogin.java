@@ -1529,7 +1529,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password).callAsyncEvent();
 		data.setPassword(password);
 		data.login(password);
-		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player);
+		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player, password);
 		if (wasGuest)
 			if (alwaysNeedPassword)
 			{
