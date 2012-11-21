@@ -86,9 +86,9 @@ doNotSpamRequests: false
 doNotSpamRegisterRequests: false
 # these commands can be executed as guest (even if blockGuestCommands is enabled) or when not logged in
 commandWhitelist:
-- /login .*
-- /register .*
-- /language [a-z][a-z]_[a-z][a-z]
+- /login[ ]?.*
+- /register[ ]?.*
+- /language [a-z]{2,3}_[a-z]{2,3}
 - /language select.*
 - /language list.*
 - /worldedit cui
