@@ -247,7 +247,7 @@ public class CrazyLoginPlayerListener implements Listener
 			if (plugin.isLoggedIn(player))
 				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName());
 		}
-		PlayerQuit(player);
+		PlayerQuit(player, false);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 		{
 
@@ -272,7 +272,7 @@ public class CrazyLoginPlayerListener implements Listener
 			if (plugin.isLoggedIn(player))
 				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName());
 		}
-		PlayerQuit(player);
+		PlayerQuit(player, true);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 		{
 
@@ -284,9 +284,9 @@ public class CrazyLoginPlayerListener implements Listener
 		}, 5);
 	}
 
-	public void PlayerQuit(final Player player)
+	public void PlayerQuit(final Player player, boolean kicked)
 	{
-		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server");
+		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server." + (kicked ? " (Kicked)" : ""));
 		disableSaveLogin(player);
 		disableHidenInventory(player);
 		unhidePlayerQuit(player);
