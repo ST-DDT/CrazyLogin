@@ -1491,7 +1491,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.PASSWORDDELETE.SUCCESS", "CRAZYLOGIN.PASSWORDCHANGE.SUCCESS", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
+	@Localized({ "CRAZYLOGIN.PASSWORDDELETE.SUCCESS", "CRAZYLOGIN.PASSWORDCHANGE.SUCCESS $Password$", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
 	public void playerPassword(final Player player, final String password) throws CrazyCommandException, CrazyLoginException
 	{
 		if (disableRegistrations)
