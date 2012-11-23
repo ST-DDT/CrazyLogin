@@ -1404,7 +1404,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
+	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
 	public void playerLogin(final Player player, final String password) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1435,7 +1435,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			fails++;
 			if (fails >= autoKickLoginFailer)
 			{
-				player.kickPlayer(locale.getLocaleMessage(player, "LOGIN.FAILED"));
+				player.kickPlayer(locale.getLocaleMessage(player, "KICKED.LOGINFAIL"));
 				if (autoTempBanLoginFailer > 0)
 					setTempBanned(player, autoTempBanLoginFailer);
 				fails = 0;

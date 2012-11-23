@@ -22,6 +22,7 @@ CRAZYLOGIN.EXCEPTION.REGISTER.DISABLED=&CIngame Registraties uitgeschakeld.
 CRAZYLOGIN.KICKED.BANNED.UNTIL=&CJe bent gebanned tot $0$.
 CRAZYLOGIN.KICKED.COMMANDUSAGE=Je bent niet benoemt om dit commando uit te voeren!
 CRAZYLOGIN.KICKED.CONNECTIONS.TOMUCH=Te veel verbindingen!
+#CRAZYLOGIN.KICKED.LOGINFAIL=
 CRAZYLOGIN.KICKED.NAME.INVALIDCASE=&ENickname character verandert!
 CRAZYLOGIN.KICKED.NAME.INVALIDCHARS=&Everkeerde characters gebruikt in gebruikersnaam!
 CRAZYLOGIN.KICKED.NAME.INVALIDLENGTH=&EVerkeerde gebruikersnaam lengte!
