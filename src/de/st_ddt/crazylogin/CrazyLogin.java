@@ -1448,7 +1448,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callAsyncEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
-		logger.log("Login", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " logged in successfully.");
+		logger.log("Login", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged in successfully.");
 		if (!wasOnline)
 		{
 			player.setFireTicks(0);
