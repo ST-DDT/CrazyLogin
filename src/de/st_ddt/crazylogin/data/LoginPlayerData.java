@@ -81,7 +81,7 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 		config.set(path + columnNames[0], name);
 		config.set(path + columnNames[1], password);
 		config.set(path + columnNames[2], ips);
-		config.set(path + columnNames[3], lastAction);
+		config.set(path + columnNames[3], ObjectSaveLoadHelper.DateToString(lastAction));
 	}
 
 	// aus Flat-Datenbank laden
