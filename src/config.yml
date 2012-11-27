@@ -117,7 +117,7 @@ pluginCommunicationEnabled: false
 # when set to 0 you cannot move/rotate
 moveRange: 5.0
 # when enabled only default chars are allowed in a players name (true/false/[a-zA-Z0-9_]/...)
-filterNames: false
+filterNames: true
 # check a players name case for its char case (true/false)
 # when enabled a player cannot join as "PLaYer" when he registered as "Player"
 # some encryptions may fail when a player has different char cases.

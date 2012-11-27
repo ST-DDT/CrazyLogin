@@ -1234,7 +1234,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		moveRange = config.getDouble("moveRange", 5);
 		playerListener.clearMovementBlocker(false);
-		filterNames = config.getString("filterNames", "false");
+		filterNames = config.getString("filterNames", "true");
 		if (filterNames.equals("false"))
 			filterNames = ".";
 		else if (filterNames.equals("true"))
