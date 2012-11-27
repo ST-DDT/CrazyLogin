@@ -148,6 +148,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean hideJoinQuitMessages;
 	private Encryptor encryptor;
 	private int autoDelete;
+	private int maxStoredIPs;
 	private int maxOnlinesPerIP;
 	private int maxRegistrationsPerIP;
 	private boolean pluginCommunicationEnabled;
@@ -613,6 +614,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				removeGuestData = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new IntegerMode("maxStoredIPs")
+		{
+
+			@Override
+			public Integer getValue()
+			{
+				return maxStoredIPs;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				maxStoredIPs = Math.max(newValue, 1);
 				saveConfiguration();
 			}
 		});
@@ -1227,6 +1244,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		hideInventory = config.getBoolean("hideInventory", false);
 		hidePlayer = config.getBoolean("hidePlayer", false);
 		hideJoinQuitMessages = config.getBoolean("hideJoinQuitMessages", hideJoinQuitMessages);
+		maxStoredIPs = config.getInt("maxStoredIPs", 5);
 		maxOnlinesPerIP = config.getInt("maxOnlinesPerIP", 3);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
@@ -1350,13 +1368,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("doNotSpamRegisterRequests", doNotSpamRegisterRequests);
 		config.set("commandWhitelist", commandWhiteList);
 		config.set("uniqueIDKey", uniqueIDKey);
-		config.set("autoDelete", autoDelete);
 		config.set("forceSingleSession", forceSingleSession);
 		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
 		config.set("forceSaveLogin", forceSaveLogin);
 		config.set("hideInventory", hideInventory);
 		config.set("hidePlayer", hidePlayer);
 		config.set("hideJoinQuitMessages", hideJoinQuitMessages);
+		config.set("autoDelete", autoDelete);
+		config.set("maxStoredIPs", maxStoredIPs);
 		config.set("maxOnlinesPerIP", maxOnlinesPerIP);
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
 		config.set("pluginCommunicationEnabled", pluginCommunicationEnabled);
@@ -1371,7 +1390,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		super.saveConfiguration();
 	}
 
-	@Override
 	public int dropInactiveAccounts()
 	{
 		if (autoDelete != -1)
@@ -1500,7 +1518,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			throw new CrazyCommandCircumstanceException("when database is accessible");
 		if (password.length() == 0)
 		{
-			if (alwaysNeedPassword)
+			if (alwaysNeedPassword || PermissionModule.hasPermission(player, "crazylogin.requirepassword"))
 				throw new CrazyCommandUsageException("<Passwort>" + (confirmPassword ? " <Passwort>" : ""));
 			playerListener.removeFromMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", player);
@@ -1549,7 +1567,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return true;
 		final LoginPlayerData data = getPlayerData(player);
 		if (data == null)
-			return !alwaysNeedPassword;
+			return !alwaysNeedPassword && !PermissionModule.hasPermission(player, "crazylogin.requirepassword");
 		return data.isLoggedIn() && player.isOnline();
 	}
 
@@ -1638,7 +1656,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return autoKick;
 	}
 
-	@Override
 	public long getAutoTempBan()
 	{
 		return autoTempBan;
@@ -1650,25 +1667,21 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return autoKickUnregistered;
 	}
 
-	@Override
 	public int getAutoKickLoginFailer()
 	{
 		return autoKickLoginFailer;
 	}
 
-	@Override
 	public long getAutoTempBanLoginFailer()
 	{
 		return autoTempBanLoginFailer;
 	}
 
-	@Override
 	public boolean isAutoKickCommandUsers()
 	{
 		return autoKickCommandUsers;
 	}
 
-	@Override
 	public boolean isBlockingGuestCommandsEnabled()
 	{
 		return blockGuestCommands;
@@ -1692,7 +1705,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return removeGuestData;
 	}
 
-	@Override
 	public boolean isTempBanned(final String IP)
 	{
 		final Date date = tempBans.get(IP);
@@ -1701,13 +1713,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return new Date().before(date);
 	}
 
-	@Override
 	public Date getTempBanned(final String IP)
 	{
 		return tempBans.get(IP);
 	}
 
-	@Override
 	public String getTempBannedString(final String IP)
 	{
 		final Date date = getTempBanned(IP);
@@ -1744,13 +1754,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return doNotSpamRegisterRequests;
 	}
 
-	@Override
 	public boolean isForceSingleSessionEnabled()
 	{
 		return forceSingleSession;
 	}
 
-	@Override
 	public boolean isForceSingleSessionSameIPBypassEnabled()
 	{
 		return forceSingleSessionSameIPBypass;
@@ -1774,7 +1782,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return hidePlayer;
 	}
 
-	@Override
 	public boolean isHidingJoinQuitMessagesEnabled()
 	{
 		return hideJoinQuitMessages;
@@ -1786,19 +1793,21 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return encryptor;
 	}
 
-	@Override
 	public int getAutoDelete()
 	{
 		return autoDelete;
 	}
 
-	@Override
+	public int getMaxStoredIPs()
+	{
+		return maxStoredIPs;
+	}
+
 	public int getMaxOnlinesPerIP()
 	{
 		return maxOnlinesPerIP;
 	}
 
-	@Override
 	public int getMaxRegistrationsPerIP()
 	{
 		return maxRegistrationsPerIP;
@@ -1815,25 +1824,21 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return moveRange;
 	}
 
-	@Override
 	public String getNameFilter()
 	{
 		return filterNames;
 	}
 
-	@Override
 	public boolean checkNameChars(final String name)
 	{
 		return name.matches(filterNames + "+");
 	}
 
-	@Override
 	public boolean isBlockingDifferentNameCasesEnabled()
 	{
 		return blockDifferentNameCases;
 	}
 
-	@Override
 	public boolean checkNameCase(final String name)
 	{
 		if (blockDifferentNameCases)
@@ -1848,19 +1853,16 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return true;
 	}
 
-	@Override
 	public int getMinNameLength()
 	{
 		return minNameLength;
 	}
 
-	@Override
 	public int getMaxNameLength()
 	{
 		return maxNameLength;
 	}
 
-	@Override
 	public boolean checkNameLength(final String name)
 	{
 		final int length = name.length();

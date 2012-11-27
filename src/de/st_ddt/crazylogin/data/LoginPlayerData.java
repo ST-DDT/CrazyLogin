@@ -227,10 +227,11 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 	@Override
 	public void addIP(final String ip)
 	{
+		final int max = getPlugin().getMaxStoredIPs();
 		ips.remove(ip);
 		ips.add(0, ip);
-		while (ips.size() > 5)
-			ips.remove(5);
+		while (ips.size() > max)
+			ips.remove(max);
 	}
 
 	@Override
@@ -249,7 +250,8 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 	{
 		if (ips.isEmpty())
 			return "";
-		return ips.get(0);
+		else
+			return ips.get(0);
 	}
 
 	@Override

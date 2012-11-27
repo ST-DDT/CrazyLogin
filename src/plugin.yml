@@ -1,7 +1,7 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.5
+version: 7.6
 # requires CrazyCore v9.5 or later
 depend: [CrazyCore]
 description: >
@@ -42,6 +42,7 @@ permissions:
       crazylogin.login.command: true
       crazylogin.login.channel: true
       crazylogin.adminlogin: true
+      crazylogin.requirepassword: true
       crazylogin.logout.command: true
       crazylogin.logout.channel: true
       crazylogin.commands: true
@@ -69,6 +70,7 @@ permissions:
       crazylogin.login.command: true
       crazylogin.login.channel: true
       crazylogin.adminlogin: true
+      crazylogin.requirepassword: true
       crazylogin.logout.command: true
       crazylogin.logout.channel: true
       crazylogin.commands: true
@@ -106,6 +108,11 @@ permissions:
     default: true
   crazylogin.adminlogin:
     description: Allow admins to login as another player.
+    default: op
+    children:
+      crazylogin.requirepassword: true
+  crazylogin.requirepassword: 
+    description: Force this player to create a password.
     default: op
   crazylogin.blockadminlogin:
     description: Block admins logins to this account.

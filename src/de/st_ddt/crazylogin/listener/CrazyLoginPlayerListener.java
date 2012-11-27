@@ -28,6 +28,7 @@ import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.PlayerSaver;
 import de.st_ddt.crazyutil.locales.Localized;
+import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
 public class CrazyLoginPlayerListener implements Listener
 {
@@ -208,7 +209,7 @@ public class CrazyLoginPlayerListener implements Listener
 		{
 			// Unregistered
 			plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server (No Account)");
-			if (plugin.isAlwaysNeedPassword())
+			if (plugin.isAlwaysNeedPassword() || PermissionModule.hasPermission(player, "crazylogin.requirepassword"))
 			{
 				// Default Protection
 				Location location = player.getLocation().clone();
@@ -284,7 +285,7 @@ public class CrazyLoginPlayerListener implements Listener
 		}, 5);
 	}
 
-	public void PlayerQuit(final Player player, boolean kicked)
+	public void PlayerQuit(final Player player, final boolean kicked)
 	{
 		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server." + (kicked ? " (Kicked)" : ""));
 		disableSaveLogin(player);
