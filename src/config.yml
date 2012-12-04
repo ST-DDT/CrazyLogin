@@ -67,7 +67,7 @@ autoTempBanLoginFailer: -1
 # when enabled you are kicked when using a none whitelisted command (true/false)
 autoKickCommandUsers: false
 # when enabled you cannot execute a command without having registered (works with autoKickCommandUsers) (true/false)
-blockGuestCommands: false
+blockGuestCommands: true
 # when enabled you cannot chat without having registered (true/false)
 blockGuestChat: false
 # when enabled you cannot join without having registered (use with mysql databases) (true/false)
