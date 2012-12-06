@@ -1,8 +1,8 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.6
-# requires CrazyCore v9.5 or later
+version: 7.7
+# requires CrazyCore v9.6.1 or later
 depend: [CrazyCore]
 description: >
             CrazyLogin protect your server with passwords and many usefully features.
@@ -20,6 +20,7 @@ commands:
   register:
     description: Create/Change password
     usage: /<command> <new Password>
+    aliases: [changepw,chgpw,changepassword]
   crazylogin:
     description: Plugin Main Menu
     usage: /<command> password <new Password>
