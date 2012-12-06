@@ -1,8 +1,10 @@
 package de.st_ddt.crazylogin.listener;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.bukkit.Location;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,11 +30,14 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
+import de.st_ddt.crazyutil.ChatHelper;
+import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
 
 public class CrazyLoginDynamicPlayerListener implements Listener
 {
 
+	protected final static Pattern PATTERN_SPACE = Pattern.compile(" ");
 	protected final CrazyLogin plugin;
 	private final CrazyLoginPlayerListener playerListener;
 	private final Map<String, Location> movementBlocker;
@@ -298,6 +303,32 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 				plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + IP + " tried to execute", event.getMessage());
 			}
 			plugin.broadcastLocaleMessage(true, "crazylogin.warncommandexploits", true, "COMMAND.EXPLOITWARN", player.getName(), IP, event.getMessage().replaceAll("\\$", "_"));
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void PlayerPreCommandHiddenPassword(final PlayerCommandPreprocessEvent event)
+	{
+		if (!plugin.isHidingPasswordsFromConsoleEnabled())
+			return;
+		final Player player = event.getPlayer();
+		String message = event.getMessage().substring(1).toLowerCase();
+		String[] split = PATTERN_SPACE.split(message);
+		PluginCommand login = plugin.getCommand("login");
+		if (event.isCancelled())
+			return;
+		if ("login".equals(split[0]) || login.getAliases().contains(split[0]))
+		{
+			login.execute(player, split[0], ChatHelperExtended.shiftArray(split, 1));
+			event.setCancelled(true);
+			return;
+		}
+		PluginCommand register = plugin.getCommand("register");
+		if ("register".equals(split[0]) || register.getAliases().contains(split[0]) || message.startsWith("cl password") || message.startsWith("crazylogin password"))
+		{
+			register.execute(player, split[0], ChatHelperExtended.shiftArray(split, 1));
+			event.setCancelled(true);
+			return;
 		}
 	}
 }

@@ -102,10 +102,19 @@ autoDelete: -1
 forceSingleSession: true
 # bypass forceSingleSession when using the same ip (true/false)
 forceSingleSessionSameIPBypass: true
-# when enabled you are teleported to spawn until login
+# when enabled you are teleported to spawn until login (true/false)
 forceSaveLogin: false
-# when enabled your inventory is wiped until login
+# when enabled your inventory is hidden until login. (true/false)
 hideInventory: false
+# hide every player which isn't logged in. (true/false)
+hidePlayer: false
+# Delay Join messages until login / hide Quit messages if not logged in. (true/false)
+delayJoinQuitMessages: false
+# use the multilingual messages defined in the lang files. (true/false)
+useCustomJoinQuitMessages: true
+# hide Password from Console (Player issues command: /login Password) (true/false)
+# INFO: This could bypass some command protections/mechanics from other plugins in very rare cases.
+hidePasswordsFromConsole: false
 # maximum players allowed to play on your server at once
 maxOnlinesPerIP: 3
 # maximum players allowed to register an account using the same ip on your server

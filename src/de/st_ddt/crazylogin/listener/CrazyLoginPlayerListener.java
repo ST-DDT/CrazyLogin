@@ -38,6 +38,7 @@ public class CrazyLoginPlayerListener implements Listener
 	private final Map<String, Location> savelogin = new HashMap<String, Location>();
 	private final Map<String, PlayerSaver> hiddenInventory = new HashMap<String, PlayerSaver>();
 	private final Map<Player, Set<Player>> hiddenPlayers = new HashMap<Player, Set<Player>>();
+	private final Map<Player, String> joinMessages = new HashMap<Player, String>();
 
 	public CrazyLoginPlayerListener(final CrazyLogin plugin)
 	{
@@ -148,20 +149,51 @@ public class CrazyLoginPlayerListener implements Listener
 		plugin.getCrazyLogger().log("AccessDenied", "Denied access for player " + player.getName() + " @ " + event.getAddress().getHostAddress() + " because of he has no account!");
 	}
 
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-	@Localized("CRAZYLOGIN.BROADCAST.JOIN $Name$")
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void PlayerJoin(final PlayerJoinEvent event)
 	{
 		final Player player = event.getPlayer();
 		if (player.hasMetadata("NPC"))
 			return;
 		PlayerJoin(player);
-		if (plugin.isHidingJoinQuitMessagesEnabled())
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	public void PlayerJoinMessagesSet(final PlayerJoinEvent event)
+	{
+		if (plugin.isUsingCustomJoinQuitMessagesEnabled() && event.getJoinMessage() != null)
+			event.setJoinMessage("CRAZYLOGIN.JOIN");
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+	@Localized("CRAZYLOGIN.BROADCAST.JOIN $Name$")
+	public void PlayerJoinMessagesGet(final PlayerJoinEvent event)
+	{
+		final String message = event.getJoinMessage();
+		if (message == null)
+			return;
+		final Player player = event.getPlayer();
+		if (plugin.isDelayingJoinQuitMessagesEnabled() && !plugin.isLoggedIn(player))
 		{
+			joinMessages.put(player, message);
 			event.setJoinMessage(null);
-			if (plugin.isLoggedIn(player))
-				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
 		}
+		else if (message.equals("CRAZYLOGIN.JOIN"))
+		{
+			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+			event.setJoinMessage(null);
+		}
+	}
+
+	public void sendPlayerJoinMessage(final Player player)
+	{
+		final String message = joinMessages.remove(player);
+		if (message == null)
+			return;
+		if (message.equals("CRAZYLOGIN.JOIN"))
+			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+		else
+			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", message);
 	}
 
 	@Localized({ "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.REGISTER.HEADER2", "CRAZYLOGIN.REGISTER.REQUEST", "CRAZYLOGIN.LOGIN.REQUEST" })
@@ -235,19 +267,17 @@ public class CrazyLoginPlayerListener implements Listener
 		}
 	}
 
-	@EventHandler
-	@Localized("CRAZYLOGIN.BROADCAST.QUIT $Name$")
+	@EventHandler(priority = EventPriority.LOW)
 	public void PlayerQuit(final PlayerQuitEvent event)
 	{
 		final Player player = event.getPlayer();
 		if (player.hasMetadata("NPC"))
 			return;
-		if (plugin.isHidingJoinQuitMessagesEnabled())
-		{
-			event.setQuitMessage(null);
+		if (plugin.isDelayingJoinQuitMessagesEnabled() && event.getQuitMessage() != null && !event.getQuitMessage().equals("CRAZYLOGIN.KICK"))
 			if (plugin.isLoggedIn(player))
-				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName());
-		}
+				event.setQuitMessage("CRAZYLOGIN.QUIT");
+			else
+				event.setQuitMessage(null);
 		PlayerQuit(player, false);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 		{
@@ -260,19 +290,14 @@ public class CrazyLoginPlayerListener implements Listener
 		}, 5);
 	}
 
-	@EventHandler
-	@Localized("CRAZYLOGIN.BROADCAST.KICK $Name$")
+	@EventHandler(priority = EventPriority.LOW)
 	public void PlayerKick(final PlayerKickEvent event)
 	{
 		final Player player = event.getPlayer();
 		if (player.hasMetadata("NPC"))
 			return;
-		if (plugin.isHidingJoinQuitMessagesEnabled())
-		{
-			event.setLeaveMessage(null);
-			if (plugin.isLoggedIn(player))
-				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName());
-		}
+		if (plugin.isDelayingJoinQuitMessagesEnabled())
+			event.setLeaveMessage("CRAZYLOGIN.KICK");
 		PlayerQuit(player, true);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 		{
@@ -285,12 +310,31 @@ public class CrazyLoginPlayerListener implements Listener
 		}, 5);
 	}
 
+	@EventHandler(priority = EventPriority.HIGHEST)
+	@Localized({ "CRAZYLOGIN.BROADCAST.QUIT $Name$", "CRAZYLOGIN.BROADCAST.KICK $Name$" })
+	public void PlayerQuitMessage(final PlayerQuitEvent event)
+	{
+		final Player player = event.getPlayer();
+		if (plugin.isDelayingJoinQuitMessagesEnabled() && event.getQuitMessage() != null)
+			if (event.getQuitMessage().equals("CRAZYLOGIN.QUIT"))
+			{
+				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName());
+				event.setQuitMessage(null);
+			}
+			else if (event.getQuitMessage().equals("CRAZYLOGIN.KICK"))
+			{
+				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName());
+				event.setQuitMessage(null);
+			}
+	}
+
 	public void PlayerQuit(final Player player, final boolean kicked)
 	{
 		plugin.getCrazyLogger().log("Quit", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " left the server." + (kicked ? " (Kicked)" : ""));
 		disableSaveLogin(player);
 		disableHidenInventory(player);
 		unhidePlayerQuit(player);
+		joinMessages.remove(player);
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
 		if (playerdata == null)
 		{
@@ -314,6 +358,7 @@ public class CrazyLoginPlayerListener implements Listener
 		disableSaveLogin(player);
 		disableHidenInventory(player);
 		unhidePlayer(player);
+		joinMessages.remove(player);
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
 		if (playerdata != null)
 		{
