@@ -57,8 +57,10 @@ import de.st_ddt.crazylogin.data.comparator.LoginDataComparator;
 import de.st_ddt.crazylogin.data.comparator.LoginDataIPComparator;
 import de.st_ddt.crazylogin.data.comparator.LoginDataLastActionComparator;
 import de.st_ddt.crazylogin.databases.CrazyLoginConfigurationDatabase;
+import de.st_ddt.crazylogin.databases.CrazyLoginDataDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginFlatDatabase;
 import de.st_ddt.crazylogin.databases.CrazyLoginMySQLDatabase;
+import de.st_ddt.crazylogin.databases.CrazyLoginSQLiteDatabase;
 import de.st_ddt.crazylogin.events.CrazyLoginLoginEvent;
 import de.st_ddt.crazylogin.events.CrazyLoginLoginFailEvent;
 import de.st_ddt.crazylogin.events.CrazyLoginPasswordEvent;
@@ -145,7 +147,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean forceSaveLogin;
 	private boolean hideInventory;
 	private boolean hidePlayer;
-	private boolean hideJoinQuitMessages;
+	private boolean delayJoinQuitMessages;
+	private boolean useCustomJoinQuitMessages;
+	private boolean hidePasswordsFromConsole;
 	private Encryptor encryptor;
 	private int autoDelete;
 	private int maxStoredIPs;
@@ -293,19 +297,51 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("hideJoinQuitMessages")
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("delayJoinQuitMessages")
 		{
 
 			@Override
 			public Boolean getValue()
 			{
-				return hideJoinQuitMessages;
+				return delayJoinQuitMessages;
 			}
 
 			@Override
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
-				hideJoinQuitMessages = newValue;
+				delayJoinQuitMessages = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("useCustomJoinQuitMessages")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return useCustomJoinQuitMessages;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				useCustomJoinQuitMessages = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("hidePasswordsFromConsole")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return hidePasswordsFromConsole;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				hidePasswordsFromConsole = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1167,9 +1203,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	public PlayerDataDatabase<LoginPlayerData> getCrazyDatabase()
+	public CrazyLoginDataDatabase getCrazyDatabase()
 	{
-		return database;
+		return (CrazyLoginDataDatabase) database;
 	}
 
 	@Override
@@ -1220,7 +1256,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		autoTempBanLoginFailer = Math.max(config.getInt("autoTempBanLoginFailer", -1), -1);
 		loginFailures.clear();
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
-		blockGuestCommands = config.getBoolean("blockGuestCommands", false);
+		blockGuestCommands = config.getBoolean("blockGuestCommands", true);
 		blockGuestChat = config.getBoolean("blockGuestChat", false);
 		blockGuestJoin = config.getBoolean("blockGuestJoin", false);
 		removeGuestData = config.getBoolean("removeGuestData", false);
@@ -1243,7 +1279,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
 		hideInventory = config.getBoolean("hideInventory", false);
 		hidePlayer = config.getBoolean("hidePlayer", false);
-		hideJoinQuitMessages = config.getBoolean("hideJoinQuitMessages", hideJoinQuitMessages);
+		delayJoinQuitMessages = config.getBoolean("delayJoinQuitMessages", delayJoinQuitMessages);
+		useCustomJoinQuitMessages = config.getBoolean("useCustomJoinQuitMessages", true);
+		hidePasswordsFromConsole = config.getBoolean("hidePasswordsFromConsole", false);
 		maxStoredIPs = config.getInt("maxStoredIPs", 5);
 		maxOnlinesPerIP = config.getInt("maxOnlinesPerIP", 3);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
@@ -1297,10 +1335,12 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		if (type == DatabaseType.CONFIG)
 			database = new CrazyLoginConfigurationDatabase(this, config.getConfigurationSection("database.CONFIG"));
-		else if (type == DatabaseType.MYSQL)
-			database = new CrazyLoginMySQLDatabase(config.getConfigurationSection("database.MYSQL"));
 		else if (type == DatabaseType.FLAT)
 			database = new CrazyLoginFlatDatabase(this, config.getConfigurationSection("database.FLAT"));
+		else if (type == DatabaseType.MYSQL)
+			database = new CrazyLoginMySQLDatabase(config.getConfigurationSection("database.MYSQL"));
+		else if (type == DatabaseType.SQLITE)
+			database = new CrazyLoginSQLiteDatabase(config.getConfigurationSection("database.SQLITE"));
 		if (database != null)
 			try
 			{
@@ -1373,7 +1413,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("forceSaveLogin", forceSaveLogin);
 		config.set("hideInventory", hideInventory);
 		config.set("hidePlayer", hidePlayer);
-		config.set("hideJoinQuitMessages", hideJoinQuitMessages);
+		config.set("delayJoinQuitMessages", delayJoinQuitMessages);
+		config.set("useCustomJoinQuitMessages", useCustomJoinQuitMessages);
+		config.set("hidePasswordsFromConsole", hidePasswordsFromConsole);
 		config.set("autoDelete", autoDelete);
 		config.set("maxStoredIPs", maxStoredIPs);
 		config.set("maxOnlinesPerIP", maxOnlinesPerIP);
@@ -1470,8 +1512,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (!wasOnline)
 		{
 			player.setFireTicks(0);
-			if (hideJoinQuitMessages)
-				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+			playerListener.sendPlayerJoinMessage(player);
 		}
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
@@ -1502,8 +1543,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			data.logout();
 			database.save(data);
 		}
-		if (hideJoinQuitMessages)
-			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName());
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
 		logger.log("Logout", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged out.");
 	}
@@ -1552,12 +1591,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			if (alwaysNeedPassword)
 			{
 				player.setFireTicks(0);
-				if (hideJoinQuitMessages)
-					ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+				playerListener.sendPlayerJoinMessage(player);
 			}
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.unhidePlayer(player);
-		database.save(data);
+		getCrazyDatabase().saveWithPassword(data);
 	}
 
 	@Override
@@ -1782,9 +1820,19 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return hidePlayer;
 	}
 
-	public boolean isHidingJoinQuitMessagesEnabled()
+	public boolean isDelayingJoinQuitMessagesEnabled()
 	{
-		return hideJoinQuitMessages;
+		return delayJoinQuitMessages;
+	}
+
+	public boolean isUsingCustomJoinQuitMessagesEnabled()
+	{
+		return useCustomJoinQuitMessages;
+	}
+
+	public boolean isHidingPasswordsFromConsoleEnabled()
+	{
+		return hidePasswordsFromConsole;
 	}
 
 	@Override

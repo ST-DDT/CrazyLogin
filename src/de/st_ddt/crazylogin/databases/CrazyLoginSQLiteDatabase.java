@@ -8,20 +8,20 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.data.LoginPlayerData;
-import de.st_ddt.crazyutil.databases.MySQLPlayerDataDatabase;
 import de.st_ddt.crazyutil.databases.SQLColumn;
+import de.st_ddt.crazyutil.databases.SQLitePlayerDataDatabase;
 
-public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<LoginPlayerData> implements CrazyLoginDataDatabase
+public final class CrazyLoginSQLiteDatabase extends SQLitePlayerDataDatabase<LoginPlayerData> implements CrazyLoginDataDatabase
 {
 
-	public CrazyLoginMySQLDatabase(final ConfigurationSection config)
+	public CrazyLoginSQLiteDatabase(final ConfigurationSection config)
 	{
-		super(LoginPlayerData.class, getLoginColumns(), "CrazyLogin_accounts", config);
+		super(LoginPlayerData.class, getLoginColumns(), "plugins/CrazyLogin/accounts.sqlite", "CrazyLogin_accounts", config);
 	}
 
-	public CrazyLoginMySQLDatabase(final String tableName, final String[] columnNames, final String host, final String port, final String database, final String user, final String password, final boolean cached, final boolean doNotUpdate)
+	public CrazyLoginSQLiteDatabase(final String tableName, final String[] columnNames, final String path, final boolean cached, final boolean doNotUpdate)
 	{
-		super(LoginPlayerData.class, getLoginColumns(), tableName, columnNames, host, port, database, user, password, cached, doNotUpdate);
+		super(LoginPlayerData.class, getLoginColumns(), tableName, columnNames, path, cached, doNotUpdate);
 	}
 
 	private static SQLColumn[] getLoginColumns()
@@ -55,8 +55,8 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 	{
 		if (containsEntry(entry.getName()))
 		{
-			final String sql = "UPDATE `" + tableName + "` SET " + entry.saveToMySQLDatabaseLight(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
-			final Connection connection = mysqlConnectionPool.getConnection();
+			final String sql = "UPDATE `" + tableName + "` SET " + entry.saveUpdateToSQLiteDatabase(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
+			final Connection connection = connectionPool.getConnection();
 			Statement query = null;
 			try
 			{
@@ -76,7 +76,7 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 					}
 					catch (final SQLException e)
 					{}
-				mysqlConnectionPool.releaseConnection(connection);
+				connectionPool.releaseConnection(connection);
 			}
 		}
 		else

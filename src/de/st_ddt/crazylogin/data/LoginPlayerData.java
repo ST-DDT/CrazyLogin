@@ -23,10 +23,11 @@ import de.st_ddt.crazyutil.databases.ConfigurationPlayerDataDatabaseEntry;
 import de.st_ddt.crazyutil.databases.FlatPlayerDataDatabaseEntry;
 import de.st_ddt.crazyutil.databases.MySQLDatabase;
 import de.st_ddt.crazyutil.databases.MySQLPlayerDataDatabaseEntry;
+import de.st_ddt.crazyutil.databases.SQLitePlayerDataDatabaseEntry;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
 import de.st_ddt.crazyutil.locales.Localized;
 
-public final class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationPlayerDataDatabaseEntry, MySQLPlayerDataDatabaseEntry, FlatPlayerDataDatabaseEntry, LoginData
+public final class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationPlayerDataDatabaseEntry, MySQLPlayerDataDatabaseEntry, SQLitePlayerDataDatabaseEntry, FlatPlayerDataDatabaseEntry, LoginData
 {
 
 	private String password;
@@ -162,6 +163,29 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 	// in MySQL-Datenbank speichern
 	@Override
 	public String saveToMySQLDatabase(final String[] columnNames)
+	{
+		final String IPs = ChatHelper.listingString(",", ips);
+		final Timestamp timestamp = new Timestamp(lastAction.getTime());
+		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "'";
+	}
+
+	public String saveToMySQLDatabaseLight(final String[] columnNames)
+	{
+		final String IPs = ChatHelper.listingString(",", ips);
+		final Timestamp timestamp = new Timestamp(lastAction.getTime());
+		return columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "'";
+	}
+
+	@Override
+	public String saveInsertToSQLiteDatabase(final String[] columnNames)
+	{
+		final String IPs = ChatHelper.listingString(",", ips);
+		final Timestamp timestamp = new Timestamp(lastAction.getTime());
+		return "(" + columnNames[0] + ", " + columnNames[1] + ", " + columnNames[2] + ", " + columnNames[3] + ") VALUES ('" + name + "','" + password + "', '" + IPs + "', '" + timestamp + "')";
+	}
+
+	@Override
+	public String saveUpdateToSQLiteDatabase(final String[] columnNames)
 	{
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());

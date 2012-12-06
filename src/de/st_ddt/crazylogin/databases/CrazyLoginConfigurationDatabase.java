@@ -6,7 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyutil.databases.ConfigurationPlayerDataDatabase;
 
-public final class CrazyLoginConfigurationDatabase extends ConfigurationPlayerDataDatabase<LoginPlayerData>
+public final class CrazyLoginConfigurationDatabase extends ConfigurationPlayerDataDatabase<LoginPlayerData> implements CrazyLoginDataDatabase
 {
 
 	public CrazyLoginConfigurationDatabase(final JavaPlugin plugin, final ConfigurationSection config)
@@ -17,5 +17,11 @@ public final class CrazyLoginConfigurationDatabase extends ConfigurationPlayerDa
 	public CrazyLoginConfigurationDatabase(final JavaPlugin plugin, final String path, final String[] columnNames)
 	{
 		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction" }, plugin, path, columnNames);
+	}
+
+	@Override
+	public void saveWithPassword(final LoginPlayerData entry)
+	{
+		save(entry);
 	}
 }
