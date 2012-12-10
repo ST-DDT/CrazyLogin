@@ -412,7 +412,7 @@ public class CrazyLoginPlayerListener implements Listener
 	{
 		if (savelogin.get(player.getName().toLowerCase()) == null)
 			savelogin.put(player.getName().toLowerCase(), player.getLocation().clone());
-		player.teleport(player.getWorld().getSpawnLocation(), TeleportCause.PLUGIN);
+		player.teleport(plugin.getSaveLoginLocations(player), TeleportCause.PLUGIN);
 	}
 
 	public void disableSaveLogin(final Player player)

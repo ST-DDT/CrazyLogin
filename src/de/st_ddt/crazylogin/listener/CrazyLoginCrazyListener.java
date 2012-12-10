@@ -4,7 +4,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import de.st_ddt.crazylogin.CrazyLogin;
-import de.st_ddt.crazylogin.LoginPlugin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyplugin.events.CrazyPlayerAssociatesEvent;
 import de.st_ddt.crazyplugin.events.CrazyPlayerIPsConnectedToNameEvent;
@@ -25,7 +24,7 @@ public final class CrazyLoginCrazyListener implements Listener
 		this.playerListener = playerListener;
 	}
 
-	public LoginPlugin<?> getPlugin()
+	public CrazyLogin getPlugin()
 	{
 		return plugin;
 	}

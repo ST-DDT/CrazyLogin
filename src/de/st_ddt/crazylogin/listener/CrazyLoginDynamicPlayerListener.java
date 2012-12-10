@@ -30,7 +30,6 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
-import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
 
@@ -312,9 +311,9 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 		if (!plugin.isHidingPasswordsFromConsoleEnabled())
 			return;
 		final Player player = event.getPlayer();
-		String message = event.getMessage().substring(1).toLowerCase();
-		String[] split = PATTERN_SPACE.split(message);
-		PluginCommand login = plugin.getCommand("login");
+		final String message = event.getMessage().substring(1).toLowerCase();
+		final String[] split = PATTERN_SPACE.split(message);
+		final PluginCommand login = plugin.getCommand("login");
 		if (event.isCancelled())
 			return;
 		if ("login".equals(split[0]) || login.getAliases().contains(split[0]))
@@ -323,7 +322,7 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 			event.setCancelled(true);
 			return;
 		}
-		PluginCommand register = plugin.getCommand("register");
+		final PluginCommand register = plugin.getCommand("register");
 		if ("register".equals(split[0]) || register.getAliases().contains(split[0]) || message.startsWith("cl password") || message.startsWith("crazylogin password"))
 		{
 			register.execute(player, split[0], ChatHelperExtended.shiftArray(split, 1));

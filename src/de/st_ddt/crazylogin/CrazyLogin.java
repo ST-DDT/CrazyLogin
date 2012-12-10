@@ -9,10 +9,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -78,6 +81,7 @@ import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener_142;
 import de.st_ddt.crazylogin.listener.CrazyLoginDynamicVehicleListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
+import de.st_ddt.crazylogin.listener.CrazyLoginWorldListener;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazylogin.tasks.ScheduledCheckTask;
 import de.st_ddt.crazyplugin.CrazyPlayerDataPlugin;
@@ -95,6 +99,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.ListOptionsModder;
+import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.VersionComparator;
 import de.st_ddt.crazyutil.databases.DatabaseType;
 import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
@@ -113,9 +118,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 {
 
 	private static CrazyLogin plugin;
-	private final HashMap<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
-	private final HashMap<String, Integer> loginFailures = new HashMap<String, Integer>();
-	private final HashMap<String, Date> tempBans = new HashMap<String, Date>();
+	private final Map<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
+	private final Map<String, Integer> loginFailures = new HashMap<String, Integer>();
+	private final Map<String, Date> tempBans = new HashMap<String, Date>();
+	private final Map<String, Location> saveLoginLocations = new HashMap<String, Location>();
 	private final CrazyPluginCommandMainMode modeCommand = new CrazyPluginCommandMainMode(this);
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginDynamicPlayerListener dynamicPlayerListener;
@@ -787,6 +793,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				return autoDelete;
 			}
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public void setValue(final Integer newValue) throws CrazyException
 			{
@@ -1104,6 +1111,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(crazylistener, this);
+		pm.registerEvents(new CrazyLoginWorldListener(this), this);
 		registerDynamicHooks();
 		final CrazyLoginMessageListener messageListener = new CrazyLoginMessageListener(this);
 		final Messenger ms = getServer().getMessenger();
@@ -1217,6 +1225,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		super.onLoad();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onEnable()
 	{
@@ -1239,6 +1248,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		super.onDisable();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void loadConfiguration()
 	{
@@ -1277,6 +1287,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
 		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
+		for (final World world : Bukkit.getWorlds())
+			loadConfigurationForWorld(world);
 		hideInventory = config.getBoolean("hideInventory", false);
 		hidePlayer = config.getBoolean("hidePlayer", false);
 		delayJoinQuitMessages = config.getBoolean("delayJoinQuitMessages", delayJoinQuitMessages);
@@ -1318,6 +1330,21 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Register", "Login", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
 	}
 
+	public void loadConfigurationForWorld(final World world)
+	{
+		final ConfigurationSection saveLoginLocationsConfig = getConfig().getConfigurationSection("saveLoginLocations");
+		final Location location = ObjectSaveLoadHelper.loadLocation(saveLoginLocationsConfig.getConfigurationSection(world.getName()), null);
+		if (location == null)
+			saveLoginLocations.put(world.getName(), world.getSpawnLocation());
+		else
+		{
+			saveLoginLocations.put(world.getName(), location);
+			if (location.getWorld() == null)
+				location.setWorld(world);
+		}
+	}
+
+	@SuppressWarnings("deprecation")
 	@Override
 	@Localized({ "CRAZYLOGIN.DATABASE.ACCESSWARN $SaveType$", "CRAZYLOGIN.DATABASE.LOADED $EntryCount$" })
 	public void loadDatabase()
@@ -1411,6 +1438,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("forceSingleSession", forceSingleSession);
 		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
 		config.set("forceSaveLogin", forceSaveLogin);
+		for (final Entry<String, Location> entry : saveLoginLocations.entrySet())
+			ObjectSaveLoadHelper.saveLocation(config, "saveLoginLocations." + entry.getKey() + ".", entry.getValue(), true, true);
 		config.set("hideInventory", hideInventory);
 		config.set("hidePlayer", hidePlayer);
 		config.set("delayJoinQuitMessages", delayJoinQuitMessages);
@@ -1594,6 +1623,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				playerListener.sendPlayerJoinMessage(player);
 			}
 		playerListener.removeFromMovementBlocker(player);
+		playerListener.disableSaveLogin(player);
+		playerListener.disableHidenInventory(player);
 		playerListener.unhidePlayer(player);
 		getCrazyDatabase().saveWithPassword(data);
 	}
@@ -1806,6 +1837,24 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public boolean isForceSaveLoginEnabled()
 	{
 		return forceSaveLogin;
+	}
+
+	public Map<String, Location> getSaveLoginLocations()
+	{
+		return saveLoginLocations;
+	}
+
+	public Location getSaveLoginLocations(final World world)
+	{
+		if (saveLoginLocations.containsKey(world.getName()))
+			return saveLoginLocations.get(world.getName());
+		else
+			return world.getSpawnLocation();
+	}
+
+	public Location getSaveLoginLocations(final Player player)
+	{
+		return getSaveLoginLocations(player.getWorld());
 	}
 
 	@Override

@@ -4,11 +4,22 @@
 version: X.Y
 # required plugins +version can be found there
 # https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/plugin.yml
+# the chat header used ingame (this can only be changed, when server is shut down)
+chatHeader: '&C[&ACrazyLogin&C] &F'
 database:
 # database saveTypes can be MYSQL, FLAT and CONFIG
   saveType: FLAT
 # whether the database should be saved on shutdown
   saveOnShutdown: true
+# CONFIG Database options
+  CONFIG:
+# path inside config.yml
+    path: accounts
+    columns:
+      name: name
+      password: password
+      ips: ips
+      lastAction: lastAction
 # FLAT Database options
   FLAT:
 # path relativ to PluginFolder for the flat database.
@@ -27,17 +38,24 @@ database:
 # this may reduce the plugins RAM usage
     cached: true
 # if static is true playerdata will not be updated on player join, 
-# this may cause sync problems in databases used by more than one server.
+# this may cause sync problems in databases used on more than one server.
     static: false
     columns:
       name: name
       password: password
       ips: ips
       lastAction: lastAction
-# CONFIG Database options
-  CONFIG:
-# path inside config.yml
-    path: accounts
+# SQLITE Database options
+  SQLITE:
+    connection:
+      path: plugins/CrazyLogin/accounts.sqlite
+    tableName: CrazyLogin_accounts
+# whether all data are loaded on startup and remain loaded when player isn't online. 
+# this may reduce the plugins RAM usage
+    cached: true
+# if static is true playerdata will not be updated on player join, 
+# this may cause sync problems in databases used on more than one server.
+    static: false
     columns:
       name: name
       password: password
@@ -88,9 +106,9 @@ doNotSpamRegisterRequests: false
 commandWhitelist:
 - /login[ ]?.*
 - /register[ ]?.*
-- /language [a-z]{2,3}_[a-z]{2,3}
-- /language select.*
-- /language list.*
+- /language[ ]?[a-z]{2,3}_[a-z]{2,3}
+- /language select[ ]?.*
+- /language list[ ]?.*
 - /worldedit cui
 # the encryption alogrithm used to encrypt your passwords. http://dev.bukkit.org/server-mods/crazylogin/pages/encryption/
 encryptor:
@@ -104,6 +122,16 @@ forceSingleSession: true
 forceSingleSessionSameIPBypass: true
 # when enabled you are teleported to spawn until login (true/false)
 forceSaveLogin: false
+# custom saveLogin locations for each world
+saveLoginLocations: {}
+#  world:
+#    x: 1500
+#    y: -300
+#    z: 0.1
+## this parameters are optional
+##    world: world
+##    yaw: 0
+##    pitch: 0
 # when enabled your inventory is hidden until login. (true/false)
 hideInventory: false
 # hide every player which isn't logged in. (true/false)
