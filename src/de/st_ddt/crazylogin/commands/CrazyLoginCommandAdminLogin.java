@@ -58,7 +58,7 @@ public class CrazyLoginCommandAdminLogin extends CrazyLoginCommandExecutor
 		}
 		playerData.setOnline(true);
 		plugin.sendLocaleMessage("LOGIN.SUCCESS", player);
-		plugin.getCrazyLogger().log("Login", player.getName() + "(via " + admin.getName() + ") logged in successfully.");
+		plugin.getCrazyLogger().log("Login", player.getName() + " (via " + admin.getName() + ") logged in successfully.");
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
