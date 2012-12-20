@@ -213,11 +213,11 @@ public class CrazyLoginPlayerListener implements Listener
 			playerdata.checkTimeOut();
 			if (playerdata.isLoggedIn())
 			{
-				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server (Verified)");
+				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server. (Verified)");
 				return;
 			}
 			else
-				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server");
+				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server.");
 			// Default Protection
 			Location location = player.getLocation().clone();
 			if (plugin.isForceSaveLoginEnabled())
