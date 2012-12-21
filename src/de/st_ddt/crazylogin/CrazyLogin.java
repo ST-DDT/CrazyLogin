@@ -1325,14 +1325,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			String algorithm = config.getString("algorithm");
 			if (algorithm.startsWith("MD") || algorithm.startsWith("SHA"))
 				algorithm = "Seeded" + algorithm;
-			encryptor = EncryptHelper.getEncryptor(plugin, algorithm, config.getConfigurationSection("customEncryptor"));
+			encryptor = EncryptHelper.getEncryptor(this, algorithm, config.getConfigurationSection("customEncryptor"));
 			config.set("algorithm", null);
 			config.set("customEncryptor", null);
 		}
 		else
-			encryptor = EncryptHelper.getEncryptor(plugin, config.getConfigurationSection("encryptor"));
+			encryptor = EncryptHelper.getEncryptor(this, config.getConfigurationSection("encryptor"));
 		if (encryptor == null)
-			encryptor = new CrazyCrypt1(plugin, config);
+			encryptor = new CrazyCrypt1(this, config);
 		// Logger
 		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Register", "Login", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
 	}
