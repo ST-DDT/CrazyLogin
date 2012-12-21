@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
+import de.st_ddt.crazylogin.metadata.Authenticated;
 import de.st_ddt.crazylogin.tasks.ScheduledKickTask;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
 import de.st_ddt.crazyutil.ChatHelper;
@@ -213,6 +214,7 @@ public class CrazyLoginPlayerListener implements Listener
 			playerdata.checkTimeOut();
 			if (playerdata.isLoggedIn())
 			{
+				player.setMetadata("Authenticated", new Authenticated(plugin, player));
 				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server. (Verified)");
 				return;
 			}

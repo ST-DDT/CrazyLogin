@@ -82,6 +82,7 @@ import de.st_ddt.crazylogin.listener.CrazyLoginDynamicVehicleListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
 import de.st_ddt.crazylogin.listener.CrazyLoginWorldListener;
+import de.st_ddt.crazylogin.metadata.Authenticated;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazylogin.tasks.ScheduledCheckTask;
 import de.st_ddt.crazyplugin.CrazyPlayerDataPlugin;
@@ -1086,14 +1087,20 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		getCommand("adminlogin").setExecutor(new CrazyLoginCommandAdminLogin(this, playerListener));
 		getCommand("logout").setExecutor(new CrazyLoginCommandLogout(this));
 		getCommand("register").setExecutor(passwordCommand);
-		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, playerCommand), "player", "players", "account", "accounts");
-		mainCommand.addSubCommand(passwordCommand, "password");
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, playerCommand), "p", "plr", "player", "players", "account", "accounts");
+		mainCommand.addSubCommand(passwordCommand, "pw", "password");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, modeCommand), "mode");
 		mainCommand.addSubCommand(new CrazyLoginCommandMainCommands(this), "commands");
 		mainCommand.addSubCommand(new CrazyLoginCommandMainDropOldData(this), "dropolddata");
-		playerCommand.addSubCommand(new CrazyLoginCommandPlayerCreate(this), "create");
-		playerCommand.addSubCommand(new CrazyLoginCommandPlayerPassword(this), "chgpw", "changepassword");
-		playerCommand.addSubCommand(new CrazyLoginCommandPlayerDetachIP(this), "detachip");
+		final CrazyLoginCommandExecutor create = new CrazyLoginCommandPlayerCreate(this);
+		final CrazyLoginCommandExecutor changePassword = new CrazyLoginCommandPlayerPassword(this);
+		final CrazyLoginCommandExecutor delete = new CrazyLoginCommandPlayerDetachIP(this);
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, create), "create");
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, changePassword), "chgpw", "changepw", "changepassword");
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, delete), "detachip");
+		playerCommand.addSubCommand(create, "create");
+		playerCommand.addSubCommand(changePassword, "chgpw", "changepw", "changepassword");
+		playerCommand.addSubCommand(delete, "detachip");
 	}
 
 	private void registerHooks()
@@ -1549,6 +1556,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerListener.unhidePlayer(player);
 		loginFailures.remove(player.getName().toLowerCase());
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
+		player.setMetadata("Authenticated", new Authenticated(this, player));
 		if (encryptor instanceof UpdatingEncryptor)
 			data.setPassword(password);
 		data.addIP(player.getAddress().getAddress().getHostAddress());
@@ -1572,6 +1580,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			data.logout();
 			database.save(data);
 		}
+		player.removeMetadata("Authenticated", this);
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
 		logger.log("Logout", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged out.");
 	}
@@ -1627,6 +1636,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerListener.disableHidenInventory(player);
 		playerListener.unhidePlayer(player);
 		getCrazyDatabase().saveWithPassword(data);
+		player.setMetadata("Authenticated", new Authenticated(this, player));
 	}
 
 	@Override
