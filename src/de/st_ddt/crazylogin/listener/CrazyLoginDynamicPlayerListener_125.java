@@ -8,7 +8,6 @@ import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 
 import de.st_ddt.crazylogin.CrazyLogin;
-import de.st_ddt.crazylogin.data.LoginPlayerData;
 
 @SuppressWarnings("deprecation")
 public class CrazyLoginDynamicPlayerListener_125 extends CrazyLoginDynamicPlayerListener
@@ -44,22 +43,7 @@ public class CrazyLoginDynamicPlayerListener_125 extends CrazyLoginDynamicPlayer
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void PlayerChat(final PlayerChatEvent event)
 	{
-		final Player player = event.getPlayer();
-		if (plugin.hasPlayerData(player))
-		{
-			final LoginPlayerData playerdata = plugin.getPlayerData(player);
-			if (playerdata != null)
-				if (playerdata.isLoggedIn())
-				{
-					playerdata.notifyAction();
-					plugin.getCrazyDatabase().save(playerdata);
-					return;
-				}
-		}
-		else if (!plugin.isBlockingGuestChatEnabled())
-			return;
-		plugin.getCrazyLogger().log("ChatBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to chat", event.getMessage());
-		event.setCancelled(true);
-		plugin.requestLogin(event.getPlayer());
+		if (!PlayerChat(event.getPlayer(), event.getMessage()))
+			event.setCancelled(true);
 	}
 }

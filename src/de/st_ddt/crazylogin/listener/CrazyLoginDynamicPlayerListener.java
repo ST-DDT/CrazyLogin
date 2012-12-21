@@ -330,4 +330,25 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 			return;
 		}
 	}
+
+	protected final boolean PlayerChat(final Player player, final String message)
+	{
+		if (plugin.hasPlayerData(player))
+		{
+			final LoginPlayerData playerdata = plugin.getPlayerData(player);
+			if (playerdata != null)
+				if (playerdata.isLoggedIn())
+				{
+					playerdata.notifyAction();
+					plugin.getCrazyDatabase().save(playerdata);
+					return true;
+				}
+		}
+		else if (!plugin.isBlockingGuestChatEnabled())
+			return true;
+		if (message != null)
+			plugin.getCrazyLogger().log("ChatBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to chat", message);
+		plugin.requestLogin(player);
+		return false;
+	}
 }
