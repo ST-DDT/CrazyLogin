@@ -1569,7 +1569,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.LOGOUT.SUCCESS", "CRAZYLOGIN.BROADCAST.QUIT $Name$" })
+	@Localized({ "CRAZYLOGIN.LOGOUT.SUCCESS", "CRAZYLOGIN.BROADCAST.QUIT $Name$", "CRAZYLOGIN.BROADCAST.QUIT $Name$" })
 	public void playerLogout(final Player player) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1585,6 +1585,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		player.removeMetadata("Authenticated", this);
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
+		if (delayJoinQuitMessages)
+			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", locale.getLanguageEntry("BROADCAST.QUIT"), player.getName());
 		logger.log("Logout", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged out.");
 	}
 

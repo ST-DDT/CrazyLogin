@@ -275,11 +275,9 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (player.hasMetadata("NPC"))
 			return;
-		if (plugin.isDelayingJoinQuitMessagesEnabled() && event.getQuitMessage() != null && !event.getQuitMessage().equals("CRAZYLOGIN.KICK"))
-			if (plugin.isLoggedIn(player))
+		if (plugin.isUsingCustomJoinQuitMessagesEnabled())
+			if (event.getQuitMessage() != null && !event.getQuitMessage().equals("CRAZYLOGIN.KICK"))
 				event.setQuitMessage("CRAZYLOGIN.QUIT");
-			else
-				event.setQuitMessage(null);
 		PlayerQuit(player, false);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 		{
@@ -298,7 +296,7 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (player.hasMetadata("NPC"))
 			return;
-		if (plugin.isDelayingJoinQuitMessagesEnabled())
+		if (plugin.isUsingCustomJoinQuitMessagesEnabled())
 			event.setLeaveMessage("CRAZYLOGIN.KICK");
 		PlayerQuit(player, true);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
@@ -317,17 +315,18 @@ public class CrazyLoginPlayerListener implements Listener
 	public void PlayerQuitMessage(final PlayerQuitEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.isDelayingJoinQuitMessagesEnabled() && event.getQuitMessage() != null)
-			if (event.getQuitMessage().equals("CRAZYLOGIN.QUIT"))
-			{
-				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName());
-				event.setQuitMessage(null);
-			}
-			else if (event.getQuitMessage().equals("CRAZYLOGIN.KICK"))
-			{
-				ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName());
-				event.setQuitMessage(null);
-			}
+		if (plugin.isUsingCustomJoinQuitMessagesEnabled() && event.getQuitMessage() != null)
+			if (plugin.isLoggedIn(player) || !plugin.isDelayingJoinQuitMessagesEnabled())
+				if (event.getQuitMessage().equals("CRAZYLOGIN.QUIT"))
+				{
+					ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName());
+					event.setQuitMessage(null);
+				}
+				else if (event.getQuitMessage().equals("CRAZYLOGIN.KICK"))
+				{
+					ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName());
+					event.setQuitMessage(null);
+				}
 	}
 
 	public void PlayerQuit(final Player player, final boolean kicked)
