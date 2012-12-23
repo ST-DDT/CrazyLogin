@@ -14,6 +14,7 @@ CRAZYLOGIN.COMMAND.EXPLOITWARN=&CВнимание! Забранено е изп�
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Направи акаунт за $0$!
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Смени паролата на $0$!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CВнимание: &EConfirmPassword е изключен!\nНаписването на паролата веднъж е достатъчно.\nАко тази двойна парола не е предназначена, трябва да я смените.
+#CRAZYLOGIN.COMMAND.REVERIFY.SUCCESS=
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CWARNING: Няма достъп до датабазата!
 CRAZYLOGIN.DATABASE.LOADED=Заредени са $0$ Entries от датабазата.
 CRAZYLOGIN.EXCEPTION=Възникна грешка

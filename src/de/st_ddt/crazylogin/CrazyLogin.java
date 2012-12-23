@@ -1094,13 +1094,16 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		mainCommand.addSubCommand(new CrazyLoginCommandMainDropOldData(this), "dropolddata");
 		final CrazyLoginCommandExecutor create = new CrazyLoginCommandPlayerCreate(this);
 		final CrazyLoginCommandExecutor changePassword = new CrazyLoginCommandPlayerPassword(this);
-		final CrazyLoginCommandExecutor delete = new CrazyLoginCommandPlayerDetachIP(this);
+		final CrazyLoginCommandExecutor detachip = new CrazyLoginCommandPlayerDetachIP(this);
+		final CrazyLoginCommandExecutor reverify = new CrazyLoginCommandPlayerDetachIP(this);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, create), "create");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, changePassword), "chgpw", "changepw", "changepassword");
-		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, delete), "detachip");
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, detachip), "detachip");
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, reverify), "reverify");
 		playerCommand.addSubCommand(create, "create");
 		playerCommand.addSubCommand(changePassword, "chgpw", "changepw", "changepassword");
-		playerCommand.addSubCommand(delete, "detachip");
+		playerCommand.addSubCommand(detachip, "detachip");
+		playerCommand.addSubCommand(reverify, "reverify");
 	}
 
 	private void registerHooks()

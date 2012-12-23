@@ -14,6 +14,7 @@ CRAZYLOGIN.COMMAND.EXPLOITWARN=&CВНИМАНИЕ! Попытка исполне
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Создан аккаунт для $0$!
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Пароль изменен для $0$!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CВнимание: &EПодтверждение пароля отключено!\nДостаточно ввести один раз свой пароль.\nЕсли двойной пароль не предназначен, то поменяйте его.
+#CRAZYLOGIN.COMMAND.REVERIFY.SUCCESS=
 #CRAZYLOGIN.DATABASE.ACCESSWARN=
 CRAZYLOGIN.DATABASE.LOADED=Загружено $0$ записей из базы данных.
 CRAZYLOGIN.EXCEPTION=Произошла ошибка

@@ -83,6 +83,8 @@ permissions:
       crazylogin.player.password: true
       crazylogin.player.delete: true
       crazylogin.player.list: true
+      crazylogin.player.detachip: true
+      crazylogin.player.reverify: true
   crazylogin.ensureregistration:
     description: This player can always register an account.
     default: op
@@ -175,5 +177,11 @@ permissions:
     description: Allow deleting player data
     default: op
   crazylogin.player.list:
-    description: List all player accounts.
+    description: Allow viewing all players accounts.
+    default: op
+  crazylogin.player.detachip:
+    description: Allow removing an IP from a player.
+    default: op
+  crazylogin.player.reverify:
+    description: Allow forcing a player to login again.
     default: op

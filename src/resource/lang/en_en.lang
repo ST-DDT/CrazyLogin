@@ -14,6 +14,7 @@ CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNING! Forbidden command execution! $0$ @ $1$
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Created Account for $0$!
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Changed Password for $0$!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CWARNING: &EConfirmPassword is disabled!\nTyping your password once is enough.\nIf this double password isn't intended, you should change it.
+CRAZYLOGIN.COMMAND.REVERIFY.SUCCESS=$0$ has to login again!
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CWARNING: Database not accessible!
 CRAZYLOGIN.DATABASE.LOADED=Loaded $0$ Entries from database.
 CRAZYLOGIN.EXCEPTION=An error occured
