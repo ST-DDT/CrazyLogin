@@ -160,15 +160,15 @@ public class CrazyLoginPlayerListener implements Listener
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void PlayerJoinMessagesSet(final PlayerJoinEvent event)
+	public void PlayerJoinMessageSet(final PlayerJoinEvent event)
 	{
-		if (plugin.isUsingCustomJoinQuitMessagesEnabled() && event.getJoinMessage() != null)
+		if (plugin.isUsingCustomJoinQuitMessagesEnabled())
 			event.setJoinMessage("CRAZYLOGIN.JOIN");
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	@Localized("CRAZYLOGIN.BROADCAST.JOIN $Name$")
-	public void PlayerJoinMessagesGet(final PlayerJoinEvent event)
+	public void PlayerJoinMessageGet(final PlayerJoinEvent event)
 	{
 		final String message = event.getJoinMessage();
 		if (message == null)
@@ -275,9 +275,6 @@ public class CrazyLoginPlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (player.hasMetadata("NPC"))
 			return;
-		if (plugin.isUsingCustomJoinQuitMessagesEnabled())
-			if (event.getQuitMessage() != null && !event.getQuitMessage().equals("CRAZYLOGIN.KICK"))
-				event.setQuitMessage("CRAZYLOGIN.QUIT");
 		PlayerQuit(player, false);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 		{
@@ -290,14 +287,20 @@ public class CrazyLoginPlayerListener implements Listener
 		}, 5);
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerQuitMessageSet(final PlayerQuitEvent event)
+	{
+		if (plugin.isUsingCustomJoinQuitMessagesEnabled())
+			if (event.getQuitMessage() != null && !event.getQuitMessage().equals("CRAZYLOGIN.KICK"))
+				event.setQuitMessage("CRAZYLOGIN.QUIT");
+	}
+
 	@EventHandler(priority = EventPriority.LOW)
 	public void PlayerKick(final PlayerKickEvent event)
 	{
 		final Player player = event.getPlayer();
 		if (player.hasMetadata("NPC"))
 			return;
-		if (plugin.isUsingCustomJoinQuitMessagesEnabled())
-			event.setLeaveMessage("CRAZYLOGIN.KICK");
 		PlayerQuit(player, true);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 		{
@@ -310,9 +313,16 @@ public class CrazyLoginPlayerListener implements Listener
 		}, 5);
 	}
 
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void PlayerKickMessageSet(final PlayerKickEvent event)
+	{
+		if (plugin.isUsingCustomJoinQuitMessagesEnabled())
+			event.setLeaveMessage("CRAZYLOGIN.KICK");
+	}
+
 	@EventHandler(priority = EventPriority.HIGHEST)
 	@Localized({ "CRAZYLOGIN.BROADCAST.QUIT $Name$", "CRAZYLOGIN.BROADCAST.KICK $Name$" })
-	public void PlayerQuitMessage(final PlayerQuitEvent event)
+	public void PlayerQuitMessageGet(final PlayerQuitEvent event)
 	{
 		final Player player = event.getPlayer();
 		if (plugin.isUsingCustomJoinQuitMessagesEnabled() && event.getQuitMessage() != null)
