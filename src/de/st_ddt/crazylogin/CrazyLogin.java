@@ -1164,13 +1164,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		{
 			final Metrics metrics = new Metrics(this);
 			final Graph playerstats = metrics.createGraph("Player Stats");
+			final int offlines = Bukkit.getOfflinePlayers().length;
 			playerstats.addPlotter(new Plotter("players total")
 			{
 
 				@Override
 				public int getValue()
 				{
-					return Bukkit.getOfflinePlayers().length;
+					return offlines;
 				}
 			});
 			playerstats.addPlotter(new Plotter("accounts total")
