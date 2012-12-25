@@ -305,7 +305,7 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void PlayerPreCommandHiddenPassword(final PlayerCommandPreprocessEvent event)
 	{
 		if (!plugin.isHidingPasswordsFromConsoleEnabled())
