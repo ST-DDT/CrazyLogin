@@ -12,6 +12,7 @@ CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=$0$ изтри $2$ играчи, коит
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=$0$ опита да изтир всички играчи, които са били неактивни през последните $1$ дена.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CВнимание! Забранено е използването на командата! $0$ @ $1$: $2$
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Направи акаунт за $0$!
+#CRAZYLOGIN.COMMAND.PLAYER.DELETE.SUCCESS=
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Смени паролата на $0$!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CВнимание: &EConfirmPassword е изключен!\nНаписването на паролата веднъж е достатъчно.\nАко тази двойна парола не е предназначена, трябва да я смените.
 #CRAZYLOGIN.COMMAND.REVERIFY.SUCCESS=

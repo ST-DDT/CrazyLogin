@@ -1339,7 +1339,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (encryptor == null)
 			encryptor = new CrazyCrypt1(this, config);
 		// Logger
-		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Register", "Login", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
+		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Account", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
 	}
 
 	public void loadConfigurationForWorld(final World world)
@@ -1561,7 +1561,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerListener.unhidePlayer(player);
 		loginFailures.remove(player.getName().toLowerCase());
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
-		player.setMetadata("Authenticated", new Authenticated(this, player));
 		if (encryptor instanceof UpdatingEncryptor)
 		{
 			data.setPassword(password);
@@ -1570,6 +1569,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		data.notifyAction();
 		getCrazyDatabase().saveWithoutPassword(data);
+		player.setMetadata("Authenticated", new Authenticated(this, player));
 		unregisterDynamicHooks();
 	}
 
@@ -1610,6 +1610,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			playerListener.removeFromMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", player);
 			deletePlayerData(player);
+			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " deleted his account successfully.");
 			return;
 		}
 		LoginPlayerData data = getPlayerData(player);
@@ -1628,8 +1629,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				throw new CrazyCommandPermissionException();
 			data = new LoginPlayerData(player);
 			tempBans.remove(player.getAddress().getAddress().getHostAddress());
-			logger.log("Register", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " registered successfully.");
+			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " registered successfully.");
 		}
+		else
+			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " changed his password successfully.");
 		if (pluginCommunicationEnabled)
 			new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password).callAsyncEvent();
 		data.setPassword(password);
@@ -1647,6 +1650,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerListener.unhidePlayer(player);
 		getCrazyDatabase().save(data);
 		player.setMetadata("Authenticated", new Authenticated(this, player));
+		unregisterDynamicHooks();
 	}
 
 	@Override

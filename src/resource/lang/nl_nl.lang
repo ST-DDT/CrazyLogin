@@ -12,6 +12,7 @@ CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=$0$ verwijdert $2$ spelers, die inactief 
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=$0$ probeerde alle spelerdata te verwijderen, Die inactief zijn voor $1$ dagen.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNING! Verboden commandos uitgevoert! $0$ @ $1$: $2$
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Crerde account voor $0$!
+#CRAZYLOGIN.COMMAND.PLAYER.DELETE.SUCCESS=
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Veranderde wachtwoord voor $0$!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CWaarschuwing: &EConfirmPassword is Uitgeschakeld!\nJe wachtwoord n keer typen is genoeg.\nIf Dit dubbele paswoord is niet de bedoeling, Je zou het beter veranderen.
 #CRAZYLOGIN.COMMAND.REVERIFY.SUCCESS=

@@ -12,6 +12,7 @@ CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=$0$ deleted $2$ players, who have been in
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=$0$ tried to delete all playerdata, which have been inactive for at least $1$ days.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNING! Forbidden command execution! $0$ @ $1$: $2$
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Created Account for $0$!
+#CRAZYLOGIN.COMMAND.PLAYER.DELETE.SUCCESS=
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Changed Password for $0$!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CWARNING: &EConfirmPassword is disabled!\nTyping your password once is enough.\nIf this double password isn't intended, you should change it.
 CRAZYLOGIN.COMMAND.REVERIFY.SUCCESS=$0$ has to login again!

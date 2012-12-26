@@ -48,6 +48,7 @@ public class CrazyLoginCommandPlayerPassword extends CrazyLoginCommandExecutor
 		data.setPassword(password);
 		plugin.sendLocaleMessage("COMMAND.PLAYER.PASSWORD.SUCCESS", sender, data.getName());
 		plugin.getCrazyDatabase().save(data);
+		plugin.getCrazyLogger().log("Account", data.getName() + " changed his password successfully (via " + sender.getName() + ").");
 		if (!plugin.isConfirmPasswordEnabled())
 			if (passwordArgs.length % 2 == 0)
 				if (ChatHelper.listingString(" ", ChatHelperExtended.cutArray(passwordArgs, passwordArgs.length / 2)).equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(passwordArgs, passwordArgs.length / 2))))

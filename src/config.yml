@@ -167,10 +167,22 @@ minNameLength: 3
 maxNameLength: 16
 # additional information about logging can be found here http://dev.bukkit.org/server-mods/crazycore/pages/logging/
 #logs:
-#  AccessDenied:
+#  Join:
 #    path: false
 #    console: false
-#  Join:
+#  Quit:
+#    path: false
+#    console: false
+#  Login:
+#    path: false
+#    console: false
+#  Account:
+#    path: false
+#    console: false
+#  Logout:
+#    path: false
+#    console: false
+#  LoginFail:
 #    path: false
 #    console: false
 #  ChatBlocked:
@@ -179,18 +191,6 @@ maxNameLength: 16
 #  CommandBlocked:
 #    path: false
 #    console: false
-#  Register:
-#    path: false
-#    console: false
-#  Login:
-#    path: false
-#    console: false
-#  Logout:
-#    path: false
-#    console: false
-#  Quit:
-#    path: false
-#    console: false
-#  LoginFail:
+#  AccessDenied:
 #    path: false
 #    console: false

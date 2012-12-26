@@ -12,6 +12,7 @@ CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=$0$ usunieto $2$ graczy, ktorzy byli niea
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=$0$ probowal usunac wszystkie dane graczy, ktorzy byli nieaktywni przez co najmniej $1$ dni.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CUWAGA! Wykonywanie polecen ZABRONIONE! $0$ @ $1$: $2$
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Konto utworzone dla $0$!
+#CRAZYLOGIN.COMMAND.PLAYER.DELETE.SUCCESS=
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Haslo zmienione dla $0$!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CUWAGA: &EPotwierdzenieHasla zablokowane!\nWystarczy raz wpisac swoje haslo.\nJesli jest to podwojne haslo, nalezy go zmienic.
 #CRAZYLOGIN.COMMAND.REVERIFY.SUCCESS=

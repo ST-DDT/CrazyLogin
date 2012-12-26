@@ -12,6 +12,7 @@ CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=$0$ hat $2$ Spieler gelöscht, die länge
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=$0$ hat versucht alle Spieler, die länger als $1$ Tage inaktiv sind, zu löschen.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNUNG! Vereiteltes Befehlskommando! $0$ @ $1$: $2$
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Account für $0$ erstellt!
+#CRAZYLOGIN.COMMAND.PLAYER.DELETE.SUCCESS=
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Passwort von $0$ geändert!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CWARNUNG: &EPasswortbestätigung ist deaktiviert!\nDu musst das Passwort nur einmal eingeben.\nWenn das doppelte Eingeben nicht beabsichtigt war, solltest du es ändern.
 CRAZYLOGIN.COMMAND.REVERIFY.SUCCESS=$0$ muss sich neu einloggen!
