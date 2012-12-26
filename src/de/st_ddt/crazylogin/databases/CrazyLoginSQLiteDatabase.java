@@ -51,7 +51,7 @@ public final class CrazyLoginSQLiteDatabase extends SQLitePlayerDataDatabase<Log
 	}
 
 	@Override
-	public void save(final LoginPlayerData entry)
+	public void saveWithoutPassword(final LoginPlayerData entry)
 	{
 		if (containsEntry(entry.getName()))
 		{
@@ -86,11 +86,5 @@ public final class CrazyLoginSQLiteDatabase extends SQLitePlayerDataDatabase<Log
 			if (player != null)
 				player.kickPlayer("Your account has been deleted!");
 		}
-	}
-
-	@Override
-	public void saveWithPassword(final LoginPlayerData entry)
-	{
-		super.save(entry);
 	}
 }

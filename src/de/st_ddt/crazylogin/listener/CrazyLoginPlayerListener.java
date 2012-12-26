@@ -367,7 +367,7 @@ public class CrazyLoginPlayerListener implements Listener
 			playerdata.notifyAction();
 			if (plugin.isInstantAutoLogoutEnabled())
 				playerdata.logout();
-			plugin.getCrazyDatabase().save(playerdata);
+			plugin.getCrazyDatabase().saveWithoutPassword(playerdata);
 		}
 	}
 
@@ -386,7 +386,7 @@ public class CrazyLoginPlayerListener implements Listener
 			playerdata.notifyAction();
 			if (plugin.isInstantAutoLogoutEnabled())
 				playerdata.logout();
-			plugin.getCrazyDatabase().save(playerdata);
+			plugin.getCrazyDatabase().saveWithoutPassword(playerdata);
 		}
 	}
 

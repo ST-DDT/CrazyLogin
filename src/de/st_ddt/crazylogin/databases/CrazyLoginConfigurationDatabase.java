@@ -20,7 +20,7 @@ public final class CrazyLoginConfigurationDatabase extends ConfigurationPlayerDa
 	}
 
 	@Override
-	public void saveWithPassword(final LoginPlayerData entry)
+	public void saveWithoutPassword(final LoginPlayerData entry)
 	{
 		save(entry);
 	}

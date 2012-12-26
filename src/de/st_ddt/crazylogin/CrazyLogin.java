@@ -733,7 +733,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final CommandSender sender, final String... args) throws CrazyException
 			{
 				if (args.length > 1)
-					throw new CrazyCommandUsageException("[SaveType (MYSQL/FLAT/CONFIG)]");
+					throw new CrazyCommandUsageException("[SaveType (CONFIG/FLAT/MYSQL/SQLITE)]");
 				final String saveType = args[0];
 				DatabaseType type = null;
 				try
@@ -745,7 +745,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					type = null;
 				}
 				if (type == null)
-					throw new CrazyCommandNoSuchException("SaveType", saveType, "MYSQL", "FLAT", "CONFIG");
+					throw new CrazyCommandNoSuchException("SaveType", saveType, "CONFIG", "FLAT", "MYSQL", "SQLITE");
 				setValue(type);
 				showValue(sender);
 			}
@@ -776,6 +776,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				res.add("CONFIG");
 				res.add("FLAT");
 				res.add("MYSQL");
+				res.add("SQLITE");
 				return res;
 			}
 		});
@@ -1407,7 +1408,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		else
 		{
 			dropInactiveAccounts();
-			sendLocaleMessage("DATABASE.LOADED", Bukkit.getConsoleSender(), database.getAllEntries().size());
+			sendLocaleMessage("DATABASE.LOADED", Bukkit.getConsoleSender(), database.size());
 		}
 	}
 
@@ -1562,10 +1563,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		player.setMetadata("Authenticated", new Authenticated(this, player));
 		if (encryptor instanceof UpdatingEncryptor)
+		{
 			data.setPassword(password);
+			database.save(data);
+		}
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		data.notifyAction();
-		database.save(data);
+		getCrazyDatabase().saveWithoutPassword(data);
 		unregisterDynamicHooks();
 	}
 
@@ -1582,7 +1586,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		{
 			data.notifyAction();
 			data.logout();
-			database.save(data);
+			getCrazyDatabase().saveWithoutPassword(data);
 		}
 		player.removeMetadata("Authenticated", this);
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
@@ -1641,7 +1645,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
 		playerListener.unhidePlayer(player);
-		getCrazyDatabase().saveWithPassword(data);
+		getCrazyDatabase().save(data);
 		player.setMetadata("Authenticated", new Authenticated(this, player));
 	}
 

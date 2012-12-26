@@ -6,5 +6,5 @@ import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
 public interface CrazyLoginDataDatabase extends PlayerDataDatabase<LoginPlayerData>
 {
 
-	public void saveWithPassword(LoginPlayerData entry);
+	public void saveWithoutPassword(LoginPlayerData entry);
 }

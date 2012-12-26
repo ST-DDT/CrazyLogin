@@ -38,7 +38,7 @@ public class CrazyLoginCommandPlayerDetachIP extends CrazyLoginCommandExecutor
 				plugin.sendLocaleMessage("COMMAND.PLAYER.DETACHIP.SUCCESS", sender, data.getName(), ip);
 			else
 				plugin.sendLocaleMessage("COMMAND.PLAYER.DETACHIP.FAIL", sender, data.getName(), ip);
-		plugin.getCrazyDatabase().save(data);
+		plugin.getCrazyDatabase().saveWithoutPassword(data);
 	}
 
 	@Override
