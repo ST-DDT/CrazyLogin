@@ -301,7 +301,8 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 				plugin.requestLogin(player);
 				plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + IP + " tried to execute", event.getMessage());
 			}
-			plugin.broadcastLocaleMessage(true, "crazylogin.warncommandexploits", true, "COMMAND.EXPLOITWARN", player.getName(), IP, event.getMessage().replaceAll("\\$", "_"));
+			if (!plugin.isHidingWarningsEnabled())
+				plugin.broadcastLocaleMessage(true, "crazylogin.warncommandexploits", true, "COMMAND.EXPLOITWARN", player.getName(), IP, event.getMessage().replaceAll("\\$", "_"));
 		}
 	}
 

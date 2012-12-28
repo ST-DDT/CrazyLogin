@@ -69,6 +69,10 @@ confirmPassword: false
 # if true if everyone is logged in protection will be disabled to decrease overall performance usage, 
 # but increase join, login and quit performance 
 dynamicProtection: false
+# hides LOGIN.FAILEDWARN & COMMAND.EXPLOITWARN messages
+# INFO: some other warn messages will be hidden in the future too.
+# WARNING: you won't notice any (blocked) attempt to hack the server (until he managed to do so). 
+hideWarnings: false
 # you have to login again after being inactive/offline for at least x seconds
 # when using a new ip you are logged out automatically
 autoLogout: 3600

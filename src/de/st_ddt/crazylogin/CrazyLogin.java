@@ -132,6 +132,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean alwaysNeedPassword;
 	private boolean confirmPassword;
 	private boolean dynamicProtection;
+	private boolean hideWarnings;
 	private int autoLogout;
 	private int autoKick;
 	private long autoTempBan;
@@ -253,6 +254,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					unregisterDynamicHooks();
 				else
 					registerDynamicHooks();
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("hideWarnings")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return hideWarnings;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				hideWarnings = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1270,6 +1287,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		confirmPassword = config.getBoolean("confirmPassword", false);
 		dynamicProtection = config.getBoolean("dynamicProtection", false);
+		hideWarnings = config.getBoolean("hideWarnings", false);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
 		autoTempBan = Math.max(config.getInt("autoTempBan", -1), -1);
 		tempBans.clear();
@@ -1430,6 +1448,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("confirmPassword", confirmPassword);
 		config.set("dynamicProtection", dynamicProtection);
+		config.set("hideWarnings", hideWarnings);
 		config.set("autoLogout", autoLogout);
 		config.set("autoKick", autoKick);
 		config.set("autoTempBan", autoTempBan);
@@ -1529,7 +1548,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (!data.login(password))
 		{
 			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.WRONG_PASSWORD).callAsyncEvent();
-			broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
+			if (!plugin.isHidingWarningsEnabled())
+				broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			Integer fails = loginFailures.get(player.getName().toLowerCase());
 			if (fails == null)
 				fails = 0;
@@ -1692,6 +1712,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public boolean isConfirmPasswordEnabled()
 	{
 		return confirmPassword;
+	}
+
+	public boolean isHidingWarningsEnabled()
+	{
+		return hideWarnings;
 	}
 
 	@Override
