@@ -1362,8 +1362,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	public void loadConfigurationForWorld(final World world)
 	{
-		final ConfigurationSection saveLoginLocationsConfig = getConfig().getConfigurationSection("saveLoginLocations");
-		final Location location = ObjectSaveLoadHelper.loadLocation(saveLoginLocationsConfig.getConfigurationSection(world.getName()), null);
+		final Location location = ObjectSaveLoadHelper.loadLocation(getConfig().getConfigurationSection("saveLoginLocations." + world.getName()), null);
 		if (location == null)
 			saveLoginLocations.put(world.getName(), world.getSpawnLocation());
 		else
