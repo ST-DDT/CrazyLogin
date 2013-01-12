@@ -1625,7 +1625,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (password.length() == 0)
 		{
 			if (alwaysNeedPassword || PermissionModule.hasPermission(player, "crazylogin.requirepassword"))
-				throw new CrazyCommandUsageException("<Passwort>" + (confirmPassword ? " <Passwort>" : ""));
+				throw new CrazyCommandUsageException("<Password>" + (confirmPassword ? " <Password>" : ""));
 			playerListener.removeFromMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", player);
 			deletePlayerData(player);
