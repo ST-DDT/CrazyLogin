@@ -28,7 +28,7 @@ public class CrazyLoginCommandPlayerPassword extends CrazyLoginCommandExecutor
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
 		if (args.length < (plugin.isConfirmPasswordEnabled() ? 3 : 2))
-			throw new CrazyCommandUsageException("<Player> <Passwort>" + (plugin.isConfirmPasswordEnabled() ? " <Password>" : ""));
+			throw new CrazyCommandUsageException("<Player> <Password>" + (plugin.isConfirmPasswordEnabled() ? " <Password>" : ""));
 		final LoginPlayerData data = plugin.getPlayerData(args[0]);
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player (with Account)", args[0]);
