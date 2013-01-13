@@ -22,6 +22,7 @@ public final class CrazyLoginMessageListener extends CrazyPluginMessageListener<
 	@Override
 	protected void pluginMessageQuerryRecieved(final String channel, final Player player, final String header, final String args)
 	{
+		System.out.println(channel + "_" + header + "_" + args);
 		if (channel.equals(plugin.getName()))
 		{
 			if (header.equals("sAuth"))
@@ -61,7 +62,7 @@ public final class CrazyLoginMessageListener extends CrazyPluginMessageListener<
 				sendPluginMessage(channel, player, "A_Login " + (plugin.isLoggedIn(player) ? "true" : "false"));
 				return;
 			}
-			if (header.startsWith("ChgPW "))
+			if (header.startsWith("ChgPW"))
 			{
 				if (plugin.hasPlayerData(player))
 					if (!plugin.isLoggedIn(player))
