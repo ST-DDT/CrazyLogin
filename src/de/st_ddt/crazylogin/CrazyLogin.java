@@ -127,6 +127,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginDynamicPlayerListener dynamicPlayerListener;
 	private CrazyLoginDynamicVehicleListener dynamicVehicleListener;
+	private CrazyLoginMessageListener messageListener;
 	private boolean dynamicHooksRegistered;
 	// plugin config
 	private boolean alwaysNeedPassword;
@@ -1141,7 +1142,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		pm.registerEvents(crazylistener, this);
 		pm.registerEvents(new CrazyLoginWorldListener(this), this);
 		registerDynamicHooks();
-		final CrazyLoginMessageListener messageListener = new CrazyLoginMessageListener(this);
+		messageListener = new CrazyLoginMessageListener(this);
 		final Messenger ms = getServer().getMessenger();
 		ms.registerIncomingPluginChannel(this, "CrazyLogin", messageListener);
 		ms.registerOutgoingPluginChannel(this, "CrazyLogin");
@@ -1655,6 +1656,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (pluginCommunicationEnabled)
 			new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password).callAsyncEvent();
 		data.setPassword(password);
+		messageListener.sendMessage(player, "Q_StorePW " + password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player, password);
 		if (wasGuest)
@@ -2089,6 +2091,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					continue;
 			sendLocaleMessage(locale, player, args);
 		}
+	}
+
+	public CrazyLoginMessageListener getMessageListener()
+	{
+		return messageListener;
 	}
 
 	public boolean isDynamicProtectionEnabled()

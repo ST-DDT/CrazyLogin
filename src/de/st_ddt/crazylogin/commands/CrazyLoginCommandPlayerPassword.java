@@ -46,6 +46,8 @@ public class CrazyLoginCommandPlayerPassword extends CrazyLoginCommandExecutor
 		else
 			password = ChatHelper.listingString(" ", passwordArgs);
 		data.setPassword(password);
+		if (data.isOnline())
+			plugin.getMessageListener().sendMessage(data.getPlayer(), "Q_StorePW " + password);
 		plugin.sendLocaleMessage("COMMAND.PLAYER.PASSWORD.SUCCESS", sender, data.getName());
 		plugin.getCrazyDatabase().save(data);
 		plugin.getCrazyLogger().log("Account", data.getName() + " changed his password successfully (via " + sender.getName() + ").");
