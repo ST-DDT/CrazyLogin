@@ -1268,7 +1268,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		for (final Player player : Bukkit.getOnlinePlayers())
 		{
 			playerListener.PlayerJoin(player);
-			messageListener.sendMessage(player, "A_State " + (hasPlayerData(player) ? "1" : "0") + " 0");
+			messageListener.sendPluginMessage(player, "A_State " + (hasPlayerData(player) ? "1" : "0") + " 0");
 		}
 	}
 
@@ -1659,7 +1659,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (pluginCommunicationEnabled)
 			new CrazyLoginPasswordEvent(player, password).callEvent();
 		data.setPassword(password);
-		messageListener.sendMessage(player, "Q_StorePW " + password);
+		messageListener.sendPluginMessage(player, "Q_StorePW " + password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player, password);
 		if (wasGuest)

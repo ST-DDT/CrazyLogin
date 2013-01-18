@@ -54,7 +54,7 @@ public class CrazyLoginCommandPlayerCreate extends CrazyLoginCommandExecutor
 			password = ChatHelper.listingString(" ", passwordArgs);
 		data.setPassword(password);
 		if (data.isOnline())
-			plugin.getMessageListener().sendMessage(data.getPlayer(), "Q_StorePW " + password);
+			plugin.getMessageListener().sendPluginMessage(data.getPlayer(), "Q_StorePW " + password);
 		plugin.sendLocaleMessage("COMMAND.PLAYER.CREATE.SUCCESS", sender, name);
 		plugin.getCrazyDatabase().save(data);
 		plugin.getCrazyLogger().log("Account", data.getName() + " registered successfully (via " + sender.getName() + ").");
