@@ -358,7 +358,7 @@ public class CrazyLoginPlayerListener implements Listener
 		if (playerdata == null)
 		{
 			if (plugin.isRemovingGuestDataEnabled())
-				new CrazyPlayerRemoveEvent(plugin, player).callEvent();
+				new CrazyPlayerRemoveEvent(player).callEvent();
 		}
 		else
 		{

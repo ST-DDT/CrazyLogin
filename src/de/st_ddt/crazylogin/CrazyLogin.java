@@ -1519,7 +1519,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 						deletions.add(data.getName());
 		}
 		for (final String name : deletions)
-			new CrazyPlayerRemoveEvent(this, name).checkAndCallEvent();
+			new CrazyPlayerRemoveEvent(name).checkAndCallEvent();
 		return deletions.size();
 	}
 
@@ -1530,24 +1530,24 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (database == null)
 			throw new CrazyCommandCircumstanceException("when database is accessible");
 		final LoginPlayerData data = database.getEntry(player);
-		final CrazyLoginPreLoginEvent<LoginPlayerData> event = new CrazyLoginPreLoginEvent<LoginPlayerData>(this, player, data);
+		final CrazyLoginPreLoginEvent event = new CrazyLoginPreLoginEvent(player, data);
 		event.callEvent();
 		if (event.isCancelled())
 		{
-			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.CANCELLED).callEvent();
+			new CrazyLoginLoginFailEvent(player, data, LoginFailReason.CANCELLED).callEvent();
 			sendLocaleMessage("LOGIN.FAILED", player);
 			return;
 		}
 		if (data == null)
 		{
-			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.NO_ACCOUNT).callEvent();
+			new CrazyLoginLoginFailEvent(player, data, LoginFailReason.NO_ACCOUNT).callEvent();
 			sendLocaleMessage("REGISTER.HEADER", player);
 			return;
 		}
 		final boolean wasOnline = data.isLoggedIn();
 		if (!data.login(password))
 		{
-			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.WRONG_PASSWORD).callEvent();
+			new CrazyLoginLoginFailEvent(player, data, LoginFailReason.WRONG_PASSWORD).callEvent();
 			if (!plugin.isHidingWarningsEnabled())
 				broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			Integer fails = loginFailures.get(player.getName().toLowerCase());
@@ -1567,7 +1567,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			logger.log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong password");
 			return;
 		}
-		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callEvent();
+		new CrazyLoginLoginEvent(player, data).callEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
 		logger.log("Login", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged in successfully.");
 		if (!wasOnline)
@@ -1643,7 +1643,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				if (maxRegistrationsPerIP != -1)
 					if (associates.size() >= maxRegistrationsPerIP)
 						throw new CrazyLoginExceedingMaxRegistrationsPerIPException(maxRegistrationsPerIP, associates);
-			final CrazyLoginPreRegisterEvent<LoginPlayerData> event = new CrazyLoginPreRegisterEvent<LoginPlayerData>(this, player, data);
+			final CrazyLoginPreRegisterEvent event = new CrazyLoginPreRegisterEvent(player, data);
 			event.callEvent();
 			if (event.isCancelled())
 				throw new CrazyCommandPermissionException();
@@ -1654,7 +1654,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		else
 			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " changed his password successfully.");
 		if (pluginCommunicationEnabled)
-			new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password).callEvent();
+			new CrazyLoginPasswordEvent(player, password).callEvent();
 		data.setPassword(password);
 		messageListener.sendMessage(player, "Q_StorePW " + password);
 		data.login(password);
