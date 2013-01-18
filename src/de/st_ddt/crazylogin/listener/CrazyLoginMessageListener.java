@@ -121,7 +121,7 @@ public final class CrazyLoginMessageListener extends CrazyPluginMessageListener<
 		return encryptor.encrypt(player.getName(), null, plugin.getUniqueIDKey());
 	}
 
-	public void sendMessage(Player player, String message)
+	public void sendMessage(final Player player, final String message)
 	{
 		// EDIT remove this after next CrazyCore update
 		sendPluginMessage(player, message);
