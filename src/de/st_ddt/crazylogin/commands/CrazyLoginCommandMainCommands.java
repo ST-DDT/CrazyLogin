@@ -63,7 +63,7 @@ public class CrazyLoginCommandMainCommands extends CrazyCommandListEditor<CrazyL
 	@Localized("CRAZYLOGIN.COMMAND.COMMANDS.ADDED $Element$")
 	public String addLocale()
 	{
-		return "COMMAND.COMMANDS.ADDED";
+		return "CRAZYLOGIN.COMMAND.COMMANDS.ADDED";
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class CrazyLoginCommandMainCommands extends CrazyCommandListEditor<CrazyL
 	@Localized("CRAZYLOGIN.COMMAND.COMMANDS.REMOVED $Element$")
 	public String removeLocale()
 	{
-		return "COMMAND.COMMANDS.REMOVED";
+		return "CRAZYLOGIN.COMMAND.COMMANDS.REMOVED";
 	}
 
 	@Override
@@ -96,5 +96,11 @@ public class CrazyLoginCommandMainCommands extends CrazyCommandListEditor<CrazyL
 	public String getEntry(final String... args) throws CrazyException
 	{
 		return ChatHelper.listingString(" ", args);
+	}
+
+	@Override
+	protected void saveChanges()
+	{
+		plugin.saveConfiguration();
 	}
 }
