@@ -1534,20 +1534,20 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		event.callEvent();
 		if (event.isCancelled())
 		{
-			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.CANCELLED).callAsyncEvent();
+			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.CANCELLED).callEvent();
 			sendLocaleMessage("LOGIN.FAILED", player);
 			return;
 		}
 		if (data == null)
 		{
-			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.NO_ACCOUNT).callAsyncEvent();
+			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.NO_ACCOUNT).callEvent();
 			sendLocaleMessage("REGISTER.HEADER", player);
 			return;
 		}
 		final boolean wasOnline = data.isLoggedIn();
 		if (!data.login(password))
 		{
-			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.WRONG_PASSWORD).callAsyncEvent();
+			new CrazyLoginLoginFailEvent<LoginPlayerData>(this, player, data, LoginFailReason.WRONG_PASSWORD).callEvent();
 			if (!plugin.isHidingWarningsEnabled())
 				broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			Integer fails = loginFailures.get(player.getName().toLowerCase());
@@ -1567,7 +1567,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			logger.log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong password");
 			return;
 		}
-		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callAsyncEvent();
+		new CrazyLoginLoginEvent<LoginPlayerData>(this, player, data).callEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
 		logger.log("Login", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged in successfully.");
 		if (!wasOnline)
@@ -1654,7 +1654,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		else
 			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " changed his password successfully.");
 		if (pluginCommunicationEnabled)
-			new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password).callAsyncEvent();
+			new CrazyLoginPasswordEvent<LoginPlayerData>(this, player, password).callEvent();
 		data.setPassword(password);
 		messageListener.sendMessage(player, "Q_StorePW " + password);
 		data.login(password);
