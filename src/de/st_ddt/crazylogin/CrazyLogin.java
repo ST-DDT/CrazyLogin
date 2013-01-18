@@ -1266,7 +1266,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		registerMetrics();
 		// OnlinePlayer
 		for (final Player player : Bukkit.getOnlinePlayers())
+		{
 			playerListener.PlayerJoin(player);
+			messageListener.sendMessage(player, "A_State " + (hasPlayerData(player) ? "1" : "0") + " 0");
+		}
 	}
 
 	@Override
