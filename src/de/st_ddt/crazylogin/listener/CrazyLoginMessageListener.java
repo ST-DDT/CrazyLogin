@@ -22,7 +22,6 @@ public final class CrazyLoginMessageListener extends CrazyPluginMessageListener<
 	@Override
 	protected void pluginMessageQuerryRecieved(final String channel, final Player player, final String header, final String args)
 	{
-		System.out.println(channel + "_" + header + "_" + args);
 		if (channel.equals(plugin.getName()))
 		{
 			if (header.equals("sAuth"))
