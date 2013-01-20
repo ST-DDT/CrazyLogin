@@ -252,7 +252,8 @@ public final class LoginPlayerData extends PlayerData<LoginPlayerData> implement
 	public void addIP(final String ip)
 	{
 		final int max = getPlugin().getMaxStoredIPs();
-		ips.remove(ip);
+		while (ips.remove(ip))
+			;
 		ips.add(0, ip);
 		while (ips.size() > max)
 			ips.remove(max);
