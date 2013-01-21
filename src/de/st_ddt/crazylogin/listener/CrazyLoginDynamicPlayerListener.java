@@ -271,7 +271,7 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 		event.setCancelled(true);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	@Localized({ "CRAZYLOGIN.KICKED.COMMANDUSAGE", "CRAZYLOGIN.COMMAND.EXPLOITWARN $Name$ $IP$ $Command$" })
 	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{
