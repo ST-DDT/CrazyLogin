@@ -39,6 +39,7 @@ permissions:
       crazylogin.warndatabase: true
       crazylogin.warndelete: true
       crazylogin.warnsession: true
+      crazylogin.bypasshidePlayer: true
       crazylogin.register.command: true
       crazylogin.register.channel: true
       crazylogin.login.command: true
@@ -67,6 +68,7 @@ permissions:
       crazylogin.warndatabase: true
       crazylogin.warndelete: true
       crazylogin.warnsession: true
+      crazylogin.bypasshidePlayer: true
       crazylogin.register.command: true
       crazylogin.register.channel: true
       crazylogin.login.command: true
@@ -139,11 +141,14 @@ permissions:
   crazylogin.warnalgorithm:
     description: Get informed if no algorithm is set.
     default: op
+  crazylogin.warndelete:
+    description: Get informed if old accounts are deleted (via admincommands)
+    default: op
   crazylogin.warnsession:
     description: Get informed if somebody tries to login from another location.
     default: op
-  crazylogin.warndelete:
-    description: Get informed if old accounts are deleted (via admincommands)
+  crazylogin.bypasshidePlayer:
+    description: Show all players to this player even if they are hidden due to hidePlayer option.
     default: op
   crazylogin.mode:
     description: Allow changing plugin mode

@@ -466,11 +466,12 @@ public class CrazyLoginPlayerListener implements Listener
 
 	public void hidePlayer(final Player player)
 	{
-		final Set<Player> hides = new HashSet<Player>();
 		final boolean loggedIn = plugin.isLoggedIn(player);
 		if (loggedIn)
 			synchronized (hiddenPlayers)
 			{
+				if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
+					return;
 				for (final Player other : Bukkit.getOnlinePlayers())
 					if (player != other)
 					{
@@ -486,15 +487,17 @@ public class CrazyLoginPlayerListener implements Listener
 		else
 			synchronized (hiddenPlayers)
 			{
+				final Set<Player> hides = new HashSet<Player>();
 				hiddenPlayers.put(player, hides);
 				for (final Player other : Bukkit.getOnlinePlayers())
 					if (player != other)
 					{
-						if (other.canSee(player))
-						{
-							other.hidePlayer(player);
-							hides.add(other);
-						}
+						if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
+							if (other.canSee(player))
+							{
+								other.hidePlayer(player);
+								hides.add(other);
+							}
 						final Set<Player> hides2 = hiddenPlayers.get(other);
 						if (hides2 != null)
 							if (player.canSee(other))
@@ -514,6 +517,10 @@ public class CrazyLoginPlayerListener implements Listener
 			if (hides != null)
 				for (final Player other : hides)
 					other.showPlayer(player);
+			if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
+				for (final Entry<Player, Set<Player>> other : hiddenPlayers.entrySet())
+					if (other.getValue().remove(player))
+						player.showPlayer(other.getKey());
 		}
 	}
 
