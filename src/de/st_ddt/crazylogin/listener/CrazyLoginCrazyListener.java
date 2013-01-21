@@ -47,8 +47,7 @@ public final class CrazyLoginCrazyListener implements Listener
 		if (data == null)
 			return;
 		for (final String ip : data.getIPs())
-			for (final LoginPlayerData players : plugin.getPlayerDatasPerIP(ip))
-				event.add(players.getName());
+			event.addNamed(plugin.getPlayerDatasPerIP(ip));
 	}
 
 	@EventHandler
