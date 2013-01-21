@@ -156,6 +156,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean forceSaveLogin;
 	private boolean hideInventory;
 	private boolean hidePlayer;
+	private boolean hideChat;
 	private boolean delayJoinQuitMessages;
 	private boolean useCustomJoinQuitMessages;
 	private boolean hidePasswordsFromConsole;
@@ -319,6 +320,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				hidePlayer = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(modeCommand.new BooleanFalseMode("hideChat")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return hideChat;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				hideChat = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1325,6 +1342,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			loadConfigurationForWorld(world);
 		hideInventory = config.getBoolean("hideInventory", false);
 		hidePlayer = config.getBoolean("hidePlayer", false);
+		hideChat = config.getBoolean("hideChat", false);
 		delayJoinQuitMessages = config.getBoolean("delayJoinQuitMessages", delayJoinQuitMessages);
 		useCustomJoinQuitMessages = config.getBoolean("useCustomJoinQuitMessages", true);
 		hidePasswordsFromConsole = config.getBoolean("hidePasswordsFromConsole", false);
@@ -1476,6 +1494,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			ObjectSaveLoadHelper.saveLocation(config, "saveLoginLocations." + entry.getKey() + ".", entry.getValue(), true, true);
 		config.set("hideInventory", hideInventory);
 		config.set("hidePlayer", hidePlayer);
+		config.set("hideChat", hideChat);
 		config.set("delayJoinQuitMessages", delayJoinQuitMessages);
 		config.set("useCustomJoinQuitMessages", useCustomJoinQuitMessages);
 		config.set("hidePasswordsFromConsole", hidePasswordsFromConsole);
@@ -1920,6 +1939,12 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public boolean isHidingPlayerEnabled()
 	{
 		return hidePlayer;
+	}
+
+	@Override
+	public boolean isHidingChatEnabled()
+	{
+		return hideChat;
 	}
 
 	public boolean isDelayingJoinQuitMessagesEnabled()

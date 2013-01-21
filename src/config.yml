@@ -140,6 +140,8 @@ saveLoginLocations: {}
 hideInventory: false
 # hide every player which isn't logged in. (true/false)
 hidePlayer: false
+# hide chat from players who aren't logged in to avoid espionage. (true/false)
+hideChat: false
 # Delay Join messages until login / hide Quit messages if not logged in. (true/false)
 delayJoinQuitMessages: false
 # use the multilingual messages defined in the lang files. (true/false)

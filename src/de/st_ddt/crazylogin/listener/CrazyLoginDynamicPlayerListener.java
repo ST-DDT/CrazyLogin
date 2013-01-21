@@ -1,6 +1,8 @@
 package de.st_ddt.crazylogin.listener;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.bukkit.Location;
@@ -351,5 +353,22 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 			plugin.getCrazyLogger().log("ChatBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to chat", message);
 		plugin.requestLogin(player);
 		return false;
+	}
+
+	protected final void PlayerChatHide(final Player player, final Set<Player> recipients)
+	{
+		try
+		{
+			final Iterator<Player> it = recipients.iterator();
+			while (it.hasNext())
+			{
+				final Player recipient = it.next();
+				if (!plugin.isLoggedIn(recipient))
+					it.remove();
+			}
+			recipients.add(player.getPlayer());
+		}
+		catch (final UnsupportedOperationException e)
+		{}
 	}
 }

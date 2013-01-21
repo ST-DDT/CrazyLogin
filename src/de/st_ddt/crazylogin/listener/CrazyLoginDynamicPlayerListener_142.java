@@ -45,4 +45,11 @@ public class CrazyLoginDynamicPlayerListener_142 extends CrazyLoginDynamicPlayer
 		if (!PlayerChat(event.getPlayer(), event.getMessage()))
 			event.setCancelled(true);
 	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	public void PlayerChatHide(final AsyncPlayerChatEvent event)
+	{
+		if (plugin.isHidingChatEnabled())
+			PlayerChatHide(event.getPlayer(), event.getRecipients());
+	}
 }
