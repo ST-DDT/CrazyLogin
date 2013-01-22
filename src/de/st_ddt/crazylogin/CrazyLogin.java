@@ -109,6 +109,12 @@ import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.metrics.Metrics;
 import de.st_ddt.crazyutil.metrics.Metrics.Graph;
 import de.st_ddt.crazyutil.metrics.Metrics.Plotter;
+import de.st_ddt.crazyutil.modes.BooleanFalseMode;
+import de.st_ddt.crazyutil.modes.BooleanTrueMode;
+import de.st_ddt.crazyutil.modes.DoubleMode;
+import de.st_ddt.crazyutil.modes.IntegerMode;
+import de.st_ddt.crazyutil.modes.LongMode;
+import de.st_ddt.crazyutil.modes.Mode;
 import de.st_ddt.crazyutil.modules.login.CrazyLoginSystem;
 import de.st_ddt.crazyutil.modules.login.LoginModule;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
@@ -207,7 +213,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	@Localized("CRAZYLOGIN.MODE.CHANGE $Name$ $Value$")
 	private void registerModes()
 	{
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("alwaysNeedPassword")
+		modeCommand.addMode(new BooleanFalseMode(this, "alwaysNeedPassword")
 		{
 
 			@Override
@@ -223,7 +229,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("confirmPassword")
+		modeCommand.addMode(new BooleanFalseMode(this, "confirmPassword")
 		{
 
 			@Override
@@ -239,7 +245,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("dynamicProtection")
+		modeCommand.addMode(new BooleanFalseMode(this, "dynamicProtection")
 		{
 
 			@Override
@@ -259,7 +265,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("hideWarnings")
+		modeCommand.addMode(new BooleanFalseMode(this, "hideWarnings")
 		{
 
 			@Override
@@ -275,7 +281,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("forceSaveLogin")
+		modeCommand.addMode(new BooleanFalseMode(this, "forceSaveLogin")
 		{
 
 			@Override
@@ -291,7 +297,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("hideInventory")
+		modeCommand.addMode(new BooleanFalseMode(this, "hideInventory")
 		{
 
 			@Override
@@ -307,7 +313,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("hidePlayer")
+		modeCommand.addMode(new BooleanFalseMode(this, "hidePlayer")
 		{
 
 			@Override
@@ -323,7 +329,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("hideChat")
+		modeCommand.addMode(new BooleanFalseMode(this, "hideChat")
 		{
 
 			@Override
@@ -339,7 +345,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("delayJoinQuitMessages")
+		modeCommand.addMode(new BooleanFalseMode(this, "delayJoinQuitMessages")
 		{
 
 			@Override
@@ -355,7 +361,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("useCustomJoinQuitMessages")
+		modeCommand.addMode(new BooleanFalseMode(this, "useCustomJoinQuitMessages")
 		{
 
 			@Override
@@ -371,7 +377,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("hidePasswordsFromConsole")
+		modeCommand.addMode(new BooleanFalseMode(this, "hidePasswordsFromConsole")
 		{
 
 			@Override
@@ -387,7 +393,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("disableRegistrations")
+		modeCommand.addMode(new BooleanFalseMode(this, "disableRegistrations")
 		{
 
 			@Override
@@ -403,7 +409,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanTrueMode("disableAdminLogin")
+		modeCommand.addMode(new BooleanTrueMode(this, "disableAdminLogin")
 		{
 
 			@Override
@@ -419,7 +425,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("doNotSpamRequests")
+		modeCommand.addMode(new BooleanFalseMode(this, "doNotSpamRequests")
 		{
 
 			@Override
@@ -435,7 +441,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("doNotSpamRegisterRequests")
+		modeCommand.addMode(new BooleanFalseMode(this, "doNotSpamRegisterRequests")
 		{
 
 			@Override
@@ -451,7 +457,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("forceSingleSession")
+		modeCommand.addMode(new BooleanFalseMode(this, "forceSingleSession")
 		{
 
 			@Override
@@ -467,7 +473,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("forceSingleSessionSameIPBypass")
+		modeCommand.addMode(new BooleanFalseMode(this, "forceSingleSessionSameIPBypass")
 		{
 
 			@Override
@@ -483,7 +489,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("autoLogout")
+		modeCommand.addMode(new IntegerMode(this, "autoLogout")
 		{
 
 			@Override
@@ -505,7 +511,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("autoKick")
+		modeCommand.addMode(new IntegerMode(this, "autoKick")
 		{
 
 			@Override
@@ -527,7 +533,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new LongMode("autoTempBan")
+		modeCommand.addMode(new LongMode(this, "autoTempBan")
 		{
 
 			@Override
@@ -549,7 +555,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("autoKickUnregistered")
+		modeCommand.addMode(new IntegerMode(this, "autoKickUnregistered")
 		{
 
 			@Override
@@ -571,7 +577,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("autoKickLoginFailer")
+		modeCommand.addMode(new IntegerMode(this, "autoKickLoginFailer")
 		{
 
 			@Override
@@ -593,7 +599,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new LongMode("autoTempBanLoginFailer")
+		modeCommand.addMode(new LongMode(this, "autoTempBanLoginFailer")
 		{
 
 			@Override
@@ -615,7 +621,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("autoKickCommandUsers")
+		modeCommand.addMode(new BooleanFalseMode(this, "autoKickCommandUsers")
 		{
 
 			@Override
@@ -631,7 +637,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("blockGuestCommands")
+		modeCommand.addMode(new BooleanFalseMode(this, "blockGuestCommands")
 		{
 
 			@Override
@@ -647,7 +653,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("blockGuestChat")
+		modeCommand.addMode(new BooleanFalseMode(this, "blockGuestChat")
 		{
 
 			@Override
@@ -663,7 +669,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("blockGuestJoin")
+		modeCommand.addMode(new BooleanFalseMode(this, "blockGuestJoin")
 		{
 
 			@Override
@@ -679,7 +685,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("removeGuestData")
+		modeCommand.addMode(new BooleanFalseMode(this, "removeGuestData")
 		{
 
 			@Override
@@ -695,7 +701,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("maxStoredIPs")
+		modeCommand.addMode(new IntegerMode(this, "maxStoredIPs")
 		{
 
 			@Override
@@ -711,7 +717,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("maxRegistrationsPerIP")
+		modeCommand.addMode(new IntegerMode(this, "maxRegistrationsPerIP")
 		{
 
 			@Override
@@ -733,7 +739,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("maxOnlinesPerIP")
+		modeCommand.addMode(new IntegerMode(this, "maxOnlinesPerIP")
 		{
 
 			@Override
@@ -755,7 +761,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new Mode<DatabaseType>("saveType", DatabaseType.class)
+		modeCommand.addMode(new Mode<DatabaseType>(this, "saveType", DatabaseType.class)
 		{
 
 			@Override
@@ -815,7 +821,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				return res;
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("autoDelete")
+		modeCommand.addMode(new IntegerMode(this, "autoDelete")
 		{
 
 			@Override
@@ -837,10 +843,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				autoDelete = Math.max(newValue, -1);
 				saveConfiguration();
 				if (autoDelete != -1)
-					getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new DropInactiveAccountsTask(plugin), 20 * 60 * 60, 20 * 60 * 60 * 6);
+					getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new DropInactiveAccountsTask(CrazyLogin.this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 			}
 		});
-		modeCommand.addMode(modeCommand.new DoubleMode("moveRange")
+		modeCommand.addMode(new DoubleMode(this, "moveRange")
 		{
 
 			@Override
@@ -862,7 +868,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new Mode<String>("filterNames", String.class)
+		modeCommand.addMode(new Mode<String>(this, "filterNames", String.class)
 		{
 
 			@Override
@@ -896,7 +902,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("blockDifferentNameCases")
+		modeCommand.addMode(new BooleanFalseMode(this, "blockDifferentNameCases")
 		{
 
 			@Override
@@ -912,7 +918,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("minNameLength")
+		modeCommand.addMode(new IntegerMode(this, "minNameLength")
 		{
 
 			@Override
@@ -934,7 +940,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new IntegerMode("maxNameLength")
+		modeCommand.addMode(new IntegerMode(this, "maxNameLength")
 		{
 
 			@Override
@@ -956,7 +962,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new BooleanFalseMode("saveDatabaseOnShutdown")
+		modeCommand.addMode(new BooleanFalseMode(this, "saveDatabaseOnShutdown")
 		{
 
 			@Override
@@ -972,7 +978,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(modeCommand.new Mode<Encryptor>("algorithm", Encryptor.class)
+		modeCommand.addMode(new Mode<Encryptor>(this, "algorithm", Encryptor.class)
 		{
 
 			@Override
@@ -984,7 +990,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			@Override
 			public void setValue(final CommandSender sender, final String... args) throws CrazyException
 			{
-				final Encryptor encryptor = EncryptHelper.getEncryptor(plugin, args[0], ChatHelperExtended.shiftArray(args, 1));
+				final Encryptor encryptor = EncryptHelper.getEncryptor(CrazyLogin.this, args[0], ChatHelperExtended.shiftArray(args, 1));
 				if (encryptor == null)
 					throw new CrazyCommandNoSuchException("Encryptor", args[0], EncryptHelper.getAlgorithms());
 				setValue(encryptor);
@@ -997,7 +1003,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				if (encryptor.equals(newValue))
 					encryptor = newValue;
 				else
-					encryptor = new ChangedAlgorithmEncryptor(plugin, newValue, encryptor);
+					encryptor = new ChangedAlgorithmEncryptor(CrazyLogin.this, newValue, encryptor);
 				saveConfiguration();
 			}
 
