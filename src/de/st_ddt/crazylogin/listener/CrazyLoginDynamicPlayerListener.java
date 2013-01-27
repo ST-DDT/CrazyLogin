@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
@@ -141,7 +142,15 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 		if (dist >= moveRange)
 		{
 			if (dist >= moveRange * 2)
-				player.teleport(current, TeleportCause.PLUGIN);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						player.teleport(current, TeleportCause.PLUGIN);
+					}
+				});
 			event.setCancelled(true);
 			plugin.requestLogin(event.getPlayer());
 		}
