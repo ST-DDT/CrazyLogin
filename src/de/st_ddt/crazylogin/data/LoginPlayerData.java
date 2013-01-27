@@ -27,7 +27,7 @@ import de.st_ddt.crazyutil.databases.SQLitePlayerDataDatabaseEntry;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
 import de.st_ddt.crazyutil.locales.Localized;
 
-public final class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationPlayerDataDatabaseEntry, MySQLPlayerDataDatabaseEntry, SQLitePlayerDataDatabaseEntry, FlatPlayerDataDatabaseEntry, LoginData
+public class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationPlayerDataDatabaseEntry, MySQLPlayerDataDatabaseEntry, SQLitePlayerDataDatabaseEntry, FlatPlayerDataDatabaseEntry, LoginData
 {
 
 	private String password;
