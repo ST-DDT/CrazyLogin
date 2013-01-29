@@ -466,71 +466,62 @@ public class CrazyLoginPlayerListener implements Listener
 
 	public void hidePlayer(final Player player)
 	{
-		final boolean loggedIn = plugin.isLoggedIn(player);
-		if (loggedIn)
-			synchronized (hiddenPlayers)
-			{
-				if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
-					return;
-				for (final Player other : Bukkit.getOnlinePlayers())
-					if (player != other)
-					{
-						final Set<Player> hides2 = hiddenPlayers.get(other);
-						if (hides2 != null)
-							if (player.canSee(other))
-							{
-								player.hidePlayer(other);
-								hides2.add(player);
-							}
-					}
-			}
+		if (plugin.isLoggedIn(player))
+		{
+			if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
+				return;
+			for (final Player other : Bukkit.getOnlinePlayers())
+				if (player != other)
+				{
+					final Set<Player> hidesOthers = hiddenPlayers.get(other);
+					if (hidesOthers != null)
+						if (player.canSee(other))
+						{
+							player.hidePlayer(other);
+							hidesOthers.add(player);
+						}
+				}
+		}
 		else
-			synchronized (hiddenPlayers)
-			{
-				final Set<Player> hides = new HashSet<Player>();
-				hiddenPlayers.put(player, hides);
-				for (final Player other : Bukkit.getOnlinePlayers())
-					if (player != other)
-					{
-						if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
-							if (other.canSee(player))
-							{
-								other.hidePlayer(player);
-								hides.add(other);
-							}
-						final Set<Player> hides2 = hiddenPlayers.get(other);
-						if (hides2 != null)
-							if (player.canSee(other))
-							{
-								player.hidePlayer(other);
-								hides2.add(player);
-							}
-					}
-			}
+		{
+			final Set<Player> hides = new HashSet<Player>();
+			hiddenPlayers.put(player, hides);
+			for (final Player other : Bukkit.getOnlinePlayers())
+				if (player != other)
+				{
+					if (!PermissionModule.hasPermission(other, "crazylogin.bypasshidePlayer"))
+						if (other.canSee(player))
+						{
+							other.hidePlayer(player);
+							hides.add(other);
+						}
+					final Set<Player> hidesOthers = hiddenPlayers.get(other);
+					if (hidesOthers != null)
+						if (player.canSee(other))
+						{
+							player.hidePlayer(other);
+							hidesOthers.add(player);
+						}
+				}
+		}
 	}
 
 	public void unhidePlayer(final Player player)
 	{
-		synchronized (hiddenPlayers)
-		{
-			final Set<Player> hides = hiddenPlayers.remove(player);
-			if (hides != null)
-				for (final Player other : hides)
-					other.showPlayer(player);
-			if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
-				for (final Entry<Player, Set<Player>> other : hiddenPlayers.entrySet())
-					if (other.getValue().remove(player))
-						player.showPlayer(other.getKey());
-		}
+		final Set<Player> hides = hiddenPlayers.remove(player);
+		if (hides != null)
+			for (final Player other : hides)
+				other.showPlayer(player);
+		if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
+			for (final Entry<Player, Set<Player>> other : hiddenPlayers.entrySet())
+				if (other.getValue().remove(player))
+					player.showPlayer(other.getKey());
 	}
 
 	public void unhidePlayerQuit(final Player player)
 	{
-		synchronized (hiddenPlayers)
-		{
-			hiddenPlayers.remove(player);
-			for (final Entry<Player, Set<Player>> hides : hiddenPlayers.entrySet())
-				hides.getValue().remove(player);
-		}
+		hiddenPlayers.remove(player);
+		for (final Set<Player> hides : hiddenPlayers.values())
+			hides.remove(player);
 	}
 }
