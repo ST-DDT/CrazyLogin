@@ -86,7 +86,6 @@ import de.st_ddt.crazylogin.metadata.Authenticated;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazylogin.tasks.ScheduledCheckTask;
 import de.st_ddt.crazyplugin.CrazyPlayerDataPlugin;
-import de.st_ddt.crazyplugin.commands.CrazyPluginCommandMainMode;
 import de.st_ddt.crazyplugin.data.PlayerDataFilter;
 import de.st_ddt.crazyplugin.data.PlayerDataNameFilter;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
@@ -129,7 +128,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private final Map<String, Integer> loginFailures = new HashMap<String, Integer>();
 	private final Map<String, Date> tempBans = new HashMap<String, Date>();
 	private final Map<String, Location> saveLoginLocations = new HashMap<String, Location>();
-	private final CrazyPluginCommandMainMode modeCommand = new CrazyPluginCommandMainMode(this);
 	private CrazyLoginPlayerListener playerListener;
 	private CrazyLoginDynamicPlayerListener dynamicPlayerListener;
 	private CrazyLoginDynamicVehicleListener dynamicVehicleListener;
