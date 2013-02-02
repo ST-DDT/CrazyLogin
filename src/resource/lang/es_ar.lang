@@ -32,7 +32,7 @@ CRAZYLOGIN.KICKED.NAME.INVALIDLENGTH=&ELARGO DE NOMBRE DE USUARIO INVALIDO!
 CRAZYLOGIN.KICKED.SESSION.DUPLICATE=&CYa estás online! &CPor favor esperá a que se acabe el tiempo o contactate con un administrador.
 CRAZYLOGIN.LOGIN.FAILED=&CLOGIN INCORRECTO!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CADVERTENCIA! INTENTO DE LOGIN INCORRECTO! $0$ @ $1$
-CRAZYLOGIN.LOGIN.REQUEST=&CPor favor ingresá con: /login <contraseña>
+CRAZYLOGIN.LOGIN.REQUEST=&CPor favor ingresá con: &3/login <contraseña>
 CRAZYLOGIN.LOGIN.SUCCESS=&ATe logueaste corrrectamente
 CRAZYLOGIN.LOGOUT.SUCCESS=&ATe deslogueaste correctamente
 CRAZYLOGIN.MODE.CHANGE=Modo "$0$"="$1$" seteado
@@ -42,6 +42,6 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Borraste la contraseña!
 #CRAZYLOGIN.PLAYERINFO.IPADDRESS=
 #CRAZYLOGIN.PLAYERINFO.LASTACTION=
 CRAZYLOGIN.REGISTER.HEADER=Por razones de seguridad, tenés que especificar una contraseña!\n
-CRAZYLOGIN.REGISTER.HEADER2=Si lo deseás, podés crear una contraseña.\nUsá /crazylogin password <contraseña...> para crear una o cambiarla!
-CRAZYLOGIN.REGISTER.REQUEST=&EPor favor registrate! /register <Contraseña>
+CRAZYLOGIN.REGISTER.HEADER2=Si lo deseás, podés crear una contraseña.\nUsá &3/register <contraseña...> &Fpara crear una o cambiarla!
+CRAZYLOGIN.REGISTER.REQUEST=&EPor favor registrate! &3/register <Contraseña>
 CRAZYLOGIN.SESSION.DUPLICATEWARN=&E$0$ trató de conectarse como $1$!
