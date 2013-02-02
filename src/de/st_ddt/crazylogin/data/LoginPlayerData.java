@@ -30,10 +30,10 @@ import de.st_ddt.crazyutil.locales.Localized;
 public class LoginPlayerData extends PlayerData<LoginPlayerData> implements ConfigurationPlayerDataDatabaseEntry, MySQLPlayerDataDatabaseEntry, SQLitePlayerDataDatabaseEntry, FlatPlayerDataDatabaseEntry, LoginData
 {
 
-	private String password;
-	private final ArrayList<String> ips = new ArrayList<String>(6);
-	private boolean online;
-	private Date lastAction;
+	protected String password;
+	protected final ArrayList<String> ips = new ArrayList<String>(6);
+	protected boolean online;
+	protected Date lastAction;
 
 	public LoginPlayerData(final String name)
 	{
