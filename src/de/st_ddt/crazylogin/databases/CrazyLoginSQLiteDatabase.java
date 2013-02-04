@@ -4,9 +4,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyutil.databases.SQLColumn;
 import de.st_ddt.crazyutil.databases.SQLitePlayerDataDatabase;
@@ -50,34 +52,43 @@ public final class CrazyLoginSQLiteDatabase extends SQLitePlayerDataDatabase<Log
 		return data;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void saveWithoutPassword(final LoginPlayerData entry)
 	{
 		if (containsEntry(entry.getName()))
 		{
 			final String sql = "UPDATE `" + tableName + "` SET " + entry.saveUpdateToSQLiteDatabase(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
-			final Connection connection = connectionPool.getConnection();
-			Statement query = null;
-			try
+			Bukkit.getScheduler().scheduleAsyncDelayedTask(CrazyLogin.getPlugin(), new Runnable()
 			{
-				query = connection.createStatement();
-				query.executeUpdate(sql);
-			}
-			catch (final SQLException e)
-			{
-				e.printStackTrace();
-			}
-			finally
-			{
-				if (query != null)
+
+				@Override
+				public void run()
+				{
+					final Connection connection = connectionPool.getConnection();
+					Statement query = null;
 					try
 					{
-						query.close();
+						query = connection.createStatement();
+						query.executeUpdate(sql);
 					}
 					catch (final SQLException e)
-					{}
-				connectionPool.releaseConnection(connection);
-			}
+					{
+						e.printStackTrace();
+					}
+					finally
+					{
+						if (query != null)
+							try
+							{
+								query.close();
+							}
+							catch (final SQLException e)
+							{}
+						connectionPool.releaseConnection(connection);
+					}
+				}
+			});
 		}
 		else
 		{
