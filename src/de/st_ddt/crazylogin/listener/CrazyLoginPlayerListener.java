@@ -358,7 +358,15 @@ public class CrazyLoginPlayerListener implements Listener
 		if (playerdata == null)
 		{
 			if (plugin.isRemovingGuestDataEnabled())
-				new CrazyPlayerRemoveEvent(player).callEvent();
+				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						new CrazyPlayerRemoveEvent(player).callEvent();
+					}
+				}, 5);
 		}
 		else
 		{
