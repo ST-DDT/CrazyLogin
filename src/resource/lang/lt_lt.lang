@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Slaptazodis istrintas!
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&EAssociates: &5$0$
 CRAZYLOGIN.PLAYERINFO.IPADDRESS=&EIP adresas: &5$0$
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&EPaskutinis veiksmas: &5$0$
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=Del saugumo priezastciu turi susikurti slaptazodi!\nNaudok &3/register <slaptazodis...> &FSukurti/pakeisti splaptazodi!
 CRAZYLOGIN.REGISTER.HEADER2=Tu gali susikurti slaptazodi.\nNaudok: &3/register <slaptazodis...> &FSukurti/pakeisti splaptazodi!
 CRAZYLOGIN.REGISTER.REQUEST=&EPrasom prisiregistruoti: &3/register <slaptazodis...>

@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Senha deletada!
 #CRAZYLOGIN.PLAYERINFO.ASSOCIATES=
 #CRAZYLOGIN.PLAYERINFO.IPADDRESS=
 #CRAZYLOGIN.PLAYERINFO.LASTACTION=
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=Por motivos de seguranca você precisa especificar uma senha pessoal!\nUse &3/register <senha...> &Fpaa criar/mudar sua senha!
 CRAZYLOGIN.REGISTER.HEADER2=Voce pode criar uma senha, se desejar.\nUse &3/register <senha...> &Fpaa criar/mudar sua senha!
 CRAZYLOGIN.REGISTER.REQUEST=&Por favor, registre-se! &3/register <senha>

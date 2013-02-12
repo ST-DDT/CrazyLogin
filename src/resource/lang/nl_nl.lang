@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Wachtwoord verwijdert
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&EAssociaties: &5$0$
 CRAZYLOGIN.PLAYERINFO.IPADDRESS=&EIPAddres: &5$0$
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&ELaatste actie: &5$0$
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=Voor veiligheids redenen moet je een personlijk wachtwoord instellen!\nGebruk &3/register <Password...> &FOm het te creren of te veranderen!
 CRAZYLOGIN.REGISTER.HEADER2=Je kan een wachtwoord maken als je wilt.\ngebruik &3/register <Password...> &FOm het te creren of te veranderen!
 CRAZYLOGIN.REGISTER.REQUEST=&ERegistreer aub! &3/register <Password>

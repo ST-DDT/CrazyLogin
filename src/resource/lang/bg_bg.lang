@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Паролата е изтрита!
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&EAssociates: &5$0$
 CRAZYLOGIN.PLAYERINFO.IPADDRESS=&EIP Адрес: &5$0$
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&EПоследно действие: &5$0$
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=Като защитна мярка трябва да определите лична парола!\nИзползвай &3/register <Парола...> &Fза да я създадете/смените!
 CRAZYLOGIN.REGISTER.HEADER2=Можете да си създадете парола ако пожелаете.\nИзползвайте &3/register <Парола...> &Fза да я създадете/смените!
 CRAZYLOGIN.REGISTER.REQUEST=&EМоля регистрирайте се! &3/register <Парола>

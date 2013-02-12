@@ -763,6 +763,15 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		{
 
 			@Override
+			@Localized("CRAZYLOGIN.PLUGININFO.DATABASEENTRIES $Amount$")
+			public void showValue(final CommandSender sender)
+			{
+				super.showValue(sender);
+				if (database != null)
+					sendLocaleMessage("PLUGININFO.DATABASEENTRIES", sender, database.getAllEntries().size());
+			}
+
+			@Override
 			public DatabaseType getValue()
 			{
 				return database.getType();

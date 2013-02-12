@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Пароль успешно удален!
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&EПартнеры: &5$0$
 CRAZYLOGIN.PLAYERINFO.IPADDRESS=&EIP Адрес: &5$0$
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&EПоследние действия: &5$0$
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=Вы должны выбрать личный пароль для защиты вашего аккаунта!\nИспользуйте &3/register <password> &Fдля его создания/изменения! После создания пишите /login password !
 CRAZYLOGIN.REGISTER.HEADER2=Вы можете защитить свой аккаунт паролем, если хотите.\nИспользуйте &3/register <password> &Fдля его создания/изменения!После создания пишите /login password !
 CRAZYLOGIN.REGISTER.REQUEST=&CПожалуйста зарегистрируйтесь! &3/register <Password>

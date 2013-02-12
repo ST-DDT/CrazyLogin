@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Parola stearsa!
 #CRAZYLOGIN.PLAYERINFO.ASSOCIATES=
 #CRAZYLOGIN.PLAYERINFO.IPADDRESS=
 #CRAZYLOGIN.PLAYERINFO.LASTACTION=
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=trebuie sa specifici o parola\nFoloseste &3/register <parola...> &Fpentru a crea sau schimba o parola!
 CRAZYLOGIN.REGISTER.HEADER2=poti crea o parola daca doresti.\nFoloseste &3/register <parola...> &Fpentru a crea sau schimba o parola!
 CRAZYLOGIN.REGISTER.REQUEST=&ETe rougam inregistreazate cu! &3/register <parola>

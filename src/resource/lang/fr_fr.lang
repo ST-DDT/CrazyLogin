@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Mot de passe supprimé!
 #CRAZYLOGIN.PLAYERINFO.ASSOCIATES=
 #CRAZYLOGIN.PLAYERINFO.IPADDRESS=
 #CRAZYLOGIN.PLAYERINFO.LASTACTION=
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=Pour des raisons de sécurité, vous devez spécifier un mot de passe personnel!\nUtilisez &3/register <MotdePasse...>&Fpour le créer/changer!
 CRAZYLOGIN.REGISTER.HEADER2=Vous pouvez créer un mot de passe si vous le souhaiter.\nUtilisez &3/register <MotdePasse...> &Fpour le créer/changer!
 CRAZYLOGIN.REGISTER.REQUEST=&ES.V.P. enregistrez-vous! &3/register <Motdepasse>

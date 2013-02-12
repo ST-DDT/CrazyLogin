@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Passwort gelöscht!
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&EKollegen: &5$0$
 CRAZYLOGIN.PLAYERINFO.IPADDRESS=&EIPAddresse: &5$0$
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&ELetzte Aktion: &5$0$
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=Du musst dir ein Passwort erstellen! \nNutze &3/register <Passwort> &Fum das Passwort zu erstellen/ändern!
 CRAZYLOGIN.REGISTER.HEADER2=Du kannst dir ein Passwort erstellen.\nNutze &3/register <Passwort> &Fum das Passwort zu erstellen/ändern!
 CRAZYLOGIN.REGISTER.REQUEST=&CBitte registriere dich! &3/register <Passwort>

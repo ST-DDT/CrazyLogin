@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=암호가 제거됨.
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&E연동: &5$0$
 CRAZYLOGIN.PLAYERINFO.IPADDRESS=&E아이피주소: &5$0$
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&E최근 행동: &5$0$
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=보안 상의 이유로 당신은 개인 암호를 밝혀야 합니다.\nUse &3/register <원하시는 암호> &F옆의 명령어를 입력해 암호를 설정하십시오.
 CRAZYLOGIN.REGISTER.HEADER2=원하시면 암호를 설정할 수 있습니다.\nUse &3/register <원하시는 암호> &F옆의 명령어를 입력해 암호를 설정하십시오.
 CRAZYLOGIN.REGISTER.REQUEST=&E옆의 명령어를 입력해 계정을 등록하십시오. &3/register <원하시는 암호>

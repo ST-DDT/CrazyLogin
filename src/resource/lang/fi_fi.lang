@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Salasana poistettu!
 #CRAZYLOGIN.PLAYERINFO.ASSOCIATES=
 #CRAZYLOGIN.PLAYERINFO.IPADDRESS=
 #CRAZYLOGIN.PLAYERINFO.LASTACTION=
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=Turvallisuussyistä joudut määrittämään itsellesi henkilökohtaisen salasanan!\nKäytä &3/register <Salasana...> &Fjotta voit tehdä/vaihtaa sen!
 CRAZYLOGIN.REGISTER.HEADER2=Voit tehdä salasanan jos tahdot.\nKäytä &3/register <Salasana...> &Fjotta voit tehdä/vaihtaa sen!
 CRAZYLOGIN.REGISTER.REQUEST=&ERekisteröidy! &3/register <Salasana>

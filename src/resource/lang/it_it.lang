@@ -41,6 +41,7 @@ CRAZYLOGIN.PASSWORDDELETE.SUCCESS=Password cancellata!
 CRAZYLOGIN.PLAYERINFO.ASSOCIATES=&EAssociati: &5$0$
 #CRAZYLOGIN.PLAYERINFO.IPADDRESS=
 CRAZYLOGIN.PLAYERINFO.LASTACTION=&EUltima azione: &5$0$
+#CRAZYLOGIN.PLUGININFO.DATABASEENTRIES=
 CRAZYLOGIN.REGISTER.HEADER=Per ragioni di sicurezza è necessario specificare una password personale!\nUsa &3/register <Password...> /Fper creare/cambiarla!
 CRAZYLOGIN.REGISTER.HEADER2=È possibile creare una password, se lo si desidera.\nUsa &3/register <Password...> &Fper creare/cambiarla!
 CRAZYLOGIN.REGISTER.REQUEST=&EPer piacere registrati! &3/register <Password>
