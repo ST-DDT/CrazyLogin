@@ -1,6 +1,5 @@
 package de.st_ddt.crazylogin.listener;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -217,28 +216,29 @@ public class CrazyLoginPlayerListener implements Listener
 			{
 				player.setMetadata("Authenticated", new Authenticated(plugin, player));
 				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server. (Verified)");
-				return;
 			}
 			else
-				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server.");
-			// Default Protection
-			Location location = player.getLocation().clone();
-			if (plugin.isForceSaveLoginEnabled())
 			{
-				triggerSaveLogin(player);
-				location = player.getWorld().getSpawnLocation().clone();
+				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server.");
+				// Default Protection
+				Location location = player.getLocation().clone();
+				if (plugin.isForceSaveLoginEnabled())
+				{
+					triggerSaveLogin(player);
+					location = player.getWorld().getSpawnLocation().clone();
+				}
+				if (plugin.isHidingInventoryEnabled())
+					triggerHidenInventory(player);
+				if (movementBlocker.get(player.getName().toLowerCase()) == null)
+					movementBlocker.put(player.getName().toLowerCase(), location);
+				// Message
+				plugin.sendLocaleMessage("LOGIN.REQUEST", player);
+				// AutoKick
+				final int autoKick = plugin.getAutoKick();
+				if (autoKick >= 10)
+					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST"), plugin.getAutoTempBan()), autoKick * 20);
+				plugin.registerDynamicHooks();
 			}
-			if (plugin.isHidingInventoryEnabled())
-				triggerHidenInventory(player);
-			if (movementBlocker.get(player.getName().toLowerCase()) == null)
-				movementBlocker.put(player.getName().toLowerCase(), location);
-			// Message
-			plugin.sendLocaleMessage("LOGIN.REQUEST", player);
-			// AutoKick
-			final int autoKick = plugin.getAutoKick();
-			if (autoKick >= 10)
-				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("LOGIN.REQUEST"), plugin.getAutoTempBan()), autoKick * 20);
-			plugin.registerDynamicHooks();
 		}
 		else
 		{
@@ -260,7 +260,7 @@ public class CrazyLoginPlayerListener implements Listener
 				// Message
 				plugin.sendLocaleMessage("REGISTER.HEADER", player);
 			}
-			else if (!plugin.isAvoidingSpammedRegisterRequestsEnabled() || new Date().getTime() - player.getFirstPlayed() < 60000)
+			else if (!plugin.isAvoidingSpammedRegisterRequestsEnabled() || System.currentTimeMillis() - player.getFirstPlayed() < 60000)
 				plugin.sendLocaleMessage("REGISTER.HEADER2", player);
 			// AutoKick
 			final int autoKick = plugin.getAutoKickUnregistered();
