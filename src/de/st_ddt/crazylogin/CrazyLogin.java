@@ -1620,7 +1620,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			database.save(data);
 		}
 		data.addIP(player.getAddress().getAddress().getHostAddress());
-		data.notifyAction();
 		getCrazyDatabase().saveWithoutPassword(data);
 		player.setMetadata("Authenticated", new Authenticated(this, player));
 		unregisterDynamicHooks();
@@ -1637,7 +1636,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final LoginPlayerData data = getPlayerData(player);
 		if (data != null)
 		{
-			data.notifyAction();
 			data.logout();
 			getCrazyDatabase().saveWithoutPassword(data);
 		}
