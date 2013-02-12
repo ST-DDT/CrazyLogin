@@ -282,7 +282,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	@Override
 	public void notifyAction()
 	{
-		lastAction = new Date();
+		lastAction.setTime(System.currentTimeMillis());
 	}
 
 	@Override
@@ -302,7 +302,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		this.online = isPassword(password);
 		if (online)
-			lastAction = new Date();
+			notifyAction();
 		return online;
 	}
 
@@ -316,7 +316,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	public void logout(final boolean removeIPs)
 	{
 		this.online = false;
-		lastAction = new Date();
+		notifyAction();
 		if (removeIPs)
 			ips.clear();
 	}
@@ -332,9 +332,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 
 	public boolean checkTimeOut()
 	{
-		final Date timeOut = new Date();
-		timeOut.setTime(timeOut.getTime() - getPlugin().getAutoLogoutTime() * 1000);
-		return checkTimeOut(timeOut);
+		return checkTimeOut(new Date(System.currentTimeMillis() - getPlugin().getAutoLogoutTime() * 1000));
 	}
 
 	public boolean checkTimeOut(final Date timeOut)

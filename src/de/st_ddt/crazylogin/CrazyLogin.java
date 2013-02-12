@@ -1527,9 +1527,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	public int dropInactiveAccounts(final long age)
 	{
-		final Date compare = new Date();
-		compare.setTime(compare.getTime() - age * 1000 * 60 * 60 * 24);
-		return dropInactiveAccounts(compare);
+		return dropInactiveAccounts(new Date(System.currentTimeMillis() - age * 1000 * 60 * 60 * 24));
 	}
 
 	protected int dropInactiveAccounts(final Date limit)
@@ -1719,11 +1717,17 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return;
 		final Date now = new Date();
 		final Date date = antiRequestSpamTable.get(player.getName());
-		if (date != null)
+		if (date == null)
+		{
+			now.setTime(now.getTime() + 5000L);
+			antiRequestSpamTable.put(player.getName(), now);
+		}
+		else
+		{
 			if (date.after(now))
 				return;
-		now.setTime(now.getTime() + 5000L);
-		antiRequestSpamTable.put(player.getName(), now);
+			date.setTime(now.getTime() + 5000L);
+		}
 		if (hasPlayerData(player))
 			sendLocaleMessage("LOGIN.REQUEST", player);
 		else
@@ -1855,7 +1859,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final Date date = tempBans.get(IP);
 		if (date == null)
 			return false;
-		return new Date().before(date);
+		else
+			return System.currentTimeMillis() < date.getTime();
 	}
 
 	public Date getTempBanned(final String IP)
@@ -1868,7 +1873,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final Date date = getTempBanned(IP);
 		if (date == null)
 			return DATETIMEFORMAT.format(new Date(0));
-		return DATETIMEFORMAT.format(date);
+		else
+			return DATETIMEFORMAT.format(date);
 	}
 
 	public void setTempBanned(final Player player, final long duration)
@@ -1878,9 +1884,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	public void setTempBanned(final String IP, final long duration)
 	{
-		final Date until = new Date();
-		until.setTime(until.getTime() + duration * 1000);
-		tempBans.put(IP, until);
+		tempBans.put(IP, new Date(System.currentTimeMillis() + duration * 1000));
 	}
 
 	@Override
