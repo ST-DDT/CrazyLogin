@@ -105,16 +105,8 @@ public final class LoginUnregisteredPlayerData extends PlayerData<LoginUnregiste
 		final OfflinePlayer player = getOfflinePlayer();
 		if (player == null)
 			return new Date(0);
-		return new Date(player.getLastPlayed());
-	}
-
-	@Override
-	public boolean isOnline()
-	{
-		final Player player = getPlayer();
-		if (player == null)
-			return false;
-		return player.isOnline();
+		else
+			return new Date(player.getLastPlayed());
 	}
 
 	@Override
@@ -136,10 +128,11 @@ public final class LoginUnregisteredPlayerData extends PlayerData<LoginUnregiste
 	@Override
 	public String toString()
 	{
-		String IP = getLatestIP();
-		if (!IP.equals(""))
-			IP = " @" + IP;
-		return (isOnline() ? ChatColor.DARK_GREEN.toString() : "") + getName() + ChatColor.WHITE + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(getLastActionTime()) + IP;
+		final String ip = getLatestIP();
+		if (ip.equals(""))
+			return name + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(getLastActionTime());
+		else
+			return name + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(getLastActionTime()) + " @ " + ip;
 	}
 
 	@Override

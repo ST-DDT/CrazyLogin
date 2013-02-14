@@ -324,10 +324,11 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	@Override
 	public String toString()
 	{
-		String IP = getLatestIP();
-		if (!IP.equals(""))
-			IP = " @" + IP;
-		return (online ? ChatColor.GREEN : ChatColor.WHITE) + getName() + ChatColor.WHITE + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(lastAction) + IP;
+		final String ip = getLatestIP();
+		if (ip.equals(""))
+			return name + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(lastAction);
+		else
+			return name + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(lastAction) + " @ " + ip;
 	}
 
 	public boolean checkTimeOut()
