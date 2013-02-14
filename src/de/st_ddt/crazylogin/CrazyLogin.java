@@ -1259,7 +1259,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					@Override
 					public int getValue()
 					{
-						return (type == database.getType()) ? 1 : 0;
+						if (database == null)
+							return 0;
+						else
+							return (type == database.getType()) ? 1 : 0;
 					}
 				});
 			metrics.start();
