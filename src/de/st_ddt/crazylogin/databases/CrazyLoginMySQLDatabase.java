@@ -53,7 +53,6 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 	@Override
 	public void saveWithoutPassword(final LoginPlayerData entry)
 	{
-		final String sql = "UPDATE `" + tableName + "` SET " + entry.saveToMySQLDatabaseLight(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
 		final Connection connection = connectionPool.getConnection();
 		if (connection == null)
 			return;
@@ -61,6 +60,7 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 		try
 		{
 			query = connection.createStatement();
+			final String sql = "UPDATE `" + tableName + "` SET " + entry.saveToMySQLDatabaseLight(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
 			if (query.executeUpdate(sql) == 0)
 			{
 				datas.remove(entry.getName().toLowerCase());
