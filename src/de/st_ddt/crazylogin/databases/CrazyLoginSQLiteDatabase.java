@@ -53,38 +53,36 @@ public final class CrazyLoginSQLiteDatabase extends SQLitePlayerDataDatabase<Log
 	@Override
 	public void saveWithoutPassword(final LoginPlayerData entry)
 	{
-		if (containsEntry(entry.getName()))
+		final Connection connection = connectionPool.getConnection();
+		if (connection == null)
+			return;
+		Statement query = null;
+		try
 		{
-			final String sql = "UPDATE `" + tableName + "` SET " + entry.saveUpdateToSQLiteDatabase(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
-			final Connection connection = connectionPool.getConnection();
-			Statement query = null;
-			try
+			query = connection.createStatement();
+			final String sql = "UPDATE `" + tableName + "` SET " + entry.saveToMySQLDatabaseLight(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
+			if (query.executeUpdate(sql) == 0)
 			{
-				query = connection.createStatement();
-				query.executeUpdate(sql);
-			}
-			catch (final SQLException e)
-			{
-				e.printStackTrace();
-			}
-			finally
-			{
-				if (query != null)
-					try
-					{
-						query.close();
-					}
-					catch (final SQLException e)
-					{}
-				connectionPool.releaseConnection(connection);
+				datas.remove(entry.getName().toLowerCase());
+				final Player player = entry.getPlayer();
+				if (player != null)
+					player.kickPlayer("Your account has been deleted!");
 			}
 		}
-		else
+		catch (final SQLException e)
 		{
-			datas.remove(entry.getName().toLowerCase());
-			final Player player = entry.getPlayer();
-			if (player != null)
-				player.kickPlayer("Your account has been deleted!");
+			e.printStackTrace();
+		}
+		finally
+		{
+			if (query != null)
+				try
+				{
+					query.close();
+				}
+				catch (final SQLException e)
+				{}
+			connectionPool.releaseConnection(connection);
 		}
 	}
 }
