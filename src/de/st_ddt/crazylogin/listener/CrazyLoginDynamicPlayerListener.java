@@ -62,10 +62,7 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 		{
 			final LoginPlayerData playerdata = plugin.getPlayerData(player);
 			if (playerdata != null)
-			{
 				playerdata.notifyAction();
-				plugin.getCrazyDatabase().saveWithoutPassword(playerdata);
-			}
 			return;
 		}
 		event.setCancelled(true);
@@ -164,10 +161,7 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 		{
 			final LoginPlayerData playerdata = plugin.getPlayerData(player);
 			if (playerdata != null)
-			{
 				playerdata.notifyAction();
-				plugin.getCrazyDatabase().saveWithoutPassword(playerdata);
-			}
 			return;
 		}
 		if (movementBlocker.get(player.getName().toLowerCase()) == null)
@@ -352,7 +346,6 @@ public class CrazyLoginDynamicPlayerListener implements Listener
 				if (playerdata.isLoggedIn())
 				{
 					playerdata.notifyAction();
-					plugin.getCrazyDatabase().saveWithoutPassword(playerdata);
 					return true;
 				}
 		}
