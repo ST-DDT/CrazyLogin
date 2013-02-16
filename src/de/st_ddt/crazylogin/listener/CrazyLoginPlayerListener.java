@@ -221,16 +221,40 @@ public class CrazyLoginPlayerListener implements Listener
 			{
 				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server.");
 				// Default Protection
-				Location location = player.getLocation().clone();
-				if (plugin.isForceSaveLoginEnabled())
+				if (plugin.isDelayingPreLoginSecurityEnabled())
+					Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+					{
+
+						@Override
+						public void run()
+						{
+							if (plugin.isLoggedIn(player))
+								return;
+							Location location = player.getLocation().clone();
+							if (plugin.isForceSaveLoginEnabled())
+							{
+								triggerSaveLogin(player);
+								location = player.getWorld().getSpawnLocation().clone();
+							}
+							if (plugin.isHidingInventoryEnabled())
+								triggerHidenInventory(player);
+							if (movementBlocker.get(player.getName().toLowerCase()) == null)
+								movementBlocker.put(player.getName().toLowerCase(), location);
+						}
+					}, plugin.getDelayPreLoginSecurity());
+				else
 				{
-					triggerSaveLogin(player);
-					location = player.getWorld().getSpawnLocation().clone();
+					Location location = player.getLocation().clone();
+					if (plugin.isForceSaveLoginEnabled())
+					{
+						triggerSaveLogin(player);
+						location = player.getWorld().getSpawnLocation().clone();
+					}
+					if (plugin.isHidingInventoryEnabled())
+						triggerHidenInventory(player);
+					if (movementBlocker.get(player.getName().toLowerCase()) == null)
+						movementBlocker.put(player.getName().toLowerCase(), location);
 				}
-				if (plugin.isHidingInventoryEnabled())
-					triggerHidenInventory(player);
-				if (movementBlocker.get(player.getName().toLowerCase()) == null)
-					movementBlocker.put(player.getName().toLowerCase(), location);
 				// Message
 				plugin.sendLocaleMessage("LOGIN.REQUEST", player);
 				// AutoKick
@@ -247,16 +271,40 @@ public class CrazyLoginPlayerListener implements Listener
 			if (plugin.isAlwaysNeedPassword() || PermissionModule.hasPermission(player, "crazylogin.requirepassword"))
 			{
 				// Default Protection
-				Location location = player.getLocation().clone();
-				if (plugin.isForceSaveLoginEnabled())
+				if (plugin.isDelayingPreLoginSecurityEnabled())
+					Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
+					{
+
+						@Override
+						public void run()
+						{
+							if (plugin.isLoggedIn(player))
+								return;
+							Location location = player.getLocation().clone();
+							if (plugin.isForceSaveLoginEnabled())
+							{
+								triggerSaveLogin(player);
+								location = player.getWorld().getSpawnLocation().clone();
+							}
+							if (plugin.isHidingInventoryEnabled())
+								triggerHidenInventory(player);
+							if (movementBlocker.get(player.getName().toLowerCase()) == null)
+								movementBlocker.put(player.getName().toLowerCase(), location);
+						}
+					}, plugin.getDelayPreLoginSecurity());
+				else
 				{
-					triggerSaveLogin(player);
-					location = player.getWorld().getSpawnLocation().clone();
+					Location location = player.getLocation().clone();
+					if (plugin.isForceSaveLoginEnabled())
+					{
+						triggerSaveLogin(player);
+						location = player.getWorld().getSpawnLocation().clone();
+					}
+					if (plugin.isHidingInventoryEnabled())
+						triggerHidenInventory(player);
+					if (movementBlocker.get(player.getName().toLowerCase()) == null)
+						movementBlocker.put(player.getName().toLowerCase(), location);
 				}
-				if (plugin.isHidingInventoryEnabled())
-					triggerHidenInventory(player);
-				if (movementBlocker.get(player.getName().toLowerCase()) == null)
-					movementBlocker.put(player.getName().toLowerCase(), location);
 				// Message
 				plugin.sendLocaleMessage("REGISTER.HEADER", player);
 			}

@@ -157,6 +157,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean doNotSpamRegisterRequests;
 	private boolean forceSingleSession;
 	private boolean forceSingleSessionSameIPBypass;
+	private int delayPreLoginSecurity;
 	private boolean forceSaveLogin;
 	private boolean hideInventory;
 	private boolean hidePlayer;
@@ -276,6 +277,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				hideWarnings = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(new IntegerMode(this, "delayPreLoginSecurity")
+		{
+
+			@Override
+			public Integer getValue()
+			{
+				return delayPreLoginSecurity;
+			}
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				delayPreLoginSecurity = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1353,6 +1370,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			}
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
+		if (config.getBoolean("delayPreLoginSecurity", true))
+			delayPreLoginSecurity = config.getInt("delayPreLoginSecurity", 5);
+		else
+			delayPreLoginSecurity = 0;
 		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
 		for (final World world : Bukkit.getWorlds())
 			loadConfigurationForWorld(world);
@@ -1505,6 +1526,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("uniqueIDKey", uniqueIDKey);
 		config.set("forceSingleSession", forceSingleSession);
 		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
+		config.set("delayPreLoginSecurity", delayPreLoginSecurity <= 0 ? "false" : delayPreLoginSecurity);
 		config.set("forceSaveLogin", forceSaveLogin);
 		for (final Entry<String, Location> entry : saveLoginLocations.entrySet())
 			ObjectSaveLoadHelper.saveLocation(config, "saveLoginLocations." + entry.getKey() + ".", entry.getValue(), true, true);
@@ -1921,6 +1943,16 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public boolean isForceSingleSessionSameIPBypassEnabled()
 	{
 		return forceSingleSessionSameIPBypass;
+	}
+
+	public boolean isDelayingPreLoginSecurityEnabled()
+	{
+		return delayPreLoginSecurity > 0;
+	}
+
+	public int getDelayPreLoginSecurity()
+	{
+		return delayPreLoginSecurity;
 	}
 
 	@Override
