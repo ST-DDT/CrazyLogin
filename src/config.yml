@@ -129,6 +129,7 @@ forceSingleSessionSameIPBypass: true
 # WARNING: some hacked clients may be able to use that time to read/modify the inventory/location
 delayPreLoginSecurity: false
 # when enabled you are teleported to spawn until login (true/false)
+# this fixes issues with AntiCheatPlugins whilte not logged in an being in mid air.
 forceSaveLogin: false
 # custom saveLogin locations for each world
 saveLoginLocations: {}
