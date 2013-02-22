@@ -12,12 +12,19 @@ commands:
     description: Login using a password
     usage: /<command> <Password...>
     aliases: [l]
+  loginonce:
+    description: Login using a password and enable auto logout
+    usage: /<command> <Password...>
+    aliases: [l1,lonce]
   adminlogin:
-    description: Login into another account using an admin account.
+    description: Login using an admin account and enable auto logout
     usage: /<command> <Admin> <AdminPassword...>
   tokenlogin:
-    description: Login into another account using a token.
+    description: Login using a token and enable auto logout
     usage: /<command> <Token>
+  autologout:
+    description: Enable auto logout
+    usage: /<command>
   logout:
     description: Logout and leave server
     usage: /<command>

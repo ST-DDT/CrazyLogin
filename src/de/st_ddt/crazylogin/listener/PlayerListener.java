@@ -402,6 +402,7 @@ public class PlayerListener implements Listener
 		disableHidenInventory(player);
 		unhidePlayerQuit(player);
 		joinMessages.remove(player);
+		final boolean autoLogout = plugin.getPlayerAutoLogouts().remove(player);
 		final LoginPlayerData playerdata = plugin.getPlayerData(player);
 		if (playerdata == null)
 		{
@@ -420,9 +421,10 @@ public class PlayerListener implements Listener
 		{
 			if (!playerdata.isLoggedIn())
 				return;
-			playerdata.notifyAction();
-			if (plugin.isInstantAutoLogoutEnabled())
+			if (plugin.isInstantAutoLogoutEnabled() || autoLogout)
 				playerdata.logout();
+			else
+				playerdata.notifyAction();
 			plugin.getCrazyDatabase().saveWithoutPassword(playerdata);
 		}
 	}

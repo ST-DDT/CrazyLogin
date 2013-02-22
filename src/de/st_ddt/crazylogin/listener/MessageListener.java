@@ -23,7 +23,6 @@ public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin
 	protected void pluginMessageQuerryRecieved(final String channel, final Player player, final String header, final String args)
 	{
 		if (channel.equals(plugin.getName()))
-		{
 			if (header.equals("sAuth"))
 			{
 				sendPluginMessage(player, "A_sAuth " + encryptID(player));
@@ -34,12 +33,12 @@ public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin
 				sendPluginMessage(player, "A_PlrIP " + player.getAddress().getAddress().getHostAddress());
 				return;
 			}
-			if (header.equals("State"))
+			else if (header.equals("State"))
 			{
 				sendPluginMessage(player, "A_State " + (plugin.hasPlayerData(player) ? "1" : "0") + " " + (plugin.isLoggedIn(player) ? "1" : "0"));
 				return;
 			}
-			if (header.startsWith("Login"))
+			else if (header.equals("Login"))
 			{
 				if (!plugin.hasPlayerData(player))
 				{
@@ -61,7 +60,18 @@ public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin
 				sendPluginMessage(channel, player, "A_Login " + (plugin.isLoggedIn(player) ? "true" : "false"));
 				return;
 			}
-			if (header.startsWith("ChgPW"))
+			else if (header.equals("AutoLogout"))
+			{
+				if (!plugin.isLoggedIn(player))
+				{
+					sendPluginMessage(channel, player, "A_AutoLogout LOGIN");
+					return;
+				}
+				plugin.getPlayerAutoLogouts().add(player);
+				sendPluginMessage(channel, player, "A_AutoLogout true");
+				return;
+			}
+			else if (header.equals("ChgPW"))
 			{
 				if (plugin.hasPlayerData(player))
 					if (!plugin.isLoggedIn(player))
@@ -102,7 +112,6 @@ public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin
 				sendPluginMessage(channel, player, "A_Logout true");
 				return;
 			}
-		}
 	}
 
 	@Override

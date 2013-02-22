@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,8 +25,10 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.messaging.Messenger;
 
 import de.st_ddt.crazylogin.commands.CommandAdminLogin;
+import de.st_ddt.crazylogin.commands.CommandAutoLogout;
 import de.st_ddt.crazylogin.commands.CommandExecutor;
 import de.st_ddt.crazylogin.commands.CommandLogin;
+import de.st_ddt.crazylogin.commands.CommandLoginWithAutoLogout;
 import de.st_ddt.crazylogin.commands.CommandLogout;
 import de.st_ddt.crazylogin.commands.CommandMainCommands;
 import de.st_ddt.crazylogin.commands.CommandMainDropOldData;
@@ -133,6 +136,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private final Map<String, Integer> loginFailures = new HashMap<String, Integer>();
 	private final Map<String, Date> tempBans = new HashMap<String, Date>();
 	private final Map<String, Token> loginTokens = new HashMap<String, Token>();
+	private final Set<Player> playerAutoLogouts = new HashSet<Player>();
 	private final Map<String, Location> saveLoginLocations = new HashMap<String, Location>();
 	private PlayerListener playerListener;
 	private DynamicPlayerListener dynamicPlayerListener;
@@ -1206,8 +1210,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	{
 		final CommandExecutor passwordCommand = new CommandPassword(this);
 		getCommand("login").setExecutor(new CommandLogin(this));
+		getCommand("loginonce").setExecutor(new CommandLoginWithAutoLogout(this));
 		getCommand("adminlogin").setExecutor(new CommandAdminLogin(this, playerListener));
 		getCommand("tokenlogin").setExecutor(new CommandTokenLogin(this, playerListener));
+		getCommand("autologout").setExecutor(new CommandAutoLogout(this));
 		getCommand("logout").setExecutor(new CommandLogout(this));
 		getCommand("register").setExecutor(passwordCommand);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, playerCommand), "p", "plr", "player", "players", "account", "accounts");
@@ -1726,6 +1732,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			getCrazyDatabase().saveWithoutPassword(data);
 		}
 		player.removeMetadata("Authenticated", this);
+		playerAutoLogouts.remove(player);
 		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
 		if (delayJoinQuitMessages)
 			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", locale.getLanguageEntry("BROADCAST.QUIT"), player.getName());
@@ -2263,6 +2270,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			if (!hasPlayerData(player) || !isLoggedIn(player))
 				return false;
 		return true;
+	}
+
+	public Set<Player> getPlayerAutoLogouts()
+	{
+		return playerAutoLogouts;
 	}
 
 	@Override

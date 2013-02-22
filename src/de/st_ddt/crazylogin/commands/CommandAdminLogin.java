@@ -72,6 +72,7 @@ public class CommandAdminLogin extends CommandExecutor
 		playerListener.removeFromMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
+		plugin.getPlayerAutoLogouts().add(player);
 	}
 
 	@Override
