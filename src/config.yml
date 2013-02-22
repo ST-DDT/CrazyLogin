@@ -98,7 +98,7 @@ blockGuestJoin: false
 # this include all CrazyPlugins, playerfile (if enabled), +more (if commands are setup)
 # after removing searching for the playersname in all files of that server will have 0 results. (Best Case)
 removeGuestData: false
-# when enabled ingame registrations are disabled (command and pluginChannel) (true/false)
+# if set to true ingame registrations are disabled (command and pluginChannel) (true/false)
 disableRegistrations: false
 # if set to true you cannot use adminlogin command (true/false)
 disableAdminLogin: false
@@ -118,7 +118,7 @@ commandWhitelist:
 encryptor:
   name: CrazyCrypt1
 # automatically delete accounts that haven't been used for x days(-1=disabled)
-# WARNING: deletes all data belonging to this player (including those saved in other plugins; equals "/crazycore delete Player")
+# WARNING: deletes all data belonging to this player (including those saved in other plugins; equals "/crazycore player delete <Player>")
 autoDelete: -1
 # block player join with an online players name (prevents Logged in from another location messages) (true/false)
 forceSingleSession: true
@@ -133,11 +133,11 @@ delayPreLoginSecurity: false
 forceSaveLogin: false
 # custom saveLogin locations for each world
 saveLoginLocations: {}
-#  world:
-#    x: 1500
-#    y: -300
-#    z: 0.1
-## this parameters are optional
+##  world:
+##    x: 1500
+##    y: -300
+##    z: 0.1
+### this parameters are optional
 ##    world: world
 ##    yaw: 0
 ##    pitch: 0
@@ -169,39 +169,38 @@ filterNames: true
 # check a players name case for its char case (true/false)
 # when enabled a player cannot join as "PLaYer" when he registered as "Player"
 # some encryptions may fail when a player has different char cases.
-# a player cannot bypass login by using an different name case.
-# WARNING: very old datas of this plugin saved their data using lowercase names.
+# INFO: a player cannot bypass login by using an different name case at any time.
 blockDifferentNameCases: false
 # minimun length of player names
 minNameLength: 3
 # maximum length of player names (minecraft max is 16)
 maxNameLength: 16
 # additional information about logging can be found here http://dev.bukkit.org/server-mods/crazycore/pages/logging/
-#logs:
-#  Join:
-#    path: false
-#    console: false
-#  Quit:
-#    path: false
-#    console: false
-#  Login:
-#    path: false
-#    console: false
-#  Account:
-#    path: false
-#    console: false
-#  Logout:
-#    path: false
-#    console: false
-#  LoginFail:
-#    path: false
-#    console: false
-#  ChatBlocked:
-#    path: false
-#    console: false
-#  CommandBlocked:
-#    path: false
-#    console: false
-#  AccessDenied:
-#    path: false
-#    console: false
+##logs:
+##  Join:
+##    path: false
+##    console: false
+##  Quit:
+##    path: false
+##    console: false
+##  Login:
+##    path: false
+##    console: false
+##  Account:
+##    path: false
+##    console: false
+##  Logout:
+##    path: false
+##    console: false
+##  LoginFail:
+##    path: false
+##    console: false
+##  ChatBlocked:
+##    path: false
+##    console: false
+##  CommandBlocked:
+##    path: false
+##    console: false
+##  AccessDenied:
+##    path: false
+##    console: false
