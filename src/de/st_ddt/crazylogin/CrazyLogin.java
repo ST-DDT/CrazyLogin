@@ -29,11 +29,13 @@ import de.st_ddt.crazylogin.commands.CommandLogin;
 import de.st_ddt.crazylogin.commands.CommandLogout;
 import de.st_ddt.crazylogin.commands.CommandMainCommands;
 import de.st_ddt.crazylogin.commands.CommandMainDropOldData;
+import de.st_ddt.crazylogin.commands.CommandMainGenerateToken;
 import de.st_ddt.crazylogin.commands.CommandPassword;
 import de.st_ddt.crazylogin.commands.CommandPlayerCreate;
 import de.st_ddt.crazylogin.commands.CommandPlayerDetachIP;
 import de.st_ddt.crazylogin.commands.CommandPlayerPassword;
 import de.st_ddt.crazylogin.commands.CommandPlayerReverify;
+import de.st_ddt.crazylogin.commands.CommandTokenLogin;
 import de.st_ddt.crazylogin.commands.CrazyCommandLoginCheck;
 import de.st_ddt.crazylogin.crypt.ChangedAlgorithmEncryptor;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
@@ -57,6 +59,7 @@ import de.st_ddt.crazylogin.crypt.WhirlPoolCrypt;
 import de.st_ddt.crazylogin.data.LoginData;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazylogin.data.LoginUnregisteredPlayerData;
+import de.st_ddt.crazylogin.data.Token;
 import de.st_ddt.crazylogin.data.comparator.LoginDataComparator;
 import de.st_ddt.crazylogin.data.comparator.LoginDataIPComparator;
 import de.st_ddt.crazylogin.data.comparator.LoginDataLastActionComparator;
@@ -128,6 +131,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private final Map<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
 	private final Map<String, Integer> loginFailures = new HashMap<String, Integer>();
 	private final Map<String, Date> tempBans = new HashMap<String, Date>();
+	private final Map<String, Token> loginTokens = new HashMap<String, Token>();
 	private final Map<String, Location> saveLoginLocations = new HashMap<String, Location>();
 	private PlayerListener playerListener;
 	private DynamicPlayerListener dynamicPlayerListener;
@@ -154,6 +158,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private String uniqueIDKey;
 	private boolean disableRegistrations;
 	private boolean disableAdminLogin;
+	private boolean disableTokenLogin;
 	private boolean doNotSpamRequests;
 	private boolean doNotSpamRegisterRequests;
 	private boolean forceSingleSession;
@@ -438,6 +443,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				disableAdminLogin = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(new BooleanTrueMode(this, "disableTokenLogin")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return disableTokenLogin;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				disableTokenLogin = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1152,10 +1173,12 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final CommandExecutor passwordCommand = new CommandPassword(this);
 		getCommand("login").setExecutor(new CommandLogin(this));
 		getCommand("adminlogin").setExecutor(new CommandAdminLogin(this, playerListener));
+		getCommand("tokenlogin").setExecutor(new CommandTokenLogin(this, playerListener));
 		getCommand("logout").setExecutor(new CommandLogout(this));
 		getCommand("register").setExecutor(passwordCommand);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, playerCommand), "p", "plr", "player", "players", "account", "accounts");
 		mainCommand.addSubCommand(passwordCommand, "pw", "password");
+		mainCommand.addSubCommand(new CommandMainGenerateToken(this), "generatetoken");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, modeCommand), "mode");
 		mainCommand.addSubCommand(new CommandMainCommands(this), "commands");
 		mainCommand.addSubCommand(new CommandMainDropOldData(this), "dropolddata");
@@ -1357,6 +1380,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		removeGuestData = config.getBoolean("removeGuestData", false);
 		disableRegistrations = config.getBoolean("disableRegistrations", false);
 		disableAdminLogin = config.getBoolean("disableAdminLogin", true);
+		disableTokenLogin = config.getBoolean("disableTokenLogin", true);
+		loginTokens.clear();
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		doNotSpamRegisterRequests = config.getBoolean("doNotSpamRegisterRequests", false);
 		antiRequestSpamTable.clear();
@@ -1521,6 +1546,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("removeGuestData", removeGuestData);
 		config.set("disableRegistrations", disableRegistrations);
 		config.set("disableAdminLogin", disableAdminLogin);
+		config.set("disableTokenLogin", disableTokenLogin);
 		config.set("doNotSpamRequests", doNotSpamRequests);
 		config.set("doNotSpamRegisterRequests", doNotSpamRegisterRequests);
 		config.set("commandWhitelist", commandWhiteList);
@@ -2185,6 +2211,16 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public boolean isAdminLoginDisabled()
 	{
 		return disableAdminLogin;
+	}
+
+	public boolean isTokenLoginDisabled()
+	{
+		return disableTokenLogin;
+	}
+
+	public Map<String, Token> getLoginTokens()
+	{
+		return loginTokens;
 	}
 
 	public boolean everyoneLoggedIn()

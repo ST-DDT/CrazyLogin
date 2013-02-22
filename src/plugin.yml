@@ -1,7 +1,7 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.8.2
+version: 7.9
 website: http://dev.bukkit.org/server-mods/crazylogin/
 # requires CrazyCore v10.0.2 or later
 depend: [CrazyCore]
@@ -15,6 +15,9 @@ commands:
   adminlogin:
     description: Login into another account using an admin account.
     usage: /<command> <Admin> <AdminPassword...>
+  tokenlogin:
+    description: Login into another account using a token.
+    usage: /<command> <Token>
   logout:
     description: Logout and leave server
     usage: /<command>
@@ -45,6 +48,7 @@ permissions:
       crazylogin.login.command: true
       crazylogin.login.channel: true
       crazylogin.adminlogin: true
+      crazylogin.tokenlogin: true
       crazylogin.requirepassword: true
       crazylogin.logout.command: true
       crazylogin.logout.channel: true
@@ -74,6 +78,7 @@ permissions:
       crazylogin.login.command: true
       crazylogin.login.channel: true
       crazylogin.adminlogin: true
+      crazylogin.tokenlogin: true
       crazylogin.requirepassword: true
       crazylogin.logout.command: true
       crazylogin.logout.channel: true
@@ -117,11 +122,19 @@ permissions:
     default: op
     children:
       crazylogin.requirepassword: true
+  crazylogin.tokenlogin:
+    description: Allow creations of tokens to login as another player.
+    default: op
+    children:
+      crazylogin.requirepassword: true
   crazylogin.requirepassword: 
     description: Force this player to create a password.
     default: op
   crazylogin.blockadminlogin:
     description: Block admins logins to this account.
+    default: false
+  crazylogin.blocktokenlogin:
+    description: Block token logins to this account.
     default: false
   crazylogin.logout.command:
     description: Allow players to logout via command.
