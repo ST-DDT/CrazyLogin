@@ -22,7 +22,7 @@ public class CommandPlayerReverify extends CommandExecutor
 	}
 
 	@Override
-	@Localized("CRAZYLOGIN.COMMAND.REVERIFY.SUCCESS $Name$")
+	@Localized("CRAZYLOGIN.COMMAND.PLAYER.REVERIFY.SUCCESS $Name$")
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
 		if (args.length != 1)
