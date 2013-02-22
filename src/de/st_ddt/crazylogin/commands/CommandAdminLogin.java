@@ -66,7 +66,7 @@ public class CommandAdminLogin extends CommandExecutor
 			plugin.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong adminpassword.");
 			return;
 		}
-		playerData.setOnline(true);
+		playerData.setLoggedIn(true);
 		plugin.sendLocaleMessage("LOGIN.SUCCESS", player);
 		plugin.getCrazyLogger().log("Login", player.getName() + " (via Admin " + admin.getName() + ") logged in successfully.");
 		playerListener.removeFromMovementBlocker(player);

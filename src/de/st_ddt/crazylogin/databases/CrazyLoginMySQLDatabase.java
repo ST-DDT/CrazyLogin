@@ -46,7 +46,7 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 		online = data.isLoggedIn();
 		data = loadEntry(key);
 		if (data != null)
-			data.setOnline(online);
+			data.setLoggedIn(online);
 		return data;
 	}
 

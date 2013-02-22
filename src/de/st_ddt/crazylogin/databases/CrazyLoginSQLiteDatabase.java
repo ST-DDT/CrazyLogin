@@ -46,7 +46,7 @@ public final class CrazyLoginSQLiteDatabase extends SQLitePlayerDataDatabase<Log
 		online = data.isLoggedIn();
 		data = loadEntry(key);
 		if (data != null)
-			data.setOnline(online);
+			data.setLoggedIn(online);
 		return data;
 	}
 

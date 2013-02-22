@@ -31,7 +31,7 @@ public class CommandPlayerReverify extends CommandExecutor
 		if (arg.equals("*"))
 		{
 			for (final LoginPlayerData data : plugin.getPlayerData())
-				data.setOnline(false);
+				data.setLoggedIn(false);
 			plugin.sendLocaleMessage("COMMAND.PLAYER.REVERIFY.SUCCESS", sender, arg);
 		}
 		else
@@ -39,7 +39,7 @@ public class CommandPlayerReverify extends CommandExecutor
 			final LoginPlayerData data = plugin.getPlayerData(arg);
 			if (data == null)
 				throw new CrazyCommandNoSuchException("Player (with Account)", arg);
-			data.setOnline(false);
+			data.setLoggedIn(false);
 			plugin.sendLocaleMessage("COMMAND.PLAYER.REVERIFY.SUCCESS", sender, data.getName());
 		}
 	}

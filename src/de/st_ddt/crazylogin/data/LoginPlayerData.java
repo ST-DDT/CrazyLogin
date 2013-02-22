@@ -32,14 +32,14 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 
 	protected String password;
 	protected final ArrayList<String> ips = new ArrayList<String>(6);
-	protected boolean online;
+	protected boolean loggedIn;
 	protected Date lastAction;
 
 	public LoginPlayerData(final String name)
 	{
 		super(name);
 		password = "FAILEDLOADING";
-		online = false;
+		loggedIn = false;
 		lastAction = new Date();
 	}
 
@@ -52,7 +52,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	public LoginPlayerData(final Player player)
 	{
 		this(player.getName(), player.getAddress().getAddress().getHostAddress());
-		online = true;
+		loggedIn = true;
 	}
 
 	// Used for Imports
@@ -60,7 +60,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		super(name);
 		this.password = password;
-		this.online = false;
+		this.loggedIn = false;
 		this.lastAction = lastAction;
 	}
 
@@ -72,7 +72,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		for (final String ip : config.getStringList(columnNames[2]))
 			ips.add(ip);
 		lastAction = ObjectSaveLoadHelper.StringToDate(config.getString(columnNames[3]), new Date());
-		online = false;
+		loggedIn = false;
 	}
 
 	// in Config-Datenbank speichern
@@ -104,7 +104,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		{
 			lastAction = new Date();
 		}
-		online = false;
+		loggedIn = false;
 	}
 
 	// in Flat-Datenbank speichern
@@ -157,7 +157,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 			e.printStackTrace();
 			lastAction = new Date();
 		}
-		online = false;
+		loggedIn = false;
 	}
 
 	// in MySQL-Datenbank speichern
@@ -294,16 +294,16 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	@Override
 	public boolean isLoggedIn()
 	{
-		return online;
+		return loggedIn;
 	}
 
 	@Override
 	public boolean login(final String password)
 	{
-		this.online = isPassword(password);
-		if (online)
+		this.loggedIn = isPassword(password);
+		if (loggedIn)
 			notifyAction();
-		return online;
+		return loggedIn;
 	}
 
 	@Override
@@ -315,7 +315,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	@Override
 	public void logout(final boolean removeIPs)
 	{
-		this.online = false;
+		this.loggedIn = false;
 		notifyAction();
 		if (removeIPs)
 			ips.clear();
@@ -339,13 +339,13 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	public boolean checkTimeOut(final Date timeOut)
 	{
 		if (timeOut.after(lastAction))
-			this.online = false;
-		return online;
+			this.loggedIn = false;
+		return loggedIn;
 	}
 
-	public void setOnline(final boolean online)
+	public void setLoggedIn(final boolean loggedIn)
 	{
-		this.online = online;
+		this.loggedIn = loggedIn;
 	}
 
 	@Override
@@ -358,13 +358,13 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 			case 1:
 				return CrazyLightPluginInterface.DATETIMEFORMAT.format(lastAction);
 			case 2:
-				return online ? "Online" : "Offline";
+				return loggedIn ? "Online" : "Offline";
 			case 3:
 				return getLatestIP();
 			case 4:
 				return "+";
 			case 5:
-				return online ? ChatColor.YELLOW.toString() : ChatColor.WHITE.toString();
+				return loggedIn ? ChatColor.YELLOW.toString() : ChatColor.WHITE.toString();
 			case 6:
 				return ChatColor.GREEN.toString();
 		}
