@@ -36,15 +36,15 @@ import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
 
-public class CrazyLoginDynamicPlayerListener implements Listener
+public class DynamicPlayerListener implements Listener
 {
 
 	protected final static Pattern PATTERN_SPACE = Pattern.compile(" ");
 	protected final CrazyLogin plugin;
-	private final CrazyLoginPlayerListener playerListener;
+	private final PlayerListener playerListener;
 	private final Map<String, Location> movementBlocker;
 
-	public CrazyLoginDynamicPlayerListener(final CrazyLogin plugin, final CrazyLoginPlayerListener playerListener)
+	public DynamicPlayerListener(final CrazyLogin plugin, final PlayerListener playerListener)
 	{
 		super();
 		this.plugin = plugin;

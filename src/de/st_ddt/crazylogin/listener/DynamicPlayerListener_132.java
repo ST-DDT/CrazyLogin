@@ -3,40 +3,41 @@ package de.st_ddt.crazylogin.listener;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.painting.PaintingBreakByEntityEvent;
+import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 
-public class CrazyLoginDynamicPlayerListener_142 extends CrazyLoginDynamicPlayerListener
+@SuppressWarnings("deprecation")
+public class DynamicPlayerListener_132 extends DynamicPlayerListener
 {
 
-	public CrazyLoginDynamicPlayerListener_142(final CrazyLogin plugin, final CrazyLoginPlayerListener playerListener)
+	public DynamicPlayerListener_132(final CrazyLogin plugin, final PlayerListener playerListener)
 	{
 		super(plugin, playerListener);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-	public void HangingPlace(final HangingPlaceEvent event)
+	public void PaintingPlace(final PaintingPlaceEvent event)
 	{
-		if (!(event.getEntity() instanceof Player))
-			return;
-		final Player player = (Player) event.getEntity();
+		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
+		plugin.requestLogin(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-	public void HangingBreak(final HangingBreakByEntityEvent event)
+	public void PaintingBreak(final PaintingBreakByEntityEvent event)
 	{
-		if (!(event.getEntity() instanceof Player))
+		if (!(event.getRemover() instanceof Player))
 			return;
-		final Player player = (Player) event.getEntity();
+		final Player player = (Player) event.getRemover();
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
+		plugin.requestLogin(player);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)

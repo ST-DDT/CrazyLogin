@@ -12,10 +12,10 @@ import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.OfflinePlayerParamitrisable;
 
-public class CrazyLoginCommandPlayerDelete extends CrazyLoginCommandExecutor
+public class CommandPlayerDelete extends CommandExecutor
 {
 
-	public CrazyLoginCommandPlayerDelete(final CrazyLogin plugin)
+	public CommandPlayerDelete(final CrazyLogin plugin)
 	{
 		super(plugin);
 	}

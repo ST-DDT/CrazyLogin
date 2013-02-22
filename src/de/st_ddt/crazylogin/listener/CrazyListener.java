@@ -11,13 +11,13 @@ import de.st_ddt.crazyplugin.events.CrazyPlayerNamesConnectedToIPEvent;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
 import de.st_ddt.crazyutil.Named;
 
-public final class CrazyLoginCrazyListener implements Listener
+public final class CrazyListener implements Listener
 {
 
 	protected final CrazyLogin plugin;
-	protected final CrazyLoginPlayerListener playerListener;
+	protected final PlayerListener playerListener;
 
-	public CrazyLoginCrazyListener(final CrazyLogin plugin, final CrazyLoginPlayerListener playerListener)
+	public CrazyListener(final CrazyLogin plugin, final PlayerListener playerListener)
 	{
 		super();
 		this.plugin = plugin;

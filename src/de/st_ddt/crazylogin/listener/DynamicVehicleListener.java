@@ -9,12 +9,12 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 
-public final class CrazyLoginDynamicVehicleListener implements Listener
+public final class DynamicVehicleListener implements Listener
 {
 
 	private final CrazyLogin plugin;
 
-	public CrazyLoginDynamicVehicleListener(final CrazyLogin plugin)
+	public DynamicVehicleListener(final CrazyLogin plugin)
 	{
 		super();
 		this.plugin = plugin;

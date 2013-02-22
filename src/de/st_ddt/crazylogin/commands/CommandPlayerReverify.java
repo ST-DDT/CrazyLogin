@@ -13,10 +13,10 @@ import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 
-public class CrazyLoginCommandPlayerReverify extends CrazyLoginCommandExecutor
+public class CommandPlayerReverify extends CommandExecutor
 {
 
-	public CrazyLoginCommandPlayerReverify(final CrazyLogin plugin)
+	public CommandPlayerReverify(final CrazyLogin plugin)
 	{
 		super(plugin);
 	}

@@ -9,12 +9,12 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyplugin.listener.CrazyPluginMessageListener;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
-public final class CrazyLoginMessageListener extends CrazyPluginMessageListener<CrazyLogin>
+public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin>
 {
 
 	protected final CrazyCrypt1 encryptor = new CrazyCrypt1(plugin, (String[]) null);
 
-	public CrazyLoginMessageListener(final CrazyLogin plugin)
+	public MessageListener(final CrazyLogin plugin)
 	{
 		super(plugin);
 	}

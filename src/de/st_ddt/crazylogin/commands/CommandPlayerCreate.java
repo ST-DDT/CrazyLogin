@@ -1,37 +1,44 @@
 package de.st_ddt.crazylogin.commands;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
-import de.st_ddt.crazyplugin.exceptions.CrazyCommandNoSuchException;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandAlreadyExistsException;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandCircumstanceException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
-import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 
-public class CrazyLoginCommandPlayerPassword extends CrazyLoginCommandExecutor
+public class CommandPlayerCreate extends CommandExecutor
 {
 
-	public CrazyLoginCommandPlayerPassword(final CrazyLogin plugin)
+	public CommandPlayerCreate(final CrazyLogin plugin)
 	{
 		super(plugin);
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS $Name$", "CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED" })
+	@Localized({ "CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS $Name$", "CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED" })
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
+		if (plugin.getCrazyDatabase() == null)
+			throw new CrazyCommandCircumstanceException("when database is accessible");
 		if (args.length < (plugin.isConfirmPasswordEnabled() ? 3 : 2))
-			throw new CrazyCommandUsageException("<Player> <Password>" + (plugin.isConfirmPasswordEnabled() ? " <Password>" : ""));
-		final LoginPlayerData data = plugin.getPlayerData(args[0]);
-		if (data == null)
-			throw new CrazyCommandNoSuchException("Player (with Account)", args[0]);
+			throw new CrazyCommandUsageException("<Player> <Passwort>" + (plugin.isConfirmPasswordEnabled() ? " <Password>" : ""));
+		final String name = args[0];
+		if (plugin.hasPlayerData(name))
+			throw new CrazyCommandAlreadyExistsException("Account", name);
+		final LoginPlayerData data = new LoginPlayerData(name);
 		final String[] passwordArgs = ChatHelperExtended.shiftArray(args, 1);
 		String password = null;
 		if (plugin.isConfirmPasswordEnabled())
@@ -48,9 +55,9 @@ public class CrazyLoginCommandPlayerPassword extends CrazyLoginCommandExecutor
 		data.setPassword(password);
 		if (data.isOnline())
 			plugin.getMessageListener().sendPluginMessage(data.getPlayer(), "Q_StorePW " + password);
-		plugin.sendLocaleMessage("COMMAND.PLAYER.PASSWORD.SUCCESS", sender, data.getName());
+		plugin.sendLocaleMessage("COMMAND.PLAYER.CREATE.SUCCESS", sender, name);
 		plugin.getCrazyDatabase().save(data);
-		plugin.getCrazyLogger().log("Account", data.getName() + " changed his password successfully (via " + sender.getName() + ").");
+		plugin.getCrazyLogger().log("Account", data.getName() + " registered successfully (via " + sender.getName() + ").");
 		if (!plugin.isConfirmPasswordEnabled())
 			if (passwordArgs.length % 2 == 0)
 				if (ChatHelper.listingString(" ", ChatHelperExtended.cutArray(passwordArgs, passwordArgs.length / 2)).equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(passwordArgs, passwordArgs.length / 2))))
@@ -62,12 +69,18 @@ public class CrazyLoginCommandPlayerPassword extends CrazyLoginCommandExecutor
 	{
 		if (args.length != 1)
 			return null;
-		return PlayerDataParamitrisable.tabHelp(plugin, args[0]);
+		final List<String> res = new ArrayList<String>();
+		final Pattern pattern = Pattern.compile(args[0], Pattern.CASE_INSENSITIVE);
+		for (final OfflinePlayer player : Bukkit.getOfflinePlayers())
+			if (pattern.matcher(player.getName()).find())
+				if (!plugin.hasPlayerData(player))
+					res.add(player.getName());
+		return res;
 	}
 
 	@Override
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return PermissionModule.hasPermission(sender, "crazylogin.player.password");
+		return PermissionModule.hasPermission(sender, "crazylogin.player.create");
 	}
 }

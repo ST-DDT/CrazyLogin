@@ -13,7 +13,7 @@ import de.st_ddt.crazyutil.ListFormat;
 import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
-public class CrazyLoginCommandMainCommands extends CrazyCommandListEditor<CrazyLogin, String>
+public class CommandMainCommands extends CrazyCommandListEditor<CrazyLogin, String>
 {
 
 	private final ListFormat format = new ListFormat()
@@ -39,7 +39,7 @@ public class CrazyLoginCommandMainCommands extends CrazyCommandListEditor<CrazyL
 		}
 	};
 
-	public CrazyLoginCommandMainCommands(final CrazyLogin plugin)
+	public CommandMainCommands(final CrazyLogin plugin)
 	{
 		super(plugin, true, false, true);
 	}

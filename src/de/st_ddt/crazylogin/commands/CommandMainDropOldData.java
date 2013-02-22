@@ -14,10 +14,10 @@ import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
-public class CrazyLoginCommandMainDropOldData extends CrazyLoginCommandExecutor
+public class CommandMainDropOldData extends CommandExecutor
 {
 
-	public CrazyLoginCommandMainDropOldData(final CrazyLogin plugin)
+	public CommandMainDropOldData(final CrazyLogin plugin)
 	{
 		super(plugin);
 	}

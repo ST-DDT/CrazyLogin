@@ -10,10 +10,10 @@ import org.bukkit.event.player.PlayerChatEvent;
 import de.st_ddt.crazylogin.CrazyLogin;
 
 @SuppressWarnings("deprecation")
-public class CrazyLoginDynamicPlayerListener_125 extends CrazyLoginDynamicPlayerListener
+public class DynamicPlayerListener_125 extends DynamicPlayerListener
 {
 
-	public CrazyLoginDynamicPlayerListener_125(final CrazyLogin plugin, final CrazyLoginPlayerListener playerListener)
+	public DynamicPlayerListener_125(final CrazyLogin plugin, final PlayerListener playerListener)
 	{
 		super(plugin, playerListener);
 	}

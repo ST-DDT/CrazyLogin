@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
-import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
+import de.st_ddt.crazylogin.listener.PlayerListener;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandCircumstanceException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
@@ -16,12 +16,12 @@ import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
-public class CrazyLoginCommandAdminLogin extends CrazyLoginCommandExecutor
+public class CommandAdminLogin extends CommandExecutor
 {
 
-	private final CrazyLoginPlayerListener playerListener;
+	private final PlayerListener playerListener;
 
-	public CrazyLoginCommandAdminLogin(final CrazyLogin plugin, final CrazyLoginPlayerListener playerListener)
+	public CommandAdminLogin(final CrazyLogin plugin, final PlayerListener playerListener)
 	{
 		super(plugin);
 		this.playerListener = playerListener;

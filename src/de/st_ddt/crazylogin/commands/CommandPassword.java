@@ -13,10 +13,10 @@ import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
-public class CrazyLoginCommandPassword extends CrazyLoginCommandExecutor
+public class CommandPassword extends CommandExecutor
 {
 
-	public CrazyLoginCommandPassword(final CrazyLogin plugin)
+	public CommandPassword(final CrazyLogin plugin)
 	{
 		super(plugin);
 	}

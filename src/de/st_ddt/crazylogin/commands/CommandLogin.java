@@ -10,10 +10,10 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
-public class CrazyLoginCommandLogin extends CrazyLoginCommandExecutor
+public class CommandLogin extends CommandExecutor
 {
 
-	public CrazyLoginCommandLogin(final CrazyLogin plugin)
+	public CommandLogin(final CrazyLogin plugin)
 	{
 		super(plugin);
 	}

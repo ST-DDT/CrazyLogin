@@ -16,10 +16,10 @@ import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 
-public class CrazyLoginCommandPlayerDetachIP extends CrazyLoginCommandExecutor
+public class CommandPlayerDetachIP extends CommandExecutor
 {
 
-	public CrazyLoginCommandPlayerDetachIP(final CrazyLogin plugin)
+	public CommandPlayerDetachIP(final CrazyLogin plugin)
 	{
 		super(plugin);
 	}

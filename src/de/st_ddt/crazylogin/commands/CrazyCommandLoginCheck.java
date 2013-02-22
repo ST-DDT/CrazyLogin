@@ -11,7 +11,7 @@ import de.st_ddt.crazyplugin.commands.CrazyCommandExecutor;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 
-public class CrazyCommandLoginCheck extends CrazyLoginCommandExecutor
+public class CrazyCommandLoginCheck extends CommandExecutor
 {
 
 	private final CrazyCommandExecutor<? extends CrazyPluginInterface> command;

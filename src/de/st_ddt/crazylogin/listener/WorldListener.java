@@ -6,12 +6,12 @@ import org.bukkit.event.world.WorldLoadEvent;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 
-public final class CrazyLoginWorldListener implements Listener
+public final class WorldListener implements Listener
 {
 
 	protected final CrazyLogin plugin;
 
-	public CrazyLoginWorldListener(final CrazyLogin plugin)
+	public WorldListener(final CrazyLogin plugin)
 	{
 		super();
 		this.plugin = plugin;

@@ -8,10 +8,10 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
-public class CrazyLoginCommandLogout extends CrazyLoginCommandExecutor
+public class CommandLogout extends CommandExecutor
 {
 
-	public CrazyLoginCommandLogout(final CrazyLogin plugin)
+	public CommandLogout(final CrazyLogin plugin)
 	{
 		super(plugin);
 	}

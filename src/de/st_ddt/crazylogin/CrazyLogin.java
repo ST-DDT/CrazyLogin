@@ -23,17 +23,17 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.messaging.Messenger;
 
+import de.st_ddt.crazylogin.commands.CommandAdminLogin;
+import de.st_ddt.crazylogin.commands.CommandExecutor;
+import de.st_ddt.crazylogin.commands.CommandLogin;
+import de.st_ddt.crazylogin.commands.CommandLogout;
+import de.st_ddt.crazylogin.commands.CommandMainCommands;
+import de.st_ddt.crazylogin.commands.CommandMainDropOldData;
+import de.st_ddt.crazylogin.commands.CommandPassword;
+import de.st_ddt.crazylogin.commands.CommandPlayerCreate;
+import de.st_ddt.crazylogin.commands.CommandPlayerDetachIP;
+import de.st_ddt.crazylogin.commands.CommandPlayerPassword;
 import de.st_ddt.crazylogin.commands.CrazyCommandLoginCheck;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandAdminLogin;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandExecutor;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandLogin;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandLogout;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandMainCommands;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandMainDropOldData;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandPassword;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandPlayerCreate;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandPlayerDetachIP;
-import de.st_ddt.crazylogin.commands.CrazyLoginCommandPlayerPassword;
 import de.st_ddt.crazylogin.crypt.ChangedAlgorithmEncryptor;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt2;
@@ -73,15 +73,15 @@ import de.st_ddt.crazylogin.events.LoginFailReason;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginExceedingMaxRegistrationsPerIPException;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginException;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginRegistrationsDisabled;
-import de.st_ddt.crazylogin.listener.CrazyLoginCrazyListener;
-import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener;
-import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener_125;
-import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener_132;
-import de.st_ddt.crazylogin.listener.CrazyLoginDynamicPlayerListener_142;
-import de.st_ddt.crazylogin.listener.CrazyLoginDynamicVehicleListener;
-import de.st_ddt.crazylogin.listener.CrazyLoginMessageListener;
-import de.st_ddt.crazylogin.listener.CrazyLoginPlayerListener;
-import de.st_ddt.crazylogin.listener.CrazyLoginWorldListener;
+import de.st_ddt.crazylogin.listener.CrazyListener;
+import de.st_ddt.crazylogin.listener.DynamicPlayerListener;
+import de.st_ddt.crazylogin.listener.DynamicPlayerListener_125;
+import de.st_ddt.crazylogin.listener.DynamicPlayerListener_132;
+import de.st_ddt.crazylogin.listener.DynamicPlayerListener_142;
+import de.st_ddt.crazylogin.listener.DynamicVehicleListener;
+import de.st_ddt.crazylogin.listener.MessageListener;
+import de.st_ddt.crazylogin.listener.PlayerListener;
+import de.st_ddt.crazylogin.listener.WorldListener;
 import de.st_ddt.crazylogin.metadata.Authenticated;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazylogin.tasks.ScheduledCheckTask;
@@ -128,10 +128,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private final Map<String, Integer> loginFailures = new HashMap<String, Integer>();
 	private final Map<String, Date> tempBans = new HashMap<String, Date>();
 	private final Map<String, Location> saveLoginLocations = new HashMap<String, Location>();
-	private CrazyLoginPlayerListener playerListener;
-	private CrazyLoginDynamicPlayerListener dynamicPlayerListener;
-	private CrazyLoginDynamicVehicleListener dynamicVehicleListener;
-	private CrazyLoginMessageListener messageListener;
+	private PlayerListener playerListener;
+	private DynamicPlayerListener dynamicPlayerListener;
+	private DynamicVehicleListener dynamicVehicleListener;
+	private MessageListener messageListener;
 	private boolean dynamicHooksRegistered;
 	// plugin config
 	private boolean alwaysNeedPassword;
@@ -1148,20 +1148,20 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	private void registerCommands()
 	{
-		final CrazyLoginCommandExecutor passwordCommand = new CrazyLoginCommandPassword(this);
-		getCommand("login").setExecutor(new CrazyLoginCommandLogin(this));
-		getCommand("adminlogin").setExecutor(new CrazyLoginCommandAdminLogin(this, playerListener));
-		getCommand("logout").setExecutor(new CrazyLoginCommandLogout(this));
+		final CommandExecutor passwordCommand = new CommandPassword(this);
+		getCommand("login").setExecutor(new CommandLogin(this));
+		getCommand("adminlogin").setExecutor(new CommandAdminLogin(this, playerListener));
+		getCommand("logout").setExecutor(new CommandLogout(this));
 		getCommand("register").setExecutor(passwordCommand);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, playerCommand), "p", "plr", "player", "players", "account", "accounts");
 		mainCommand.addSubCommand(passwordCommand, "pw", "password");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, modeCommand), "mode");
-		mainCommand.addSubCommand(new CrazyLoginCommandMainCommands(this), "commands");
-		mainCommand.addSubCommand(new CrazyLoginCommandMainDropOldData(this), "dropolddata");
-		final CrazyLoginCommandExecutor create = new CrazyLoginCommandPlayerCreate(this);
-		final CrazyLoginCommandExecutor changePassword = new CrazyLoginCommandPlayerPassword(this);
-		final CrazyLoginCommandExecutor detachip = new CrazyLoginCommandPlayerDetachIP(this);
-		final CrazyLoginCommandExecutor reverify = new CrazyLoginCommandPlayerDetachIP(this);
+		mainCommand.addSubCommand(new CommandMainCommands(this), "commands");
+		mainCommand.addSubCommand(new CommandMainDropOldData(this), "dropolddata");
+		final CommandExecutor create = new CommandPlayerCreate(this);
+		final CommandExecutor changePassword = new CommandPlayerPassword(this);
+		final CommandExecutor detachip = new CommandPlayerDetachIP(this);
+		final CommandExecutor reverify = new CommandPlayerDetachIP(this);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, create), "create");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, changePassword), "chgpw", "changepw", "changepassword");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, detachip), "detachip");
@@ -1174,22 +1174,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	private void registerHooks()
 	{
-		this.playerListener = new CrazyLoginPlayerListener(this);
+		this.playerListener = new PlayerListener(this);
 		final String mcVersion = ChatHelper.getMinecraftVersion();
 		if (VersionComparator.compareVersions(mcVersion, "1.3.2") == 1)
-			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener_142(this, playerListener);
+			this.dynamicPlayerListener = new DynamicPlayerListener_142(this, playerListener);
 		else if (VersionComparator.compareVersions(mcVersion, "1.2.5") == 1)
-			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener_132(this, playerListener);
+			this.dynamicPlayerListener = new DynamicPlayerListener_132(this, playerListener);
 		else
-			this.dynamicPlayerListener = new CrazyLoginDynamicPlayerListener_125(this, playerListener);
-		this.dynamicVehicleListener = new CrazyLoginDynamicVehicleListener(this);
-		final CrazyLoginCrazyListener crazylistener = new CrazyLoginCrazyListener(this, playerListener);
+			this.dynamicPlayerListener = new DynamicPlayerListener_125(this, playerListener);
+		this.dynamicVehicleListener = new DynamicVehicleListener(this);
+		final CrazyListener crazylistener = new CrazyListener(this, playerListener);
 		final PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(crazylistener, this);
-		pm.registerEvents(new CrazyLoginWorldListener(this), this);
+		pm.registerEvents(new WorldListener(this), this);
 		registerDynamicHooks();
-		messageListener = new CrazyLoginMessageListener(this);
+		messageListener = new MessageListener(this);
 		final Messenger ms = getServer().getMessenger();
 		ms.registerIncomingPluginChannel(this, "CrazyLogin", messageListener);
 		ms.registerOutgoingPluginChannel(this, "CrazyLogin");
@@ -2171,7 +2171,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 	}
 
-	public CrazyLoginMessageListener getMessageListener()
+	public MessageListener getMessageListener()
 	{
 		return messageListener;
 	}

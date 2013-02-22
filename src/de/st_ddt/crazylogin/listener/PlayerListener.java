@@ -30,7 +30,7 @@ import de.st_ddt.crazyutil.PlayerSaver;
 import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 
-public class CrazyLoginPlayerListener implements Listener
+public class PlayerListener implements Listener
 {
 
 	protected final CrazyLogin plugin;
@@ -41,7 +41,7 @@ public class CrazyLoginPlayerListener implements Listener
 	private final Map<Player, String> joinMessages = new HashMap<Player, String>();
 	private final Set<String> kicked = new HashSet<String>();
 
-	public CrazyLoginPlayerListener(final CrazyLogin plugin)
+	public PlayerListener(final CrazyLogin plugin)
 	{
 		super();
 		this.plugin = plugin;
