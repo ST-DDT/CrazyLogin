@@ -1355,7 +1355,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		blockGuestJoin = config.getBoolean("blockGuestJoin", false);
 		removeGuestData = config.getBoolean("removeGuestData", false);
 		disableRegistrations = config.getBoolean("disableRegistrations", false);
-		disableAdminLogin = config.getBoolean("disableAdminLogin", false);
+		disableAdminLogin = config.getBoolean("disableAdminLogin", true);
 		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
 		doNotSpamRegisterRequests = config.getBoolean("doNotSpamRegisterRequests", false);
 		antiRequestSpamTable.clear();

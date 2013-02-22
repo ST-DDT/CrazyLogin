@@ -100,7 +100,7 @@ blockGuestJoin: false
 removeGuestData: false
 # when enabled ingame registrations are disabled (command and pluginChannel) (true/false)
 disableRegistrations: false
-# when enabled you cannot use adminlogin command (true/false)
+# if set to true you cannot use adminlogin command (true/false)
 disableAdminLogin: false
 # when disabled request login/register messages are spammed every cancelled action, when enabled only every 5 seconds (true/false)
 doNotSpamRequests: false
