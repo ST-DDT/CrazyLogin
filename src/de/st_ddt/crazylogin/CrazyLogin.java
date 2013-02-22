@@ -104,6 +104,7 @@ import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.ListOptionsModder;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
+import de.st_ddt.crazyutil.PreSetList;
 import de.st_ddt.crazyutil.VersionComparator;
 import de.st_ddt.crazyutil.databases.DatabaseType;
 import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
@@ -184,6 +185,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private int maxNameLength;
 	static
 	{
+		// Encryption Algorithms
 		EncryptHelper.registerAlgorithm("Plaintext", PlainCrypt.class);
 		EncryptHelper.registerAlgorithm("MD2", MD2Crypt.class);
 		EncryptHelper.registerAlgorithm("MD5", MD5Crypt.class);
@@ -199,6 +201,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		EncryptHelper.registerAlgorithm("CrazyCrypt2", CrazyCrypt2.class);
 		EncryptHelper.registerAlgorithm("WebCrypt", WebCrypt.class);
 		EncryptHelper.registerAlgorithm("Whirlpool", WhirlPoolCrypt.class);
+		// LoginSystem
 		LoginModule.LOGINSYSTEMS.add(0, CrazyLoginSystem.class);
 	}
 
@@ -210,9 +213,40 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public CrazyLogin()
 	{
 		super();
+		registerPreSetLists();
 		registerModes();
 		registerFilter();
 		registerSorters();
+	}
+
+	private void registerPreSetLists()
+	{
+		new PreSetList("login_verified")
+		{
+
+			@Override
+			public List<String> getList()
+			{
+				final List<String> names = new ArrayList<String>();
+				for (final LoginPlayerData data : getOnlinePlayerDatas())
+					if (data.isLoggedIn())
+						names.add(data.getName());
+				return names;
+			}
+		};
+		new PreSetList("login_notverified")
+		{
+
+			@Override
+			public List<String> getList()
+			{
+				final List<String> names = new ArrayList<String>();
+				for (final LoginPlayerData data : getOnlinePlayerDatas())
+					if (data.isLoggedIn())
+						names.add(data.getName());
+				return names;
+			}
+		};
 	}
 
 	@Localized("CRAZYLOGIN.MODE.CHANGE $Name$ $Value$")
