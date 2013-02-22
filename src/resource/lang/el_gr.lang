@@ -3,6 +3,7 @@ CRAZYLOGIN.ADMINLOGIN.FAILEDWARN=&;ΠΡΟΣΟΧΗ! ΑΠΕΤΥΧΕ H ΠΡΟΣΠΑ
 CRAZYLOGIN.BROADCAST.JOIN=&EΟ παίχτης $0$ μπήκε στο παιχνίδι.
 CRAZYLOGIN.BROADCAST.KICK=&EΟ παίχτης $0$ έφυγε από το παιχνίδι.(kick)
 CRAZYLOGIN.BROADCAST.QUIT=&EΟ παίχτης $0$ έφυγε από το παιχνίδι.(quit)
+#CRAZYLOGIN.COMMAND.AUTOLOGOUT=
 CRAZYLOGIN.COMMAND.COMMANDS.ADDED=Εντολή προστέθηκε\n($0$)
 CRAZYLOGIN.COMMAND.COMMANDS.LISTHEAD=$2$Whitelisted Εντολές (Σελίδα $0$ / $1$)
 CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Εντολή αφαιρέθηκε\n($0$)

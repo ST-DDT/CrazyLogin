@@ -3,6 +3,7 @@ CRAZYLOGIN.ADMINLOGIN.FAILEDWARN=&CWARNUNG! Fehlgeschlagener Adminloginversuch! 
 CRAZYLOGIN.BROADCAST.JOIN=&E$0$ hat das Spiel betreten.
 CRAZYLOGIN.BROADCAST.KICK=&E$0$ hat das Spiel verlassen.
 CRAZYLOGIN.BROADCAST.QUIT=&E$0$ hat das Spiel verlassen.
+CRAZYLOGIN.COMMAND.AUTOLOGOUT=Du wirst automatisch ausgeloggt, wenn du den Server verlässt!
 CRAZYLOGIN.COMMAND.COMMANDS.ADDED=Befehl hinzugefügt\n($0$)
 CRAZYLOGIN.COMMAND.COMMANDS.LISTHEAD=Befehls Whitelist (Seite $0$ / $1$)
 CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Befehl entfernt\n($0$)

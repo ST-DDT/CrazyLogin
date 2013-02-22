@@ -3,6 +3,7 @@ CRAZYLOGIN.ADMINLOGIN.FAILEDWARN=&CВНИМАНИЕ! ПРОВАЛЕН ОПИТ �
 CRAZYLOGIN.BROADCAST.JOIN=&E$0$ се присъедини към играта.
 CRAZYLOGIN.BROADCAST.KICK=&E$0$ напусна играта.
 CRAZYLOGIN.BROADCAST.QUIT=&E$0$ напусна играта.
+#CRAZYLOGIN.COMMAND.AUTOLOGOUT=
 CRAZYLOGIN.COMMAND.COMMANDS.ADDED=Команда добавена\n($0$)
 CRAZYLOGIN.COMMAND.COMMANDS.LISTHEAD=$2$Списък с достъпните команди (Страница $0$ / $1$)
 CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Команда премахната\n($0$)

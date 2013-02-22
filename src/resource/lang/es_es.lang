@@ -3,6 +3,7 @@ CRAZYLOGIN.ADMINLOGIN.FAILEDWARN=&CAVISO! Autorización errónea de un admin! $0
 CRAZYLOGIN.BROADCAST.JOIN=&E$0$ ha entrado al servidor.
 CRAZYLOGIN.BROADCAST.KICK=&E$0$ ha salido del servidor.
 CRAZYLOGIN.BROADCAST.QUIT=&E$0$ ha salido del servidor.
+#CRAZYLOGIN.COMMAND.AUTOLOGOUT=
 CRAZYLOGIN.COMMAND.COMMANDS.ADDED=Commando añadido\n($0$)
 CRAZYLOGIN.COMMAND.COMMANDS.LISTHEAD=Commandos autorizados (pág. $0$ / $1$)
 CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Commando eliminado \n($0$)
