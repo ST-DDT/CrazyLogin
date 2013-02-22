@@ -33,6 +33,7 @@ import de.st_ddt.crazylogin.commands.CommandPassword;
 import de.st_ddt.crazylogin.commands.CommandPlayerCreate;
 import de.st_ddt.crazylogin.commands.CommandPlayerDetachIP;
 import de.st_ddt.crazylogin.commands.CommandPlayerPassword;
+import de.st_ddt.crazylogin.commands.CommandPlayerReverify;
 import de.st_ddt.crazylogin.commands.CrazyCommandLoginCheck;
 import de.st_ddt.crazylogin.crypt.ChangedAlgorithmEncryptor;
 import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
@@ -1161,7 +1162,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final CommandExecutor create = new CommandPlayerCreate(this);
 		final CommandExecutor changePassword = new CommandPlayerPassword(this);
 		final CommandExecutor detachip = new CommandPlayerDetachIP(this);
-		final CommandExecutor reverify = new CommandPlayerDetachIP(this);
+		final CommandExecutor reverify = new CommandPlayerReverify(this);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, create), "create");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, changePassword), "chgpw", "changepw", "changepassword");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, detachip), "detachip");
