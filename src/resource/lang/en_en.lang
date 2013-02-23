@@ -34,6 +34,7 @@ CRAZYLOGIN.KICKED.NOACCOUNT=You need an account to join this server.
 CRAZYLOGIN.KICKED.SESSION.DUPLICATE=&CYou are already online! &CPlease wait for your TimeOut or contact an admin!
 CRAZYLOGIN.LOGIN.FAILED=&CLOGIN FAILED!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CWARNING! FAILED LOGIN ATTEMPT! $0$ @ $1$
+CRAZYLOGIN.LOGIN.FAILINFO=&EThere have been &C$0$ &Efailed login attempts!
 CRAZYLOGIN.LOGIN.REQUEST=&CPlease Login! &3/login <Password>
 CRAZYLOGIN.LOGIN.SUCCESS=&ALogin successful
 CRAZYLOGIN.LOGOUT.SUCCESS=&ALogout successful

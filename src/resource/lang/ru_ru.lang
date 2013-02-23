@@ -34,6 +34,7 @@ CRAZYLOGIN.KICKED.NOACCOUNT=Вам необходимо зарегистриро
 CRAZYLOGIN.KICKED.SESSION.DUPLICATE=&CНик уже в игре. Ждите таймаута или обратитесь к оператору.
 CRAZYLOGIN.LOGIN.FAILED=&CНЕУДАЧНЫЙ ВХОД!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CВНИМАНИЕ! ОБНАРУЖЕН НЕУДАЧНЫЙ ВХОД! $0$ @ $1$
+#CRAZYLOGIN.LOGIN.FAILINFO=
 CRAZYLOGIN.LOGIN.REQUEST=&CПожалуйста войдите! &3/login <Password>
 CRAZYLOGIN.LOGIN.SUCCESS=&AУспешный вход
 CRAZYLOGIN.LOGOUT.SUCCESS=&AУспешный выход

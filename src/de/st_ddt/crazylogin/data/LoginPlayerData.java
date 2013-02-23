@@ -34,6 +34,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	protected final ArrayList<String> ips = new ArrayList<String>(6);
 	protected boolean loggedIn;
 	protected Date lastAction;
+	protected int loginFails;
 
 	public LoginPlayerData(final String name)
 	{
@@ -303,7 +304,19 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		this.loggedIn = isPassword(password);
 		if (loggedIn)
 			notifyAction();
+		else
+			loginFails++;
 		return loggedIn;
+	}
+
+	public int getLoginFails()
+	{
+		return loginFails;
+	}
+
+	public void resetLoginFails()
+	{
+		loginFails = 0;
 	}
 
 	@Override

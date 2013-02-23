@@ -133,7 +133,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	private static CrazyLogin plugin;
 	private final Map<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
-	private final Map<String, Integer> loginFailures = new HashMap<String, Integer>();
+	private final Map<String, Integer> loginFailuresPerIP = new HashMap<String, Integer>();
 	private final Map<String, Date> tempBans = new HashMap<String, Date>();
 	private final Map<String, Token> loginTokens = new HashMap<String, Token>();
 	private final Set<Player> playerAutoLogouts = new HashSet<Player>();
@@ -1412,7 +1412,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		autoKickUnregistered = Math.max(config.getInt("autoKickUnregistered", config.getInt("kickUnregistered", -1)), -1);
 		autoKickLoginFailer = Math.max(config.getInt("autoKickLoginFailer", 3), -1);
 		autoTempBanLoginFailer = Math.max(config.getInt("autoTempBanLoginFailer", -1), -1);
-		loginFailures.clear();
+		loginFailuresPerIP.clear();
 		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
 		blockGuestCommands = config.getBoolean("blockGuestCommands", true);
 		blockGuestChat = config.getBoolean("blockGuestChat", false);
@@ -1649,7 +1649,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
+	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
 	public void playerLogin(final Player player, final String password) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1675,25 +1675,28 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			new CrazyLoginLoginFailEvent(player, data, LoginFailReason.WRONG_PASSWORD).callEvent();
 			if (!plugin.isHidingWarningsEnabled())
 				broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
-			Integer fails = loginFailures.get(player.getName().toLowerCase());
+			Integer fails = loginFailuresPerIP.get(player.getAddress().getAddress().getHostAddress());
 			if (fails == null)
 				fails = 0;
 			fails++;
-			if (fails >= autoKickLoginFailer)
+			if (fails % autoKickLoginFailer == 0)
 			{
-				player.kickPlayer(locale.getLocaleMessage(player, "KICKED.LOGINFAIL"));
+				player.kickPlayer(locale.getLocaleMessage(player, "KICKED.LOGINFAIL", fails));
 				if (autoTempBanLoginFailer > 0)
 					setTempBanned(player, autoTempBanLoginFailer);
-				fails = 0;
 			}
 			else
 				sendLocaleMessage("LOGIN.FAILED", player);
-			loginFailures.put(player.getName().toLowerCase(), fails);
-			logger.log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong password");
+			loginFailuresPerIP.put(player.getAddress().getAddress().getHostAddress(), fails);
+			logger.log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong password (AttemptPerIP: " + fails + ", AttemptPerAccount: " + data.getLoginFails() + ")");
 			return;
 		}
 		new CrazyLoginLoginEvent(player, data).callEvent();
 		sendLocaleMessage("LOGIN.SUCCESS", player);
+		final int fails = data.getLoginFails();
+		data.resetLoginFails();
+		if (fails > 0)
+			sendLocaleMessage("LOGIN.FAILINFO", player, fails);
 		logger.log("Login", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged in successfully.");
 		if (!wasOnline)
 		{
@@ -1704,7 +1707,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
 		playerListener.unhidePlayer(player);
-		loginFailures.remove(player.getName().toLowerCase());
+		loginFailuresPerIP.remove(player.getAddress().getAddress().getHostAddress());
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		if (encryptor instanceof UpdatingEncryptor)
 		{

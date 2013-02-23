@@ -34,6 +34,7 @@ CRAZYLOGIN.KICKED.NAME.INVALIDLENGTH=&ELungimea numelui incorecta!
 CRAZYLOGIN.KICKED.SESSION.DUPLICATE=&CYou are already online! &CPlease wait for client timeout or contact an operator.
 CRAZYLOGIN.LOGIN.FAILED=&CLogare nereusita!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CAtentia!nuai reusit sa te loghezi! $0$ @ $1$
+#CRAZYLOGIN.LOGIN.FAILINFO=
 CRAZYLOGIN.LOGIN.REQUEST=&CTe rugam logheazate cu &3/login <parola>
 CRAZYLOGIN.LOGIN.SUCCESS=&ATe-ai logat cu succes
 CRAZYLOGIN.LOGOUT.SUCCESS=&Ate-ai delogat cu succes

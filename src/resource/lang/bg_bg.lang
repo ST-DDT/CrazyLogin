@@ -34,6 +34,7 @@ CRAZYLOGIN.KICKED.NOACCOUNT=Трабва да имате акаунт за да 
 CRAZYLOGIN.KICKED.SESSION.DUPLICATE=&CВече сте онлайн! &CМоля изчакайте вашият TimeOut или се свържете с админ!
 CRAZYLOGIN.LOGIN.FAILED=&CВлизането е провалено!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CВНИМАНИЕ! ПРОВАЛЕН ОПИТ ЗА ВЛИЗАНЕ! $0$ @ $1$
+#CRAZYLOGIN.LOGIN.FAILINFO=
 CRAZYLOGIN.LOGIN.REQUEST=&CМоля влезте! &3/login <Парола>
 CRAZYLOGIN.LOGIN.SUCCESS=&AВлизането успешно
 CRAZYLOGIN.LOGOUT.SUCCESS=&AИзлизането успешно

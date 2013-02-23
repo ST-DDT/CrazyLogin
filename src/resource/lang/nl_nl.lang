@@ -34,6 +34,7 @@ CRAZYLOGIN.KICKED.NOACCOUNT=Je hebt een account nodig om deze server te joinen.
 CRAZYLOGIN.KICKED.SESSION.DUPLICATE=&CJe bent al online! &CWacht aub 30min tot 1uur of contacteer een admin!
 CRAZYLOGIN.LOGIN.FAILED=&CInloggen mislukt!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&Cwaarschuwing! Inloggen mislukt! $0$ @ $1$
+#CRAZYLOGIN.LOGIN.FAILINFO=
 CRAZYLOGIN.LOGIN.REQUEST=&CLog alstublieft in! &3/login <wachtwoord>
 CRAZYLOGIN.LOGIN.SUCCESS=&ALogin successvol
 CRAZYLOGIN.LOGOUT.SUCCESS=&ALoguit successvol

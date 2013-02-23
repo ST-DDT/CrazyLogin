@@ -34,6 +34,7 @@ CRAZYLOGIN.KICKED.NOACCOUNT=Χρειάζεστε έναν λογαριασμό �
 CRAZYLOGIN.KICKED.SESSION.DUPLICATE=&CΕίστε ήδη online! &CΠαρακαλώ περιμένετε για το TimeOut σας ή επικοινωνήστε με έναν διαχειριστή!
 CRAZYLOGIN.LOGIN.FAILED=&CΑΠΟΤΥΧΙΑ ΕΙΣΟΔΟΥ!
 CRAZYLOGIN.LOGIN.FAILEDWARN=&CΠΡΟΣΟΧΗ! ΑΠΟΤΥΧΗΜΕΝΗ ΑΠΟΠΕΙΡΑ ΕΙΣΟΔΟΥ! $0$ @ $1$
+#CRAZYLOGIN.LOGIN.FAILINFO=
 CRAZYLOGIN.LOGIN.REQUEST=&CΠαρακαλώ συνδεθείτε! /login <Κωδικός πρόσβασης>
 CRAZYLOGIN.LOGIN.SUCCESS=&AΕίσοδος επιτυχής
 CRAZYLOGIN.LOGOUT.SUCCESS=&AΈξοδος επιτυχής
