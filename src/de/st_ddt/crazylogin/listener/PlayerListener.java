@@ -27,8 +27,8 @@ import de.st_ddt.crazylogin.tasks.ScheduledKickTask;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.PlayerSaver;
-import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
+import de.st_ddt.crazyutil.source.Localized;
 
 public class PlayerListener implements Listener
 {

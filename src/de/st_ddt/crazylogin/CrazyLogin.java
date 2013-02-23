@@ -112,7 +112,6 @@ import de.st_ddt.crazyutil.VersionComparator;
 import de.st_ddt.crazyutil.databases.DatabaseType;
 import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
-import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.metrics.Metrics;
 import de.st_ddt.crazyutil.metrics.Metrics.Graph;
 import de.st_ddt.crazyutil.metrics.Metrics.Plotter;
@@ -127,6 +126,7 @@ import de.st_ddt.crazyutil.modules.login.LoginModule;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.BooleanParamitrisable;
 import de.st_ddt.crazyutil.paramitrisable.Paramitrisable;
+import de.st_ddt.crazyutil.source.Localized;
 
 public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData> implements LoginPlugin<LoginPlayerData>
 {

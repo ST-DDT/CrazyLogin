@@ -1,7 +1,7 @@
 package de.st_ddt.crazylogin.tasks;
 
 import de.st_ddt.crazylogin.CrazyLogin;
-import de.st_ddt.crazyutil.locales.Localized;
+import de.st_ddt.crazyutil.source.Localized;
 
 public class DropInactiveAccountsTask implements Runnable
 {

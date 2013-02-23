@@ -34,7 +34,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyutil.ChatHelperExtended;
-import de.st_ddt.crazyutil.locales.Localized;
+import de.st_ddt.crazyutil.source.Localized;
 
 public class DynamicPlayerListener implements Listener
 {

@@ -12,9 +12,9 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandNoSuchException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelperExtended;
-import de.st_ddt.crazyutil.locales.Localized;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
+import de.st_ddt.crazyutil.source.Localized;
 
 public class CommandPlayerDetachIP extends CommandExecutor
 {
