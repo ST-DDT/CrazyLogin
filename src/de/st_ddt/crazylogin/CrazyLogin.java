@@ -127,7 +127,9 @@ import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.BooleanParamitrisable;
 import de.st_ddt.crazyutil.paramitrisable.Paramitrisable;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.LocalizedVariable;
 
+@LocalizedVariable(variables = { "CRAZYPLUGIN", "CRAZYPLAYERDATAPLUGIN" }, values = { "CRAZYLOGIN", "CRAZYLOGIN" })
 public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData> implements LoginPlugin<LoginPlayerData>
 {
 
@@ -840,7 +842,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		{
 
 			@Override
-			@Localized("CRAZYLOGIN.PLUGININFO.DATABASEENTRIES $Amount$")
+			@Localized("CRAZYLOGIN.PLUGININFO.DATABASEENTRIES $EntryCount$")
 			public void showValue(final CommandSender sender)
 			{
 				super.showValue(sender);
