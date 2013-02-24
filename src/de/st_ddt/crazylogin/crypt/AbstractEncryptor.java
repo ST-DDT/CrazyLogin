@@ -37,6 +37,12 @@ public abstract class AbstractEncryptor implements Encryptor
 	}
 
 	@Override
+	public int hashCode()
+	{
+		return getAlgorithm().hashCode();
+	}
+
+	@Override
 	public String toString()
 	{
 		return getAlgorithm();
