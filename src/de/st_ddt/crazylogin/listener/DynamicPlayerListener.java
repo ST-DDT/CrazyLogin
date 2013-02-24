@@ -211,23 +211,15 @@ public class DynamicPlayerListener implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerBedEnter(final PlayerBedEnterEvent event)
 	{
-		if (!(event.getPlayer() instanceof Player))
-			return;
-		final Player player = event.getPlayer();
-		if (plugin.isLoggedIn(player))
-			return;
-		event.setCancelled(true);
+		if (!plugin.isLoggedIn(event.getPlayer()))
+			event.setCancelled(true);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerFish(final PlayerFishEvent event)
 	{
-		if (!(event.getPlayer() instanceof Player))
-			return;
-		final Player player = event.getPlayer();
-		if (plugin.isLoggedIn(player))
-			return;
-		event.setCancelled(true);
+		if (!plugin.isLoggedIn(event.getPlayer()))
+			event.setCancelled(true);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
