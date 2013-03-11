@@ -1,7 +1,7 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.10
+version: 7.10.1
 website: http://dev.bukkit.org/server-mods/crazylogin/
 # requires CrazyCore v10.0.2 or later
 depend: [CrazyCore]
@@ -35,7 +35,7 @@ commands:
   crazylogin:
     description: Plugin Main Menu
     usage: /<command> password <new Password>
-    aliases: [cl]
+    aliases: [cl,clogin]
 permissions:
   crazylogin.*:
     description: Access to all commands
