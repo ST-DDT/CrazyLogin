@@ -17,11 +17,6 @@ public final class WorldListener implements Listener
 		this.plugin = plugin;
 	}
 
-	public CrazyLogin getPlugin()
-	{
-		return plugin;
-	}
-
 	@EventHandler
 	public void WorldLoadEvent(final WorldLoadEvent event)
 	{
