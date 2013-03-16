@@ -82,9 +82,10 @@ import de.st_ddt.crazylogin.exceptions.CrazyLoginException;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginRegistrationsDisabled;
 import de.st_ddt.crazylogin.listener.CrazyListener;
 import de.st_ddt.crazylogin.listener.DynamicPlayerListener;
-import de.st_ddt.crazylogin.listener.DynamicPlayerListener_125;
-import de.st_ddt.crazylogin.listener.DynamicPlayerListener_132;
-import de.st_ddt.crazylogin.listener.DynamicPlayerListener_142;
+import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_2_5;
+import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_3_2;
+import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_4_2;
+import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_5;
 import de.st_ddt.crazylogin.listener.DynamicVehicleListener;
 import de.st_ddt.crazylogin.listener.MessageListener;
 import de.st_ddt.crazylogin.listener.PlayerListener;
@@ -1242,12 +1243,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	{
 		this.playerListener = new PlayerListener(this);
 		final String mcVersion = ChatHelper.getMinecraftVersion();
-		if (VersionComparator.compareVersions(mcVersion, "1.3.2") == 1)
-			this.dynamicPlayerListener = new DynamicPlayerListener_142(this, playerListener);
+		if (VersionComparator.compareVersions(mcVersion, "1.4.7") == 1)
+			this.dynamicPlayerListener = new DynamicPlayerListener_1_5(this, playerListener);
+		else if (VersionComparator.compareVersions(mcVersion, "1.3.2") == 1)
+			this.dynamicPlayerListener = new DynamicPlayerListener_1_4_2(this, playerListener);
 		else if (VersionComparator.compareVersions(mcVersion, "1.2.5") == 1)
-			this.dynamicPlayerListener = new DynamicPlayerListener_132(this, playerListener);
+			this.dynamicPlayerListener = new DynamicPlayerListener_1_3_2(this, playerListener);
 		else
-			this.dynamicPlayerListener = new DynamicPlayerListener_125(this, playerListener);
+			this.dynamicPlayerListener = new DynamicPlayerListener_1_2_5(this, playerListener);
 		this.dynamicVehicleListener = new DynamicVehicleListener(this);
 		final CrazyListener crazylistener = new CrazyListener(this, playerListener);
 		final PluginManager pm = Bukkit.getPluginManager();
@@ -1438,10 +1441,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			}
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
-		if (config.getBoolean("delayPreLoginSecurity", true))
-			delayPreLoginSecurity = config.getInt("delayPreLoginSecurity", 5);
-		else
-			delayPreLoginSecurity = 0;
+		delayPreLoginSecurity = config.getInt("delayPreLoginSecurity", 0);
 		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
 		for (final World world : Bukkit.getWorlds())
 			loadConfigurationForWorld(world);

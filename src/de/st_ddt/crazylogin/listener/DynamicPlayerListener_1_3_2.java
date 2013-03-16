@@ -5,15 +5,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 
 @SuppressWarnings("deprecation")
-public class DynamicPlayerListener_125 extends DynamicPlayerListener
+public class DynamicPlayerListener_1_3_2 extends DynamicPlayerListener
 {
 
-	public DynamicPlayerListener_125(final CrazyLogin plugin, final PlayerListener playerListener)
+	public DynamicPlayerListener_1_3_2(final CrazyLogin plugin, final PlayerListener playerListener)
 	{
 		super(plugin, playerListener);
 	}
@@ -41,14 +41,14 @@ public class DynamicPlayerListener_125 extends DynamicPlayerListener
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void PlayerChat(final PlayerChatEvent event)
+	public void PlayerChat(final AsyncPlayerChatEvent event)
 	{
 		if (!PlayerChat(event.getPlayer(), event.getMessage()))
 			event.setCancelled(true);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-	public void PlayerChatHide(final PlayerChatEvent event)
+	public void PlayerChatHide(final AsyncPlayerChatEvent event)
 	{
 		if (plugin.isHidingChatEnabled())
 			PlayerChatHide(event.getPlayer(), event.getRecipients());
