@@ -128,7 +128,10 @@ forceSingleSession: true
 forceSingleSessionSameIPBypass: true
 # activates the preLoginSecurity x ticks later (hideInventory / forceSaveLogin) (false/0, 1 , ...)
 # this is intended to allow customSpawns and joinRewards
-# WARNING: some hacked clients may be able to use that time to read/modify the inventory/location
+delayPreRegisterSecurity: 5
+# activates the preLoginSecurity x ticks later (hideInventory / forceSaveLogin) (false/0, 1 , ...)
+# this is intended to allow customSpawns and joinRewards
+# WARNING: some hacked clients may be able to use that time to read the inventory/location
 delayPreLoginSecurity: false
 # when enabled you are teleported to spawn until login (true/false)
 # this fixes issues with AntiCheatPlugins whilte not logged in an being in mid air.

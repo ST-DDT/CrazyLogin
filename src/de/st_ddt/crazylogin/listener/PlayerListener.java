@@ -271,7 +271,7 @@ public class PlayerListener implements Listener
 			if (plugin.isAlwaysNeedPassword() || PermissionModule.hasPermission(player, "crazylogin.requirepassword"))
 			{
 				// Default Protection
-				if (plugin.isDelayingPreLoginSecurityEnabled())
+				if (plugin.isDelayingPreRegisterSecurityEnabled())
 					Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 					{
 
@@ -291,7 +291,7 @@ public class PlayerListener implements Listener
 							if (movementBlocker.get(player.getName().toLowerCase()) == null)
 								movementBlocker.put(player.getName().toLowerCase(), location);
 						}
-					}, plugin.getDelayPreLoginSecurity());
+					}, plugin.getDelayPreRegisterSecurity());
 				else
 				{
 					Location location = player.getLocation().clone();
