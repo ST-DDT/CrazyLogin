@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import de.st_ddt.crazylogin.CrazyLogin;
@@ -316,6 +317,21 @@ public class PlayerListener implements Listener
 				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new ScheduledKickTask(player, plugin.getLocale().getLanguageEntry("REGISTER.REQUEST"), true), autoKick * 20);
 			plugin.registerDynamicHooks();
 		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void PlayerRespawn(final PlayerRespawnEvent event)
+	{
+		final Player player = event.getPlayer();
+		if (plugin.isLoggedIn(player))
+			return;
+		if (plugin.isForceSaveLoginEnabled())
+			if (event.getRespawnLocation() != null)
+			{
+				savelogin.put(player.getName().toLowerCase(), event.getRespawnLocation());
+				event.setRespawnLocation(plugin.getSaveLoginLocations(event.getRespawnLocation().getWorld()));
+			}
+		plugin.requestLogin(player);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
