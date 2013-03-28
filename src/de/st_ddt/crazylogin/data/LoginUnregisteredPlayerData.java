@@ -86,6 +86,12 @@ public final class LoginUnregisteredPlayerData extends PlayerData<LoginUnregiste
 	}
 
 	@Override
+	public boolean isLatestIP(final String ip)
+	{
+		return false;
+	}
+
+	@Override
 	public String getLatestIP()
 	{
 		final Player player = getPlayer();

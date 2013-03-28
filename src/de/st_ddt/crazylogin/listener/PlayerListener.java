@@ -210,8 +210,8 @@ public class PlayerListener implements Listener
 			// Registered
 			// Session active?
 			final LoginPlayerData playerdata = plugin.getPlayerData(player);
-			if (!playerdata.hasIP(player.getAddress().getAddress().getHostAddress()))
-				playerdata.logout();
+			if (!playerdata.isLatestIP(player.getAddress().getAddress().getHostAddress()))
+				playerdata.setLoggedIn(false);
 			playerdata.checkTimeOut();
 			if (playerdata.isLoggedIn())
 			{

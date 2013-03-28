@@ -266,6 +266,15 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		return ips.contains(ip);
 	}
 
+	@Override
+	public boolean isLatestIP(final String ip)
+	{
+		if (ips.isEmpty() || ip == null)
+			return false;
+		else
+			return ips.get(0).equals(ip);
+	}
+
 	public List<String> getIPs()
 	{
 		return ips;
