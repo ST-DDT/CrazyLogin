@@ -20,23 +20,23 @@ public class DynamicPlayerListener_1_4_2 extends DynamicPlayerListener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void HangingPlace(final HangingPlaceEvent event)
 	{
-		if (!(event.getEntity() instanceof Player))
-			return;
-		final Player player = (Player) event.getEntity();
+		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
+		plugin.sendLoginReminderMessage(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void HangingBreak(final HangingBreakByEntityEvent event)
 	{
-		if (!(event.getEntity() instanceof Player))
+		if (!(event.getRemover() instanceof Player))
 			return;
-		final Player player = (Player) event.getEntity();
+		final Player player = (Player) event.getRemover();
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
+		plugin.sendLoginReminderMessage(player);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
