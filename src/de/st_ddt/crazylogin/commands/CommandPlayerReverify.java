@@ -32,7 +32,7 @@ public class CommandPlayerReverify extends CommandExecutor
 		{
 			for (final LoginPlayerData data : plugin.getPlayerData())
 				data.setLoggedIn(false);
-			for (Player player : Bukkit.getOnlinePlayers())
+			for (final Player player : Bukkit.getOnlinePlayers())
 				plugin.forceRelogin(player);
 			plugin.sendLocaleMessage("COMMAND.PLAYER.REVERIFY.SUCCESS", sender, arg);
 		}
