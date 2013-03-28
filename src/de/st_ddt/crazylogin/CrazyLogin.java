@@ -1863,6 +1863,24 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return data.isLoggedIn() && player.isOnline();
 	}
 
+	public void forceRelogin(final OfflinePlayer player)
+	{
+		forceRelogin(getPlayerData(player));
+	}
+
+	public void forceRelogin(final String name)
+	{
+		forceRelogin(getPlayerData(name));
+	}
+
+	public void forceRelogin(final LoginPlayerData data)
+	{
+		data.setLoggedIn(false);
+		final Player player = data.getPlayer();
+		if (player != null)
+			playerListener.PlayerJoin(data.getPlayer());
+	}
+
 	@Override
 	@Localized({ "CRAZYLOGIN.LOGIN.REQUEST", "CRAZYLOGIN.REGISTER.REQUEST" })
 	public void requestLogin(final Player player)

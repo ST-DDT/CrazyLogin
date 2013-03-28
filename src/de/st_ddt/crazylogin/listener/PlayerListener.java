@@ -331,7 +331,7 @@ public class PlayerListener implements Listener
 				savelogin.put(player.getName().toLowerCase(), event.getRespawnLocation());
 				event.setRespawnLocation(plugin.getSaveLoginLocations(event.getRespawnLocation().getWorld()));
 			}
-		plugin.requestLogin(player);
+		plugin.sendLoginReminderMessage(player);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)

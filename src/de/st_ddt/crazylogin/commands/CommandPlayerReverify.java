@@ -2,6 +2,7 @@ package de.st_ddt.crazylogin.commands;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -31,6 +32,8 @@ public class CommandPlayerReverify extends CommandExecutor
 		{
 			for (final LoginPlayerData data : plugin.getPlayerData())
 				data.setLoggedIn(false);
+			for (Player player : Bukkit.getOnlinePlayers())
+				plugin.forceRelogin(player);
 			plugin.sendLocaleMessage("COMMAND.PLAYER.REVERIFY.SUCCESS", sender, arg);
 		}
 		else
@@ -38,10 +41,7 @@ public class CommandPlayerReverify extends CommandExecutor
 			final LoginPlayerData data = plugin.getPlayerData(arg);
 			if (data == null)
 				throw new CrazyCommandNoSuchException("Player (with Account)", arg);
-			data.setLoggedIn(false);
-			final Player player = data.getPlayer();
-			if (player != null)
-				plugin.requestLogin(player);
+			plugin.forceRelogin(data);
 			plugin.sendLocaleMessage("COMMAND.PLAYER.REVERIFY.SUCCESS", sender, data.getName());
 		}
 	}
