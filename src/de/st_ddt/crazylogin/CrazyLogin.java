@@ -1883,7 +1883,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	@Override
 	@Localized({ "CRAZYLOGIN.LOGIN.REQUEST", "CRAZYLOGIN.REGISTER.REQUEST" })
-	public void requestLogin(final Player player)
+	public void sendLoginReminderMessage(final Player player)
 	{
 		if (doNotSpamRequests)
 			return;

@@ -25,7 +25,7 @@ public class DynamicPlayerListener_1_3_2 extends DynamicPlayerListener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.requestLogin(player);
+		plugin.sendLoginReminderMessage(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -37,7 +37,7 @@ public class DynamicPlayerListener_1_3_2 extends DynamicPlayerListener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.requestLogin(player);
+		plugin.sendLoginReminderMessage(player);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)

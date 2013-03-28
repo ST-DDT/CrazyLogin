@@ -29,7 +29,7 @@ public final class DynamicVehicleListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.requestLogin(player);
+		plugin.sendLoginReminderMessage(player);
 	}
 
 	@EventHandler
@@ -41,7 +41,7 @@ public final class DynamicVehicleListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.requestLogin(player);
+		plugin.sendLoginReminderMessage(player);
 	}
 
 	@EventHandler
@@ -53,6 +53,6 @@ public final class DynamicVehicleListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.requestLogin(player);
+		plugin.sendLoginReminderMessage(player);
 	}
 }
