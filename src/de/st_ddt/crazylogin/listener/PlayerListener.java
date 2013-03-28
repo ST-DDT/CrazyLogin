@@ -234,7 +234,7 @@ public class PlayerListener implements Listener
 							if (plugin.isForceSaveLoginEnabled())
 							{
 								triggerSaveLogin(player);
-								location = player.getWorld().getSpawnLocation().clone();
+								location = plugin.getSaveLoginLocations(player).clone();
 							}
 							if (plugin.isHidingInventoryEnabled())
 								triggerHidenInventory(player);
@@ -248,7 +248,7 @@ public class PlayerListener implements Listener
 					if (plugin.isForceSaveLoginEnabled())
 					{
 						triggerSaveLogin(player);
-						location = player.getWorld().getSpawnLocation().clone();
+						location = plugin.getSaveLoginLocations(player).clone();
 					}
 					if (plugin.isHidingInventoryEnabled())
 						triggerHidenInventory(player);
@@ -284,7 +284,7 @@ public class PlayerListener implements Listener
 							if (plugin.isForceSaveLoginEnabled())
 							{
 								triggerSaveLogin(player);
-								location = player.getWorld().getSpawnLocation().clone();
+								location = plugin.getSaveLoginLocations(player).clone();
 							}
 							if (plugin.isHidingInventoryEnabled())
 								triggerHidenInventory(player);
