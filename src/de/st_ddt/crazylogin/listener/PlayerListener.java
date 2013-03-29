@@ -323,7 +323,7 @@ public class PlayerListener implements Listener
 	public void PlayerRespawn(final PlayerRespawnEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.isLoggedIn(player))
+		if (isLoggedInRespawn(player))
 			return;
 		if (plugin.isForceSaveLoginEnabled())
 			if (event.getRespawnLocation() != null)
@@ -332,6 +332,16 @@ public class PlayerListener implements Listener
 				event.setRespawnLocation(plugin.getSaveLoginLocations(event.getRespawnLocation().getWorld()));
 			}
 		plugin.sendLoginReminderMessage(player);
+	}
+
+	private boolean isLoggedInRespawn(final Player player)
+	{
+		if (player.hasMetadata("NPC"))
+			return true;
+		final LoginPlayerData data = plugin.getPlayerData(player);
+		if (data == null)
+			return !plugin.isAlwaysNeedPassword() && !PermissionModule.hasPermission(player, "crazylogin.requirepassword");
+		return data.isLoggedIn();
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
