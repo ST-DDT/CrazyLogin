@@ -328,8 +328,11 @@ public class PlayerListener implements Listener
 		if (plugin.isForceSaveLoginEnabled())
 			if (event.getRespawnLocation() != null)
 			{
-				savelogin.put(player.getName().toLowerCase(), event.getRespawnLocation());
-				event.setRespawnLocation(plugin.getSaveLoginLocations(event.getRespawnLocation().getWorld()));
+				final Location respawnLocation = event.getRespawnLocation().clone();
+				savelogin.put(player.getName().toLowerCase(), respawnLocation);
+				final Location tempSpawnLocation = plugin.getSaveLoginLocations(respawnLocation.getWorld());
+				event.setRespawnLocation(tempSpawnLocation);
+				movementBlocker.put(player.getName().toLowerCase(), tempSpawnLocation);
 			}
 		plugin.sendLoginReminderMessage(player);
 	}
