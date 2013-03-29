@@ -341,6 +341,7 @@ public class PlayerListener implements Listener
 		final LoginPlayerData data = plugin.getPlayerData(player);
 		if (data == null)
 			return !plugin.isAlwaysNeedPassword() && !PermissionModule.hasPermission(player, "crazylogin.requirepassword");
+		// Do not check player.isOnline() because it will return false!
 		return data.isLoggedIn();
 	}
 
