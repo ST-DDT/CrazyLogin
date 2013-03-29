@@ -2121,7 +2121,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public Location getSaveLoginLocations(final World world)
 	{
 		if (saveLoginLocations.containsKey(world.getName()))
-			return saveLoginLocations.get(world.getName());
+			return saveLoginLocations.get(world.getName()).clone();
 		else
 			return world.getSpawnLocation();
 	}
