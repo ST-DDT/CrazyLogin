@@ -170,6 +170,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean disableTokenLogin;
 	private boolean doNotSpamAuthRequests;
 	private boolean doNotSpamRegisterRequests;
+	private long delayAuthRequests;
+	private long repeatAuthRequests;
 	private boolean forceSingleSession;
 	private boolean forceSingleSessionSameIPBypass;
 	private long delayPreRegisterSecurity;
@@ -550,6 +552,38 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
 				doNotSpamRegisterRequests = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(new DurationMode(this, "delayAuthRequests")
+		{
+
+			@Override
+			public Long getValue()
+			{
+				return delayAuthRequests * 50;
+			}
+
+			@Override
+			public void setValue(final Long newValue) throws CrazyException
+			{
+				delayAuthRequests = Math.max(newValue / 50, 0);
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(new DurationMode(this, "repeatAuthRequests")
+		{
+
+			@Override
+			public Long getValue()
+			{
+				return repeatAuthRequests * 50;
+			}
+
+			@Override
+			public void setValue(final Long newValue) throws CrazyException
+			{
+				repeatAuthRequests = Math.max(newValue / 50, 0);
 				saveConfiguration();
 			}
 		});
@@ -1477,6 +1511,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		loginTokens.clear();
 		doNotSpamAuthRequests = config.getBoolean("doNotSpamAuthRequests", false);
 		doNotSpamRegisterRequests = config.getBoolean("doNotSpamRegisterRequests", false);
+		delayAuthRequests = Math.max(config.getLong("delayAuthRequests", 0), 0);
+		repeatAuthRequests = Math.max(config.getLong("repeatAuthRequests", 200), 0);
 		antiRequestSpamTable.clear();
 		commandWhiteList = config.getStringList("commandWhitelist");
 		if (isUpdated && !isInstalled)
@@ -1640,6 +1676,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("disableTokenLogin", disableTokenLogin);
 		config.set("doNotSpamAuthRequests", doNotSpamAuthRequests);
 		config.set("doNotSpamRegisterRequests", doNotSpamRegisterRequests);
+		config.set("delayAuthRequests", delayAuthRequests);
+		config.set("repeatAuthRequests", repeatAuthRequests);
 		config.set("commandWhitelist", commandWhiteList);
 		config.set("uniqueIDKey", uniqueIDKey);
 		config.set("forceSingleSession", forceSingleSession);
@@ -2076,6 +2114,16 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public boolean isAvoidingSpammedRegisterRequests()
 	{
 		return doNotSpamRegisterRequests;
+	}
+
+	public long getDelayAuthRequests()
+	{
+		return delayAuthRequests;
+	}
+
+	public long getRepeatAuthRequests()
+	{
+		return repeatAuthRequests;
 	}
 
 	public boolean isForceSingleSessionEnabled()

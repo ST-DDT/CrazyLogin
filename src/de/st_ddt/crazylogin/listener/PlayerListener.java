@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazylogin.metadata.Authenticated;
+import de.st_ddt.crazylogin.tasks.AuthRequestor;
 import de.st_ddt.crazylogin.tasks.ScheduledKickTask;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
 import de.st_ddt.crazyutil.ChatHelper;
@@ -257,7 +258,11 @@ public class PlayerListener implements Listener
 						movementBlocker.put(player.getName().toLowerCase(), location);
 				}
 				// Message
-				plugin.sendLocaleMessage("LOGIN.REQUEST", player);
+				final AuthRequestor requestor = new AuthRequestor(plugin, player, "LOGIN.REQUEST");
+				if (plugin.getRepeatAuthRequests() > 0)
+					requestor.start(plugin.getDelayAuthRequests(), plugin.getRepeatAuthRequests());
+				else
+					requestor.start(plugin.getDelayAuthRequests());
 				// AutoKick
 				final int autoKick = plugin.getAutoKick();
 				if (autoKick >= 10)
@@ -307,10 +312,23 @@ public class PlayerListener implements Listener
 						movementBlocker.put(player.getName().toLowerCase(), location);
 				}
 				// Message
-				plugin.sendLocaleMessage("REGISTER.HEADER", player);
+				new AuthRequestor(plugin, player, "REGISTER.HEADER").start(plugin.getDelayAuthRequests());
+				final AuthRequestor requestor = new AuthRequestor(plugin, player, "REGISTER.REQUEST");
+				if (plugin.getRepeatAuthRequests() > 0)
+					requestor.start(plugin.getDelayAuthRequests() + plugin.getRepeatAuthRequests(), plugin.getRepeatAuthRequests());
+				else
+					requestor.start(plugin.getDelayAuthRequests() + 5);
 			}
-			else if (!plugin.isAvoidingSpammedRegisterRequestsEnabled() || System.currentTimeMillis() - player.getFirstPlayed() < 60000)
-				plugin.sendLocaleMessage("REGISTER.HEADER2", player);
+			else if (!plugin.isAvoidingSpammedRegisterRequests() || System.currentTimeMillis() - player.getFirstPlayed() < 60000)
+			{
+				// Message
+				new AuthRequestor(plugin, player, "REGISTER.HEADER2").start(plugin.getDelayAuthRequests());
+				final AuthRequestor requestor = new AuthRequestor(plugin, player, "REGISTER.REQUEST");
+				if (plugin.getRepeatAuthRequests() > 0)
+					requestor.start(plugin.getDelayAuthRequests() + plugin.getRepeatAuthRequests(), plugin.getRepeatAuthRequests());
+				else
+					requestor.start(plugin.getDelayAuthRequests() + 5);
+			}
 			// AutoKick
 			final int autoKick = plugin.getAutoKickUnregistered();
 			if (autoKick != -1)
@@ -336,7 +354,15 @@ public class PlayerListener implements Listener
 			}
 			else
 				movementBlocker.put(player.getName().toLowerCase(), event.getRespawnLocation());
-		plugin.sendLoginReminderMessage(player);
+		final AuthRequestor requestor;
+		if (plugin.hasPlayerData(player))
+			requestor = new AuthRequestor(plugin, player, "LOGIN.REQUEST");
+		else
+			requestor = new AuthRequestor(plugin, player, "REGISTER.REQUEST");
+		if (plugin.getRepeatAuthRequests() > 0)
+			requestor.start(5, plugin.getRepeatAuthRequests());
+		else
+			requestor.start(5);
 	}
 
 	private boolean isLoggedInRespawn(final Player player)
