@@ -104,8 +104,8 @@ disableRegistrations: false
 disableAdminLogin: false
 # if set to true you cannot use tokenlogin command (true/false)
 disableTokenLogin: false
-# when disabled request login/register messages are spammed every cancelled action, when enabled only every 5 seconds (true/false)
-doNotSpamRequests: false
+# when disabled request login/register messages are spammed every cancelled action, when enabled only every 5 or more seconds (true/false)
+doNotSpamAuthRequests: false
 # only ask the player once to create a password (if alwaysNeedPassword=false) (true/false)
 doNotSpamRegisterRequests: false
 # these commands can be executed as guest (even if blockGuestCommands is enabled) or when not logged in

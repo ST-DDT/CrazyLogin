@@ -119,6 +119,7 @@ import de.st_ddt.crazyutil.metrics.Metrics.Plotter;
 import de.st_ddt.crazyutil.modes.BooleanFalseMode;
 import de.st_ddt.crazyutil.modes.BooleanTrueMode;
 import de.st_ddt.crazyutil.modes.DoubleMode;
+import de.st_ddt.crazyutil.modes.DurationMode;
 import de.st_ddt.crazyutil.modes.IntegerMode;
 import de.st_ddt.crazyutil.modes.LongMode;
 import de.st_ddt.crazyutil.modes.Mode;
@@ -167,12 +168,12 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean disableRegistrations;
 	private boolean disableAdminLogin;
 	private boolean disableTokenLogin;
-	private boolean doNotSpamRequests;
+	private boolean doNotSpamAuthRequests;
 	private boolean doNotSpamRegisterRequests;
 	private boolean forceSingleSession;
 	private boolean forceSingleSessionSameIPBypass;
-	private int delayPreRegisterSecurity;
-	private int delayPreLoginSecurity;
+	private long delayPreRegisterSecurity;
+	private long delayPreLoginSecurity;
 	private boolean forceSaveLogin;
 	private boolean hideInventory;
 	private boolean hidePlayer;
@@ -328,35 +329,35 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(new IntegerMode(this, "delayPreRegisterSecurity")
+		modeCommand.addMode(new DurationMode(this, "delayPreRegisterSecurity")
 		{
 
 			@Override
-			public Integer getValue()
+			public Long getValue()
 			{
-				return delayPreRegisterSecurity;
+				return delayPreRegisterSecurity * 50;
 			}
 
 			@Override
-			public void setValue(final Integer newValue) throws CrazyException
+			public void setValue(final Long newValue) throws CrazyException
 			{
-				delayPreRegisterSecurity = newValue;
+				delayPreRegisterSecurity = Math.max(newValue / 50, -1);
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(new IntegerMode(this, "delayPreLoginSecurity")
+		modeCommand.addMode(new DurationMode(this, "delayPreLoginSecurity")
 		{
 
 			@Override
-			public Integer getValue()
+			public Long getValue()
 			{
-				return delayPreLoginSecurity;
+				return delayPreLoginSecurity * 50;
 			}
 
 			@Override
-			public void setValue(final Integer newValue) throws CrazyException
+			public void setValue(final Long newValue) throws CrazyException
 			{
-				delayPreLoginSecurity = newValue;
+				delayPreLoginSecurity = Math.max(newValue / 50, -1);
 				saveConfiguration();
 			}
 		});
@@ -520,19 +521,19 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(new BooleanFalseMode(this, "doNotSpamRequests")
+		modeCommand.addMode(new BooleanFalseMode(this, "doNotSpamAuthRequests")
 		{
 
 			@Override
 			public Boolean getValue()
 			{
-				return doNotSpamRequests;
+				return doNotSpamAuthRequests;
 			}
 
 			@Override
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
-				doNotSpamRequests = newValue;
+				doNotSpamAuthRequests = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1474,7 +1475,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		disableAdminLogin = config.getBoolean("disableAdminLogin", true);
 		disableTokenLogin = config.getBoolean("disableTokenLogin", true);
 		loginTokens.clear();
-		doNotSpamRequests = config.getBoolean("doNotSpamRequests", false);
+		doNotSpamAuthRequests = config.getBoolean("doNotSpamAuthRequests", false);
 		doNotSpamRegisterRequests = config.getBoolean("doNotSpamRegisterRequests", false);
 		antiRequestSpamTable.clear();
 		commandWhiteList = config.getStringList("commandWhitelist");
@@ -1637,7 +1638,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("disableRegistrations", disableRegistrations);
 		config.set("disableAdminLogin", disableAdminLogin);
 		config.set("disableTokenLogin", disableTokenLogin);
-		config.set("doNotSpamRequests", doNotSpamRequests);
+		config.set("doNotSpamAuthRequests", doNotSpamAuthRequests);
 		config.set("doNotSpamRegisterRequests", doNotSpamRegisterRequests);
 		config.set("commandWhitelist", commandWhiteList);
 		config.set("uniqueIDKey", uniqueIDKey);
@@ -1887,7 +1888,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	@Localized({ "CRAZYLOGIN.LOGIN.REQUEST", "CRAZYLOGIN.REGISTER.REQUEST" })
 	public void sendAuthReminderMessage(final Player player)
 	{
-		if (doNotSpamRequests)
+		if (doNotSpamAuthRequests)
 			return;
 		final Date now = new Date();
 		final Date date = antiRequestSpamTable.get(player.getName());
@@ -2067,12 +2068,12 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return commandWhiteList;
 	}
 
-	public boolean isAvoidingSpammedRequestsEnabled()
+	public boolean isAvoidingSpammedAuthRequests()
 	{
-		return doNotSpamRequests;
+		return doNotSpamAuthRequests;
 	}
 
-	public boolean isAvoidingSpammedRegisterRequestsEnabled()
+	public boolean isAvoidingSpammedRegisterRequests()
 	{
 		return doNotSpamRegisterRequests;
 	}
@@ -2092,7 +2093,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return delayPreRegisterSecurity > 0;
 	}
 
-	public int getDelayPreRegisterSecurity()
+	public long getDelayPreRegisterSecurity()
 	{
 		return delayPreRegisterSecurity;
 	}
@@ -2102,7 +2103,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return delayPreLoginSecurity > 0;
 	}
 
-	public int getDelayPreLoginSecurity()
+	public long getDelayPreLoginSecurity()
 	{
 		return delayPreLoginSecurity;
 	}
