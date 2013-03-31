@@ -67,7 +67,7 @@ public class DynamicPlayerListener implements Listener
 		}
 		event.setCancelled(true);
 		player.closeInventory();
-		plugin.sendLoginReminderMessage(player);
+		plugin.sendAuthReminderMessage(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -80,7 +80,7 @@ public class DynamicPlayerListener implements Listener
 			return;
 		event.setCancelled(true);
 		player.closeInventory();
-		plugin.sendLoginReminderMessage(player);
+		plugin.sendAuthReminderMessage(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -90,7 +90,7 @@ public class DynamicPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.sendLoginReminderMessage(player);
+		plugin.sendAuthReminderMessage(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -100,7 +100,7 @@ public class DynamicPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.sendLoginReminderMessage(player);
+		plugin.sendAuthReminderMessage(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -110,7 +110,7 @@ public class DynamicPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.sendLoginReminderMessage(player);
+		plugin.sendAuthReminderMessage(player);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -120,7 +120,7 @@ public class DynamicPlayerListener implements Listener
 		if (plugin.isLoggedIn(player))
 			return;
 		event.setCancelled(true);
-		plugin.sendLoginReminderMessage(player);
+		plugin.sendAuthReminderMessage(player);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -149,7 +149,7 @@ public class DynamicPlayerListener implements Listener
 					}
 				});
 			event.setCancelled(true);
-			plugin.sendLoginReminderMessage(event.getPlayer());
+			plugin.sendAuthReminderMessage(event.getPlayer());
 		}
 	}
 
@@ -172,7 +172,7 @@ public class DynamicPlayerListener implements Listener
 			return;
 		}
 		event.setCancelled(true);
-		plugin.sendLoginReminderMessage(event.getPlayer());
+		plugin.sendAuthReminderMessage(event.getPlayer());
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -295,7 +295,7 @@ public class DynamicPlayerListener implements Listener
 			}
 			else
 			{
-				plugin.sendLoginReminderMessage(player);
+				plugin.sendAuthReminderMessage(player);
 				plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + IP + " tried to execute", event.getMessage());
 			}
 			if (!plugin.isHidingWarningsEnabled())
@@ -345,7 +345,7 @@ public class DynamicPlayerListener implements Listener
 			return true;
 		if (message != null)
 			plugin.getCrazyLogger().log("ChatBlocked", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to chat", message);
-		plugin.sendLoginReminderMessage(player);
+		plugin.sendAuthReminderMessage(player);
 		return false;
 	}
 
