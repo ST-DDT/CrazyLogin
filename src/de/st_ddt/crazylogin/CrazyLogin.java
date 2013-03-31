@@ -253,7 +253,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			{
 				final List<String> names = new ArrayList<String>();
 				for (final LoginPlayerData data : getOnlinePlayerDatas())
-					if (data.isLoggedIn())
+					if (!data.isLoggedIn())
 						names.add(data.getName());
 				return names;
 			}
