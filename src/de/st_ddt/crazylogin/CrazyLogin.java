@@ -258,6 +258,19 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				return names;
 			}
 		};
+		new PreSetList("login_guest")
+		{
+
+			@Override
+			public List<String> getList()
+			{
+				final List<String> names = new ArrayList<String>();
+				for (final Player player : Bukkit.getOnlinePlayers())
+					if (!hasPlayerData(player))
+						names.add(player.getName());
+				return names;
+			}
+		};
 	}
 
 	@Localized("CRAZYLOGIN.MODE.CHANGE $Name$ $Value$")
