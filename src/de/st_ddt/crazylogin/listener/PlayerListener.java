@@ -233,7 +233,7 @@ public class PlayerListener implements Listener
 							if (plugin.isLoggedIn(player))
 								return;
 							final Location location;
-							if (plugin.isForceSaveLoginEnabled())
+							if (plugin.isForceSaveLoginEnabled() && !player.isDead())
 								location = triggerSaveLogin(player);
 							else
 								location = player.getLocation();
@@ -246,7 +246,7 @@ public class PlayerListener implements Listener
 				else
 				{
 					final Location location;
-					if (plugin.isForceSaveLoginEnabled())
+					if (plugin.isForceSaveLoginEnabled() && !player.isDead())
 						location = triggerSaveLogin(player);
 					else
 						location = player.getLocation();
@@ -285,7 +285,7 @@ public class PlayerListener implements Listener
 							if (plugin.isLoggedIn(player))
 								return;
 							final Location location;
-							if (plugin.isForceSaveLoginEnabled())
+							if (plugin.isForceSaveLoginEnabled() && !player.isDead())
 								location = triggerSaveLogin(player);
 							else
 								location = player.getLocation();
