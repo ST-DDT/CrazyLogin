@@ -334,7 +334,7 @@ public class PlayerListener implements Listener
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void PlayerRespawn(final PlayerRespawnEvent event)
 	{
 		final Player player = event.getPlayer();
