@@ -232,12 +232,14 @@ public class PlayerListener implements Listener
 						{
 							if (plugin.isLoggedIn(player))
 								return;
-							Location location = player.getLocation().clone();
+							final Location location;
 							if (plugin.isForceSaveLoginEnabled())
 							{
 								triggerSaveLogin(player);
-								location = plugin.getSaveLoginLocations(player).clone();
+								location = plugin.getSaveLoginLocations(player);
 							}
+							else
+								location = player.getLocation();
 							if (plugin.isHidingInventoryEnabled())
 								triggerHidenInventory(player);
 							if (movementBlocker.get(player.getName().toLowerCase()) == null)
@@ -246,12 +248,14 @@ public class PlayerListener implements Listener
 					}, plugin.getDelayPreLoginSecurity());
 				else
 				{
-					Location location = player.getLocation().clone();
+					final Location location;
 					if (plugin.isForceSaveLoginEnabled())
 					{
 						triggerSaveLogin(player);
-						location = plugin.getSaveLoginLocations(player).clone();
+						location = plugin.getSaveLoginLocations(player);
 					}
+					else
+						location = player.getLocation();
 					if (plugin.isHidingInventoryEnabled())
 						triggerHidenInventory(player);
 					if (movementBlocker.get(player.getName().toLowerCase()) == null)
@@ -286,12 +290,14 @@ public class PlayerListener implements Listener
 						{
 							if (plugin.isLoggedIn(player))
 								return;
-							Location location = player.getLocation().clone();
+							final Location location;
 							if (plugin.isForceSaveLoginEnabled())
 							{
 								triggerSaveLogin(player);
-								location = plugin.getSaveLoginLocations(player).clone();
+								location = plugin.getSaveLoginLocations(player);
 							}
+							else
+								location = player.getLocation();
 							if (plugin.isHidingInventoryEnabled())
 								triggerHidenInventory(player);
 							if (movementBlocker.get(player.getName().toLowerCase()) == null)
