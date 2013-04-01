@@ -234,10 +234,7 @@ public class PlayerListener implements Listener
 								return;
 							final Location location;
 							if (plugin.isForceSaveLoginEnabled())
-							{
-								triggerSaveLogin(player);
-								location = plugin.getSaveLoginLocations(player);
-							}
+								location = triggerSaveLogin(player);
 							else
 								location = player.getLocation();
 							if (plugin.isHidingInventoryEnabled())
@@ -250,10 +247,7 @@ public class PlayerListener implements Listener
 				{
 					final Location location;
 					if (plugin.isForceSaveLoginEnabled())
-					{
-						triggerSaveLogin(player);
-						location = plugin.getSaveLoginLocations(player);
-					}
+						location = triggerSaveLogin(player);
 					else
 						location = player.getLocation();
 					if (plugin.isHidingInventoryEnabled())
@@ -292,10 +286,7 @@ public class PlayerListener implements Listener
 								return;
 							final Location location;
 							if (plugin.isForceSaveLoginEnabled())
-							{
-								triggerSaveLogin(player);
-								location = plugin.getSaveLoginLocations(player);
-							}
+								location = triggerSaveLogin(player);
 							else
 								location = player.getLocation();
 							if (plugin.isHidingInventoryEnabled())
@@ -505,9 +496,7 @@ public class PlayerListener implements Listener
 		{
 			if (!playerdata.isLoggedIn())
 				return;
-			playerdata.notifyAction();
-			if (plugin.isInstantAutoLogoutEnabled())
-				playerdata.logout();
+			playerdata.logout();
 			plugin.getCrazyDatabase().saveWithoutPassword(playerdata);
 		}
 	}
@@ -549,11 +538,13 @@ public class PlayerListener implements Listener
 		return movementBlocker;
 	}
 
-	public void triggerSaveLogin(final Player player)
+	public Location triggerSaveLogin(final Player player)
 	{
 		if (savelogin.get(player.getName().toLowerCase()) == null)
-			savelogin.put(player.getName().toLowerCase(), player.getLocation().clone());
-		player.teleport(plugin.getSaveLoginLocations(player), TeleportCause.PLUGIN);
+			savelogin.put(player.getName().toLowerCase(), player.getLocation());
+		final Location location = plugin.getSaveLoginLocations(player);
+		player.teleport(location, TeleportCause.PLUGIN);
+		return location;
 	}
 
 	public void disableSaveLogin(final Player player)
