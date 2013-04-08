@@ -1464,7 +1464,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public void onLoad()
 	{
 		LoginPlugin.LOGINPLUGINPROVIDER.setPlugin(this);
-		// org.bukkit.common.login.LoginPlugin.LOGINPROVIDER.setLoginPlugin(new CommonLoginAPIBridge(this));
 		plugin = this;
 		super.onLoad();
 	}
