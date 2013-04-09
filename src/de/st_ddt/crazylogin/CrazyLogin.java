@@ -2,7 +2,6 @@ package de.st_ddt.crazylogin;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1195,10 +1194,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					}
 
 					@Override
-					public void filter(final Collection<? extends LoginData> datas)
+					public boolean isActive()
 					{
-						if (ip != null)
-							super.filter(datas);
+						return ip != null;
 					}
 
 					@Override
@@ -1247,10 +1245,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					}
 
 					@Override
-					public void filter(final Collection<? extends LoginData> datas)
+					public boolean isActive()
 					{
-						if (online != null)
-							super.filter(datas);
+						return online != null;
 					}
 
 					@Override
