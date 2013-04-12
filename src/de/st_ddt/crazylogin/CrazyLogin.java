@@ -1748,7 +1748,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
+	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$ $AttemptPerIP$ $AttemptPerAccount$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
 	public void playerLogin(final Player player, final String password) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1772,12 +1772,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (!data.login(password))
 		{
 			new CrazyLoginLoginFailEvent(player, data, LoginFailReason.WRONG_PASSWORD).callEvent();
-			if (!plugin.isHidingWarningsEnabled())
-				broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress());
 			Integer fails = loginFailuresPerIP.get(player.getAddress().getAddress().getHostAddress());
 			if (fails == null)
-				fails = 0;
-			fails++;
+				fails = 1;
+			else
+				fails++;
 			if (fails % autoKickLoginFailer == 0)
 			{
 				player.kickPlayer(locale.getLocaleMessage(player, "KICKED.LOGINFAIL", fails));
@@ -1787,6 +1786,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			else
 				sendLocaleMessage("LOGIN.FAILED", player);
 			loginFailuresPerIP.put(player.getAddress().getAddress().getHostAddress(), fails);
+			if (!plugin.isHidingWarningsEnabled())
+				broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress(), fails, data.getLoginFails());
 			logger.log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong password (AttemptPerIP: " + fails + ", AttemptPerAccount: " + data.getLoginFails() + ")");
 			return;
 		}
