@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -224,29 +223,6 @@ public class DynamicPlayerListener implements Listener
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerDamage(final EntityDamageEvent event)
-	{
-		if (!(event.getEntity() instanceof Player))
-			return;
-		final Player player = (Player) event.getEntity();
-		if (plugin.isLoggedIn(player))
-			return;
-		event.setCancelled(true);
-	}
-
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-	public void PlayerDamage(final EntityDamageByBlockEvent event)
-	{
-		if (!(event.getEntity() instanceof Player))
-			return;
-		final Player player = (Player) event.getEntity();
-		if (plugin.isLoggedIn(player))
-			return;
-		playerListener.triggerSaveLogin(player);
-		event.setCancelled(true);
-	}
-
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
-	public void PlayerDamage(final EntityDamageByEntityEvent event)
 	{
 		if (!(event.getEntity() instanceof Player))
 			return;
