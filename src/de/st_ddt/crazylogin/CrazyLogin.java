@@ -1933,7 +1933,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final LoginPlayerData data = getPlayerData(player);
 		if (data == null)
 			return !alwaysNeedPassword && !PermissionModule.hasPermission(player, "crazylogin.requirepassword");
-		return data.isLoggedIn() && player.isOnline();
+		if (player.isOnline())
+			return data.isLoggedIn();
+		else
+			return data.checkTimeOut();
 	}
 
 	@Override
