@@ -2023,8 +2023,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (database != null)
 			if (autoLogout > 0)
 			{
-				final Date timeOut = new Date();
-				timeOut.setTime(timeOut.getTime() - autoLogout * 1000);
+				final Date timeOut = new Date(System.currentTimeMillis() - autoLogout * 1000);
 				if (database.isCachedDatabase())
 					synchronized (database.getDatabaseLock())
 					{
@@ -2039,7 +2038,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					{
 						for (final LoginPlayerData data : database.getAllEntries())
 							if (!data.isOnline())
-								if (!data.checkTimeOut(timeOut) || !data.isLoggedIn())
+								if (!data.checkTimeOut(timeOut))
 									dropping.add(data);
 					}
 					for (final LoginPlayerData data : dropping)

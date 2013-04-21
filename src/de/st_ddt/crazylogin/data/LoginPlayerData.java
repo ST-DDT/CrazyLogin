@@ -361,7 +361,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	public boolean checkTimeOut(final Date timeOut)
 	{
 		if (timeOut.after(lastAction))
-			this.loggedIn = false;
+			loggedIn = false;
 		return loggedIn;
 	}
 
