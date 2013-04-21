@@ -1554,14 +1554,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		repeatAuthRequests = Math.max(config.getLong("repeatAuthRequests", 200), 0);
 		antiRequestSpamTable.clear();
 		commandWhiteList = config.getStringList("commandWhitelist");
-		if (isUpdated && !isInstalled)
-			if (VersionComparator.compareVersions(previousVersion, "7") == -1)
-			{
-				final List<String> temp = new ArrayList<String>(commandWhiteList);
-				commandWhiteList.clear();
-				for (final String entry : temp)
-					commandWhiteList.add(entry + ".*");
-			}
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
 		delayPreRegisterSecurity = config.getInt("delayPreRegisterSecurity", 5);
