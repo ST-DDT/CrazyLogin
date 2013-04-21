@@ -110,11 +110,11 @@ doNotSpamAuthRequests: false
 doNotSpamRegisterRequests: false
 # these commands can be executed as guest (even if blockGuestCommands is enabled) or when not logged in
 commandWhitelist:
-- /l[ogin]?(\\z| .*)
-- /register(\\z| .*)
-- /language(\\z| [a-z]{2,3}_[a-z]{2,3})
-- /language select(\\z| .*)
-- /language list(\\z| .*)
+- /l[ogin]?(\z| .*)
+- /register(\z| .*)
+- /language(\z| [a-z]{2,3}_[a-z]{2,3})
+- /language select(\z| .*)
+- /language list(\z| .*)
 - /worldedit cui
 # the encryption alogrithm used to encrypt your passwords. http://dev.bukkit.org/server-mods/crazylogin/pages/encryption/
 encryptor:
