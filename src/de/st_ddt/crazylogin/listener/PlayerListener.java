@@ -345,7 +345,7 @@ public class PlayerListener implements Listener
 			{
 				final Location respawnLocation = event.getRespawnLocation().clone();
 				savelogin.put(player.getName().toLowerCase(), respawnLocation);
-				final Location tempSpawnLocation = plugin.getSaveLoginLocations(respawnLocation.getWorld());
+				final Location tempSpawnLocation = plugin.getSaveLoginLocation(respawnLocation.getWorld());
 				event.setRespawnLocation(tempSpawnLocation);
 				movementBlocker.put(player.getName().toLowerCase(), tempSpawnLocation);
 			}
@@ -540,11 +540,16 @@ public class PlayerListener implements Listener
 
 	public Location triggerSaveLogin(final Player player)
 	{
-		if (savelogin.get(player.getName().toLowerCase()) == null)
-			savelogin.put(player.getName().toLowerCase(), player.getLocation());
-		final Location location = plugin.getSaveLoginLocations(player);
-		player.teleport(location, TeleportCause.PLUGIN);
-		return location;
+		if (plugin.isSaveLoginEnabled())
+		{
+			if (savelogin.get(player.getName().toLowerCase()) == null)
+				savelogin.put(player.getName().toLowerCase(), player.getLocation());
+			final Location location = plugin.getSaveLoginLocation(player);
+			player.teleport(location, TeleportCause.PLUGIN);
+			return location;
+		}
+		else
+			return player.getLocation();
 	}
 
 	public void disableSaveLogin(final Player player)

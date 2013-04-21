@@ -175,6 +175,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean forceSingleSessionSameIPBypass;
 	private long delayPreRegisterSecurity;
 	private long delayPreLoginSecurity;
+	private boolean saveLoginEnabled;
 	private boolean forceSaveLogin;
 	private boolean hideInventory;
 	private boolean hidePlayer;
@@ -375,6 +376,29 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
+		modeCommand.addMode(new BooleanFalseMode(this, "saveLoginEnabled")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return saveLoginEnabled;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				saveLoginEnabled = newValue;
+				if (newValue)
+					saveLoginEnabled = true;
+				else
+				{
+					saveLoginEnabled = false;
+					forceSaveLogin = false;
+				}
+				saveConfiguration();
+			}
+		});
 		modeCommand.addMode(new BooleanFalseMode(this, "forceSaveLogin")
 		{
 
@@ -387,7 +411,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			@Override
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
-				forceSaveLogin = newValue;
+				if (newValue)
+				{
+					saveLoginEnabled = true;
+					forceSaveLogin = true;
+				}
+				else
+					forceSaveLogin = false;
 				saveConfiguration();
 			}
 		});
@@ -1536,7 +1566,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
 		delayPreRegisterSecurity = config.getInt("delayPreRegisterSecurity", 5);
 		delayPreLoginSecurity = config.getInt("delayPreLoginSecurity", 0);
-		forceSaveLogin = config.getBoolean("forceSaveLogin", false);
+		saveLoginEnabled = config.getBoolean("saveLoginEnabled", true);
+		forceSaveLogin = saveLoginEnabled && config.getBoolean("forceSaveLogin", false);
 		for (final World world : Bukkit.getWorlds())
 			loadConfigurationForWorld(world);
 		hideInventory = config.getBoolean("hideInventory", false);
@@ -1693,7 +1724,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
 		config.set("delayPreRegisterSecurity", delayPreRegisterSecurity <= 0 ? "false" : delayPreRegisterSecurity);
 		config.set("delayPreLoginSecurity", delayPreLoginSecurity <= 0 ? "false" : delayPreLoginSecurity);
-		config.set("forceSaveLogin", forceSaveLogin);
+		config.set("saveLoginEnabled", saveLoginEnabled);
+		config.set("forceSaveLogin", saveLoginEnabled && forceSaveLogin);
 		for (final Entry<String, Location> entry : saveLoginLocations.entrySet())
 			ObjectSaveLoadHelper.saveLocation(config, "saveLoginLocations." + entry.getKey() + ".", entry.getValue(), true, true);
 		config.set("hideInventory", hideInventory);
@@ -2166,10 +2198,15 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return delayPreLoginSecurity;
 	}
 
+	public boolean isSaveLoginEnabled()
+	{
+		return saveLoginEnabled;
+	}
+
 	@Override
 	public boolean isForceSaveLoginEnabled()
 	{
-		return forceSaveLogin;
+		return saveLoginEnabled && forceSaveLogin;
 	}
 
 	public Map<String, Location> getSaveLoginLocations()
@@ -2177,7 +2214,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return saveLoginLocations;
 	}
 
-	public Location getSaveLoginLocations(final World world)
+	public Location getSaveLoginLocation(final World world)
 	{
 		if (saveLoginLocations.containsKey(world.getName()))
 			return saveLoginLocations.get(world.getName()).clone();
@@ -2185,9 +2222,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return world.getSpawnLocation();
 	}
 
-	public Location getSaveLoginLocations(final Player player)
+	public Location getSaveLoginLocation(final Player player)
 	{
-		return getSaveLoginLocations(player.getWorld());
+		return getSaveLoginLocation(player.getWorld());
 	}
 
 	@Override
