@@ -110,7 +110,7 @@ doNotSpamAuthRequests: false
 doNotSpamRegisterRequests: false
 # these commands can be executed as guest (even if blockGuestCommands is enabled) or when not logged in
 commandWhitelist:
-- /l[ogin]?(\z| .*)
+- /l(ogin)?(\z| .*)
 - /register(\z| .*)
 - /language(\z| [a-z]{2,3}_[a-z]{2,3})
 - /language select(\z| .*)
