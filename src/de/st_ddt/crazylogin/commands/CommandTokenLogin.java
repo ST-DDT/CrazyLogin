@@ -66,6 +66,6 @@ public class CommandTokenLogin extends CommandExecutor
 	@Override
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return !PermissionModule.hasPermission(sender, "crazylogin.blocktokenlogin") && !plugin.isAdminLoginDisabled();
+		return !PermissionModule.hasPermission(sender, "crazylogin.blocktokenlogin") && !plugin.isTokenLoginDisabled();
 	}
 }
