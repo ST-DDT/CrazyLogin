@@ -78,6 +78,7 @@ import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
 import de.st_ddt.crazylogin.events.LoginFailReason;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginExceedingMaxRegistrationsPerIPException;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginRegistrationsDisabled;
+import de.st_ddt.crazylogin.exceptions.CrazyLoginUnsupportedPasswordException;
 import de.st_ddt.crazylogin.listener.CrazyListener;
 import de.st_ddt.crazylogin.listener.DynamicPlayerListener;
 import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_2_5;
@@ -1771,7 +1772,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$ $AttemptPerIP$ $AttemptPerAccount$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
+	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$ $AttemptPerIP$ $AttemptPerAccount$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.BROADCAST.JOIN $Name$", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE" })
 	public void playerLogin(final Player player, final String password) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1834,7 +1835,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		if (encryptor instanceof UpdatingEncryptor)
 		{
-			data.setPassword(password);
+			try
+			{
+				data.setPassword(password);
+			}
+			catch (final CrazyLoginUnsupportedPasswordException e)
+			{
+				sendLocaleMessage("LOGIN.PASSWORDREQUIRECHANGE", player);
+			}
 			database.save(data);
 		}
 		data.addIP(player.getAddress().getAddress().getHostAddress());

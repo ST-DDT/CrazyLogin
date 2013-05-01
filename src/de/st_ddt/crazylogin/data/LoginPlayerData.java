@@ -14,6 +14,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
+import de.st_ddt.crazylogin.exceptions.CrazyLoginUnsupportedPasswordException;
 import de.st_ddt.crazyplugin.CrazyLightPluginInterface;
 import de.st_ddt.crazyplugin.data.PlayerData;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
@@ -221,7 +222,14 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	@Override
 	public void setPassword(final String password) throws CrazyCommandException
 	{
-		this.password = getPlugin().getEncryptor().encrypt(name, genSeed(), password);
+		try
+		{
+			this.password = getPlugin().getEncryptor().encrypt(name, genSeed(), password);
+		}
+		catch (final Exception e)
+		{
+			throw new CrazyLoginUnsupportedPasswordException();
+		}
 	}
 
 	private String genSeed()
