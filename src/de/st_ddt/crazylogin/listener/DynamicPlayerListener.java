@@ -1,11 +1,9 @@
 package de.st_ddt.crazylogin.listener;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
@@ -28,7 +26,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
@@ -41,14 +38,12 @@ public class DynamicPlayerListener implements Listener
 	protected final static Pattern PATTERN_SPACE = Pattern.compile(" ");
 	protected final CrazyLogin plugin;
 	private final PlayerListener playerListener;
-	private final Map<String, Location> movementBlocker;
 
 	public DynamicPlayerListener(final CrazyLogin plugin, final PlayerListener playerListener)
 	{
 		super();
 		this.plugin = plugin;
 		this.playerListener = playerListener;
-		this.movementBlocker = playerListener.getMovementBlocker();
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -122,34 +117,39 @@ public class DynamicPlayerListener implements Listener
 		plugin.sendAuthReminderMessage(player);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void PlayerMove(final PlayerMoveEvent event)
 	{
 		final Player player = event.getPlayer();
 		if (plugin.isLoggedIn(player))
 			return;
-		final Location current = movementBlocker.get(player.getName().toLowerCase());
+		final Location current = playerListener.getMovementBlocker(player);
 		if (current == null)
 			return;
-		double dist = Double.MAX_VALUE;
-		final double moveRange = plugin.getMoveRange();
-		if (current.getWorld() == event.getTo().getWorld())
-			dist = current.distance(event.getTo());
-		if (dist >= moveRange)
+		final Location target = event.getTo();
+		final double dist;
+		if (current.getWorld() == target.getWorld())
+			dist = current.distance(target);
+		else
+			dist = Double.MAX_VALUE;
+		if (dist >= plugin.getMoveRange())
 		{
-			if (dist >= moveRange * 2)
-				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
-				{
-
-					@Override
-					public void run()
-					{
-						player.teleport(current, TeleportCause.PLUGIN);
-					}
-				});
-			event.setCancelled(true);
+			final Location validLocation = playerListener.getLastValidLocation(player);
+			if (validLocation == null)
+			{
+				event.setTo(current.clone());
+				playerListener.setLastValidLocation(player, current);
+			}
+			else
+			{
+				validLocation.setYaw(target.getYaw());
+				validLocation.setPitch(target.getPitch());
+				event.setTo(validLocation.clone());
+			}
 			plugin.sendAuthReminderMessage(event.getPlayer());
 		}
+		else
+			playerListener.setLastValidLocation(player, event.getTo());
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -163,15 +163,18 @@ public class DynamicPlayerListener implements Listener
 				playerdata.notifyAction();
 			return;
 		}
-		if (movementBlocker.get(player.getName().toLowerCase()) == null)
+		if (playerListener.getMovementBlocker(player) == null)
 			return;
-		if (event.getCause() == TeleportCause.PLUGIN || event.getCause() == TeleportCause.UNKNOWN)
+		switch (event.getCause())
 		{
-			movementBlocker.put(player.getName().toLowerCase(), event.getTo());
-			return;
+			case PLUGIN:
+				playerListener.setMovementBlocker(player, event.getTo());
+			case UNKNOWN:
+				return;
+			default:
+				event.setCancelled(true);
+				plugin.sendAuthReminderMessage(event.getPlayer());
 		}
-		event.setCancelled(true);
-		plugin.sendAuthReminderMessage(event.getPlayer());
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)

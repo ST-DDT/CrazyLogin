@@ -69,7 +69,7 @@ public class CommandAdminLogin extends CommandExecutor
 		playerData.setLoggedIn(true);
 		plugin.sendLocaleMessage("LOGIN.SUCCESS", player);
 		plugin.getCrazyLogger().log("Login", player.getName() + " (via Admin " + admin.getName() + ") logged in successfully.");
-		playerListener.removeFromMovementBlocker(player);
+		playerListener.removeMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
 		plugin.getPlayerAutoLogouts().add(player);

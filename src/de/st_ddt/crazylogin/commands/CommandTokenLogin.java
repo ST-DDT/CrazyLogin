@@ -57,7 +57,7 @@ public class CommandTokenLogin extends CommandExecutor
 		playerData.setLoggedIn(true);
 		plugin.sendLocaleMessage("LOGIN.SUCCESS", player);
 		plugin.getCrazyLogger().log("Login", player.getName() + " (via Token " + token.getCreator() + ") logged in successfully.");
-		playerListener.removeFromMovementBlocker(player);
+		playerListener.removeMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
 		plugin.getPlayerAutoLogouts().add(player);

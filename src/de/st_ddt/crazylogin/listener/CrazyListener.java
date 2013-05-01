@@ -32,11 +32,12 @@ public final class CrazyListener implements Listener
 	@EventHandler
 	public void CrazyPlayerRemoveEvent(final CrazyPlayerRemoveEvent event)
 	{
-		if (plugin.deletePlayerData(event.getPlayer()))
+		final String player = event.getPlayer();
+		if (plugin.deletePlayerData(player))
 			event.markDeletion((Named) plugin);
-		if (playerListener.removeFromMovementBlocker(event.getPlayer()))
+		if (playerListener.removeMovementBlocker(player) != null)
 			event.markDeletion((Named) plugin);
-		if (playerListener.dropPlayerData(event.getPlayer()))
+		if (playerListener.dropPlayerData(player))
 			event.markDeletion((Named) plugin);
 	}
 

@@ -1827,7 +1827,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			player.setFireTicks(0);
 			playerListener.sendPlayerJoinMessage(player);
 		}
-		playerListener.removeFromMovementBlocker(player);
+		playerListener.removeMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
 		playerListener.unhidePlayer(player);
@@ -1878,7 +1878,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		{
 			if (alwaysNeedPassword || PermissionModule.hasPermission(player, "crazylogin.requirepassword"))
 				throw new CrazyCommandUsageException("<Password>" + (confirmPassword ? " <Password>" : ""));
-			playerListener.removeFromMovementBlocker(player);
+			playerListener.removeMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", player);
 			deletePlayerData(player);
 			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " deleted his account successfully.");
@@ -1916,7 +1916,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				player.setFireTicks(0);
 				playerListener.sendPlayerJoinMessage(player);
 			}
-		playerListener.removeFromMovementBlocker(player);
+		playerListener.removeMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
 		playerListener.unhidePlayer(player);

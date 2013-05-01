@@ -38,6 +38,7 @@ public class PlayerListener implements Listener
 
 	protected final CrazyLogin plugin;
 	private final Map<String, Location> movementBlocker = new HashMap<String, Location>();
+	private final Map<String, Location> lastValidLocation = new HashMap<String, Location>();
 	private final Map<String, Location> savelogin = new HashMap<String, Location>();
 	private final Map<String, PlayerSaver> hiddenInventory = new HashMap<String, PlayerSaver>();
 	private final Map<Player, Set<Player>> hiddenPlayers = new HashMap<Player, Set<Player>>();
@@ -203,8 +204,9 @@ public class PlayerListener implements Listener
 	@Localized({ "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.REGISTER.HEADER2", "CRAZYLOGIN.REGISTER.REQUEST", "CRAZYLOGIN.LOGIN.REQUEST" })
 	public void PlayerJoin(final Player player)
 	{
-		if (movementBlocker.get(player.getName().toLowerCase()) != null)
-			player.teleport(movementBlocker.get(player.getName().toLowerCase()), TeleportCause.PLUGIN);
+		final Location blocker = getMovementBlocker(player);
+		if (blocker != null)
+			player.teleport(blocker, TeleportCause.PLUGIN);
 		if (plugin.isHidingPlayerEnabled())
 			hidePlayer(player);
 		if (plugin.hasPlayerData(player))
@@ -240,8 +242,8 @@ public class PlayerListener implements Listener
 								location = player.getLocation();
 							if (plugin.isHidingInventoryEnabled())
 								triggerHidenInventory(player);
-							if (movementBlocker.get(player.getName().toLowerCase()) == null)
-								movementBlocker.put(player.getName().toLowerCase(), location);
+							if (getMovementBlocker(player) == null)
+								setMovementBlocker(player, location);
 						}
 					}, plugin.getDelayPreLoginSecurity());
 				else
@@ -253,8 +255,8 @@ public class PlayerListener implements Listener
 						location = player.getLocation();
 					if (plugin.isHidingInventoryEnabled())
 						triggerHidenInventory(player);
-					if (movementBlocker.get(player.getName().toLowerCase()) == null)
-						movementBlocker.put(player.getName().toLowerCase(), location);
+					if (getMovementBlocker(player) == null)
+						setMovementBlocker(player, location);
 				}
 				// Message
 				final AuthRequestor requestor = new AuthRequestor(plugin, player, "LOGIN.REQUEST");
@@ -292,8 +294,8 @@ public class PlayerListener implements Listener
 								location = player.getLocation();
 							if (plugin.isHidingInventoryEnabled())
 								triggerHidenInventory(player);
-							if (movementBlocker.get(player.getName().toLowerCase()) == null)
-								movementBlocker.put(player.getName().toLowerCase(), location);
+							if (getMovementBlocker(player) == null)
+								setMovementBlocker(player, location);
 						}
 					}, plugin.getDelayPreRegisterSecurity());
 				else
@@ -306,8 +308,8 @@ public class PlayerListener implements Listener
 					}
 					if (plugin.isHidingInventoryEnabled())
 						triggerHidenInventory(player);
-					if (movementBlocker.get(player.getName().toLowerCase()) == null)
-						movementBlocker.put(player.getName().toLowerCase(), location);
+					if (getMovementBlocker(player) == null)
+						setMovementBlocker(player, location);
 				}
 				// Message
 				new AuthRequestor(plugin, player, "REGISTER.HEADER").start(plugin.getDelayAuthRequests());
@@ -341,17 +343,17 @@ public class PlayerListener implements Listener
 		final Player player = event.getPlayer();
 		if (isLoggedInRespawn(player))
 			return;
-		if (event.getRespawnLocation() != null)
+		final Location respawnLocation = event.getRespawnLocation();
+		if (respawnLocation != null && respawnLocation.getWorld() != null)
 			if (plugin.isForceSaveLoginEnabled())
 			{
-				final Location respawnLocation = event.getRespawnLocation().clone();
-				savelogin.put(player.getName().toLowerCase(), respawnLocation);
+				savelogin.put(player.getName().toLowerCase(), respawnLocation.clone());
 				final Location tempSpawnLocation = plugin.getSaveLoginLocation(respawnLocation.getWorld());
 				event.setRespawnLocation(tempSpawnLocation);
-				movementBlocker.put(player.getName().toLowerCase(), tempSpawnLocation);
+				setMovementBlocker(player, tempSpawnLocation);
 			}
 			else
-				movementBlocker.put(player.getName().toLowerCase(), event.getRespawnLocation());
+				setMovementBlocker(player, respawnLocation);
 		final AuthRequestor requestor;
 		if (plugin.hasPlayerData(player))
 			requestor = new AuthRequestor(plugin, player, "LOGIN.REQUEST");
@@ -502,24 +504,41 @@ public class PlayerListener implements Listener
 		}
 	}
 
-	public void addToMovementBlocker(final Player player)
+	public void setMovementBlocker(final Player player)
 	{
-		addToMovementBlocker(player.getName(), player.getLocation());
+		setMovementBlocker(player, player.getLocation());
 	}
 
-	public void addToMovementBlocker(final String player, final Location location)
+	public void setMovementBlocker(final OfflinePlayer player, final Location location)
 	{
-		movementBlocker.put(player.toLowerCase(), location);
+		setMovementBlocker(player.getName(), location);
 	}
 
-	public boolean removeFromMovementBlocker(final OfflinePlayer player)
+	public void setMovementBlocker(final String name, final Location location)
 	{
-		return removeFromMovementBlocker(player.getName());
+		movementBlocker.put(name.toLowerCase(), location);
+		setLastValidLocation(name, location.clone());
 	}
 
-	public boolean removeFromMovementBlocker(final String player)
+	public Location getMovementBlocker(final OfflinePlayer player)
 	{
-		return movementBlocker.remove(player.toLowerCase()) != null;
+		return getMovementBlocker(player.getName());
+	}
+
+	public Location getMovementBlocker(final String name)
+	{
+		return movementBlocker.get(name.toLowerCase());
+	}
+
+	public Location removeMovementBlocker(final OfflinePlayer player)
+	{
+		return removeMovementBlocker(player.getName());
+	}
+
+	public Location removeMovementBlocker(final String name)
+	{
+		lastValidLocation.remove(name.toLowerCase());
+		return movementBlocker.remove(name.toLowerCase());
 	}
 
 	public void clearMovementBlocker(final boolean guestsOnly)
@@ -535,9 +554,24 @@ public class PlayerListener implements Listener
 			movementBlocker.clear();
 	}
 
-	public Map<String, Location> getMovementBlocker()
+	public void setLastValidLocation(final OfflinePlayer player, final Location location)
 	{
-		return movementBlocker;
+		setLastValidLocation(player.getName(), location);
+	}
+
+	public void setLastValidLocation(final String name, final Location location)
+	{
+		lastValidLocation.put(name.toLowerCase(), location.clone());
+	}
+
+	public Location getLastValidLocation(final OfflinePlayer player)
+	{
+		return getLastValidLocation(player.getName());
+	}
+
+	public Location getLastValidLocation(final String name)
+	{
+		return lastValidLocation.get(name.toLowerCase());
 	}
 
 	public Location triggerSaveLogin(final Player player)
@@ -556,9 +590,13 @@ public class PlayerListener implements Listener
 
 	public void disableSaveLogin(final Player player)
 	{
-		final Location location = savelogin.remove(player.getName().toLowerCase());
+		Location location = savelogin.remove(player.getName().toLowerCase());
 		if (location == null)
-			return;
+		{
+			location = getMovementBlocker(player);
+			if (location == null)
+				return;
+		}
 		player.teleport(location, TeleportCause.PLUGIN);
 	}
 
