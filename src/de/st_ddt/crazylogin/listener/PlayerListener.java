@@ -525,9 +525,10 @@ public class PlayerListener implements Listener
 	{
 		if (guestsOnly)
 		{
-			for (final String name : movementBlocker.keySet())
-				if (!plugin.hasPlayerData(name))
-					movementBlocker.remove(name);
+			final Iterator<String> it = movementBlocker.keySet().iterator();
+			while (it.hasNext())
+				if (!plugin.hasPlayerData(it.next()))
+					it.remove();
 		}
 		else
 			movementBlocker.clear();
