@@ -38,7 +38,7 @@ public class CommandPassword extends CommandExecutor
 		}
 		else if (!PermissionModule.hasPermission(player, "crazylogin.register.command"))
 			throw new CrazyCommandPermissionException();
-		String password = null;
+		final String password;
 		if (plugin.isConfirmPasswordEnabled())
 		{
 			if (args.length % 2 == 1)
