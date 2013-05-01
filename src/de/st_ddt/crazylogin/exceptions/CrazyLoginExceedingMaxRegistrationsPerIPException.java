@@ -7,13 +7,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import de.st_ddt.crazylogin.data.LoginData;
+import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.source.Localized;
 
-public class CrazyLoginExceedingMaxRegistrationsPerIPException extends CrazyLoginException
+public class CrazyLoginExceedingMaxRegistrationsPerIPException extends CrazyException
 {
 
-	private static final long serialVersionUID = -1015895366114344961L;
+	private static final long serialVersionUID = -1015895366114344962L;
 	protected final int maxCount;
 	private final TreeSet<String> associates = new TreeSet<String>();
 
@@ -44,7 +45,7 @@ public class CrazyLoginExceedingMaxRegistrationsPerIPException extends CrazyLogi
 	@Override
 	public String getLangPath()
 	{
-		return super.getLangPath() + ".ACCOUNTSPERIP.TOMUCH";
+		return "CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH";
 	}
 
 	@Override

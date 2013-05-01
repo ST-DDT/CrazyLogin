@@ -77,7 +77,6 @@ import de.st_ddt.crazylogin.events.CrazyLoginPreLoginEvent;
 import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
 import de.st_ddt.crazylogin.events.LoginFailReason;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginExceedingMaxRegistrationsPerIPException;
-import de.st_ddt.crazylogin.exceptions.CrazyLoginException;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginRegistrationsDisabled;
 import de.st_ddt.crazylogin.listener.CrazyListener;
 import de.st_ddt.crazylogin.listener.DynamicPlayerListener;
@@ -1868,7 +1867,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	@Override
 	@Localized({ "CRAZYLOGIN.PASSWORDDELETE.SUCCESS", "CRAZYLOGIN.PASSWORDCHANGE.SUCCESS $Password$", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
-	public void playerPassword(final Player player, final String password) throws CrazyCommandException, CrazyLoginException
+	public void playerPassword(final Player player, final String password) throws CrazyException
 	{
 		if (disableRegistrations)
 			throw new CrazyLoginRegistrationsDisabled();

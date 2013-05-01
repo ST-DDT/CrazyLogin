@@ -2,13 +2,14 @@ package de.st_ddt.crazylogin.exceptions;
 
 import org.bukkit.command.CommandSender;
 
+import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.source.Localized;
 
-public class CrazyLoginRegistrationsDisabled extends CrazyLoginException
+public class CrazyLoginRegistrationsDisabled extends CrazyException
 {
 
-	private static final long serialVersionUID = 2834302908669502217L;
+	private static final long serialVersionUID = 2834302908669502218L;
 
 	public CrazyLoginRegistrationsDisabled()
 	{
@@ -18,7 +19,7 @@ public class CrazyLoginRegistrationsDisabled extends CrazyLoginException
 	@Override
 	public String getLangPath()
 	{
-		return super.getLangPath() + ".REGISTER.DISABLED";
+		return "CRAZYLOGIN.EXCEPTION.REGISTER.DISABLED";
 	}
 
 	@Override
