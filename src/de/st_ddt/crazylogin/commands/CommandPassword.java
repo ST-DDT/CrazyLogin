@@ -28,11 +28,16 @@ public class CommandPassword extends CommandExecutor
 		if (!(sender instanceof Player))
 			throw new CrazyCommandExecutorException(false);
 		final Player player = (Player) sender;
-		if (!plugin.isLoggedIn(player) && plugin.hasPlayerData(player))
-			throw new CrazyCommandPermissionException();
-		if (!plugin.hasPlayerData(player))
-			if (!PermissionModule.hasPermission(player, "crazylogin.register.command"))
+		if (plugin.hasPlayerData(player))
+		{
+			if (!plugin.isLoggedIn(player))
+			{
+				plugin.sendAuthReminderMessage(player);
 				throw new CrazyCommandPermissionException();
+			}
+		}
+		else if (!PermissionModule.hasPermission(player, "crazylogin.register.command"))
+			throw new CrazyCommandPermissionException();
 		String password = null;
 		if (plugin.isConfirmPasswordEnabled())
 		{
