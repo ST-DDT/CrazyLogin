@@ -164,7 +164,7 @@ public class DynamicPlayerListener implements Listener
 				plugin.sendAuthReminderMessage(event.getPlayer());
 			}
 			else
-				playerListener.setLastValidLocation(player, event.getTo());
+				playerListener.setLastValidLocation(player, target);
 		}
 	}
 
