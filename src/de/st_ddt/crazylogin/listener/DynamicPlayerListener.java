@@ -127,12 +127,8 @@ public class DynamicPlayerListener implements Listener
 		if (current == null)
 			return;
 		final Location target = event.getTo();
-		final double dist;
-		if (current.getWorld() == target.getWorld())
-			dist = current.distance(target);
-		else
-			dist = Double.MAX_VALUE;
-		if (dist >= plugin.getMoveRange())
+		final double moveRange = plugin.getMoveRange();
+		if (moveRange == 0)
 		{
 			final Location validLocation = playerListener.getLastValidLocation(player);
 			if (validLocation == null)
@@ -141,15 +137,35 @@ public class DynamicPlayerListener implements Listener
 				playerListener.setLastValidLocation(player, current);
 			}
 			else
-			{
-				validLocation.setYaw(target.getYaw());
-				validLocation.setPitch(target.getPitch());
 				event.setTo(validLocation.clone());
-			}
 			plugin.sendAuthReminderMessage(event.getPlayer());
 		}
 		else
-			playerListener.setLastValidLocation(player, event.getTo());
+		{
+			final double dist;
+			if (current.getWorld() == target.getWorld())
+				dist = current.distance(target);
+			else
+				dist = Double.MAX_VALUE;
+			if (dist >= moveRange)
+			{
+				final Location validLocation = playerListener.getLastValidLocation(player);
+				if (validLocation == null)
+				{
+					event.setTo(current.clone());
+					playerListener.setLastValidLocation(player, current);
+				}
+				else
+				{
+					validLocation.setYaw(target.getYaw());
+					validLocation.setPitch(target.getPitch());
+					event.setTo(validLocation.clone());
+				}
+				plugin.sendAuthReminderMessage(event.getPlayer());
+			}
+			else
+				playerListener.setLastValidLocation(player, event.getTo());
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
