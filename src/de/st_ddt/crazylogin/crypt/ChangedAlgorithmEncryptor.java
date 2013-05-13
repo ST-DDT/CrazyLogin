@@ -4,6 +4,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import de.st_ddt.crazylogin.LoginPlugin;
 import de.st_ddt.crazylogin.data.LoginData;
+import de.st_ddt.crazylogin.exceptions.PasswordRejectedException;
 
 public class ChangedAlgorithmEncryptor extends AbstractEncryptor implements UpdatingEncryptor
 {
@@ -26,7 +27,7 @@ public class ChangedAlgorithmEncryptor extends AbstractEncryptor implements Upda
 	}
 
 	@Override
-	public String encrypt(final String name, final String salt, final String password)
+	public String encrypt(final String name, final String salt, final String password) throws PasswordRejectedException
 	{
 		return current.encrypt(name, salt, password);
 	}

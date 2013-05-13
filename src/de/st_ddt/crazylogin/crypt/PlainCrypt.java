@@ -6,6 +6,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import de.st_ddt.crazylogin.LoginPlugin;
 import de.st_ddt.crazylogin.data.LoginData;
+import de.st_ddt.crazylogin.exceptions.PasswordRejectedException;
 import de.st_ddt.crazyutil.ChatHelper;
 
 public final class PlainCrypt extends AbstractEncryptor
@@ -33,10 +34,10 @@ public final class PlainCrypt extends AbstractEncryptor
 	}
 
 	@Override
-	public String encrypt(final String name, final String salt, final String password)
+	public String encrypt(final String name, final String salt, final String password) throws PasswordRejectedException
 	{
 		if (!filterpattern.matcher(password).matches())
-			throw new IllegalArgumentException("The pasword " + password + " is not allowed!");
+			throw new PasswordRejectedException("The pasword " + password + " is not allowed!");
 		return password;
 	}
 

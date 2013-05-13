@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyplugin.CrazyLightPluginInterface;
 import de.st_ddt.crazyplugin.data.PlayerData;
-import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
 import de.st_ddt.crazyutil.source.Localized;
@@ -57,9 +56,8 @@ public final class LoginUnregisteredPlayerData extends PlayerData<LoginUnregiste
 	}
 
 	@Override
-	public void setPassword(final String password) throws CrazyCommandException
+	public void setPassword(final String password)
 	{
-		throw new CrazyCommandException();
 	}
 
 	@Override

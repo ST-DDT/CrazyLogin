@@ -23,6 +23,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.messaging.Messenger;
 
+import de.st_ddt.crazycore.CrazyCore;
 import de.st_ddt.crazylogin.commands.CommandAdminLogin;
 import de.st_ddt.crazylogin.commands.CommandAutoLogout;
 import de.st_ddt.crazylogin.commands.CommandExecutor;
@@ -78,7 +79,8 @@ import de.st_ddt.crazylogin.events.CrazyLoginPreRegisterEvent;
 import de.st_ddt.crazylogin.events.LoginFailReason;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginExceedingMaxRegistrationsPerIPException;
 import de.st_ddt.crazylogin.exceptions.CrazyLoginRegistrationsDisabled;
-import de.st_ddt.crazylogin.exceptions.CrazyLoginUnsupportedPasswordException;
+import de.st_ddt.crazylogin.exceptions.PasswordRejectedException;
+import de.st_ddt.crazylogin.exceptions.PasswordRejectedLengthException;
 import de.st_ddt.crazylogin.listener.CrazyListener;
 import de.st_ddt.crazylogin.listener.DynamicPlayerListener;
 import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_2_5;
@@ -97,6 +99,7 @@ import de.st_ddt.crazyplugin.data.PlayerDataFilter;
 import de.st_ddt.crazyplugin.data.PlayerDataNameFilter;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandCircumstanceException;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandNoSuchException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandParameterException;
@@ -184,6 +187,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean useCustomJoinQuitMessages;
 	private boolean hidePasswordsFromConsole;
 	private Encryptor encryptor;
+	private int minPasswordLength;
+	private int protectedAccountMinPasswordLength;
 	private int autoDelete;
 	private int maxStoredIPs;
 	private int maxOnlinesPerIP;
@@ -1201,6 +1206,36 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				return res;
 			}
 		});
+		modeCommand.addMode(new IntegerMode(this, "minPasswordLength")
+		{
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				minPasswordLength = newValue;
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return minPasswordLength;
+			}
+		});
+		modeCommand.addMode(new IntegerMode(this, "protectedAccountMinPasswordLength")
+		{
+
+			@Override
+			public void setValue(final Integer newValue) throws CrazyException
+			{
+				protectedAccountMinPasswordLength = newValue;
+			}
+
+			@Override
+			public Integer getValue()
+			{
+				return protectedAccountMinPasswordLength;
+			}
+		});
 	}
 
 	private void registerFilter()
@@ -1600,6 +1635,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			encryptor = EncryptHelper.getEncryptor(this, config.getConfigurationSection("encryptor"));
 		if (encryptor == null)
 			encryptor = new CrazyCrypt1(this, config);
+		minNameLength = config.getInt("minNameLength", 3);
+		protectedAccountMinPasswordLength = config.getInt("protectedAccountMinPasswordLength", 7);
 		// Logger
 		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Account", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
 	}
@@ -1688,6 +1725,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			database.save(config, "database.");
 		config.set("encryptor", null);
 		encryptor.save(config, "encryptor.");
+		config.set("minPasswordLength", minPasswordLength);
+		config.set("protectedAccountMinPasswordLength", protectedAccountMinPasswordLength);
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
 		config.set("confirmPassword", confirmPassword);
 		config.set("dynamicProtection", dynamicProtection);
@@ -1772,7 +1811,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$ $AttemptPerIP$ $AttemptPerAccount$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.BROADCAST.JOIN $Name$", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE" })
+	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$ $AttemptPerIP$ $AttemptPerAccount$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.BROADCAST.JOIN $Name$", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE.LENGTH $CurrentLength$ $MinLength$" })
 	public void playerLogin(final Player player, final String password) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1839,12 +1878,24 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			{
 				data.setPassword(password);
 			}
-			catch (final CrazyLoginUnsupportedPasswordException e)
+			catch (final PasswordRejectedException e)
 			{
 				sendLocaleMessage("LOGIN.PASSWORDREQUIRECHANGE", player);
 			}
+			catch (final Exception e)
+			{
+				throw new CrazyCommandErrorException(e);
+			}
 			database.save(data);
 		}
+		final int passwordLength = password.length();
+		final int minLength;
+		if (CrazyCore.getPlugin().getProtectedPlayers().contains(player.getName()))
+			minLength = protectedAccountMinPasswordLength;
+		else
+			minLength = minPasswordLength;
+		if (passwordLength < minLength)
+			sendLocaleMessage("LOGIN.PASSWORDREQUIRECHANGE.LENGTH", player, passwordLength, minLength);
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		getCrazyDatabase().saveWithoutPassword(data);
 		player.setMetadata("Authenticated", new Authenticated(this, player));
@@ -1881,7 +1932,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			throw new CrazyLoginRegistrationsDisabled();
 		if (database == null)
 			throw new CrazyCommandCircumstanceException("when database is accessible");
-		if (password.length() == 0)
+		final int passwordLength = password.length();
+		if (passwordLength == 0)
 		{
 			if (alwaysNeedPassword || PermissionModule.hasPermission(player, "crazylogin.requirepassword"))
 				throw new CrazyCommandUsageException("<Password>" + (confirmPassword ? " <Password>" : ""));
@@ -1891,6 +1943,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " deleted his account successfully.");
 			return;
 		}
+		final int minLength;
+		if (CrazyCore.getPlugin().getProtectedPlayers().contains(player.getName()))
+			minLength = protectedAccountMinPasswordLength;
+		else
+			minLength = minPasswordLength;
+		if (passwordLength < minLength)
+			throw new PasswordRejectedLengthException(passwordLength, minLength);
 		LoginPlayerData data = getPlayerData(player);
 		final boolean wasGuest = (data == null);
 		if (wasGuest)
@@ -1913,7 +1972,18 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " changed his password successfully.");
 		if (pluginCommunicationEnabled)
 			new CrazyLoginPasswordEvent(player, password).callEvent();
-		data.setPassword(password);
+		try
+		{
+			data.setPassword(password);
+		}
+		catch (final PasswordRejectedException e)
+		{
+			throw e;
+		}
+		catch (final Exception e)
+		{
+			throw new CrazyCommandErrorException(e);
+		}
 		messageListener.sendPluginMessage(player, "Q_StorePW " + password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player, password);

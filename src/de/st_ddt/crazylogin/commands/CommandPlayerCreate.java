@@ -10,8 +10,10 @@ import org.bukkit.command.CommandSender;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
+import de.st_ddt.crazylogin.exceptions.PasswordRejectedException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandAlreadyExistsException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandCircumstanceException;
+import de.st_ddt.crazyplugin.exceptions.CrazyCommandErrorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
@@ -52,7 +54,18 @@ public class CommandPlayerCreate extends CommandExecutor
 		}
 		else
 			password = ChatHelper.listingString(" ", passwordArgs);
-		data.setPassword(password);
+		try
+		{
+			data.setPassword(password);
+		}
+		catch (final PasswordRejectedException e)
+		{
+			throw new CrazyCommandErrorException(e);
+		}
+		catch (final Exception e)
+		{
+			throw new CrazyCommandErrorException(e);
+		}
 		if (data.isOnline())
 			plugin.getMessageListener().sendPluginMessage(data.getPlayer(), "Q_StorePW " + password);
 		plugin.sendLocaleMessage("COMMAND.PLAYER.CREATE.SUCCESS", sender, name);
