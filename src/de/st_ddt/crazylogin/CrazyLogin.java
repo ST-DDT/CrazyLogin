@@ -1714,8 +1714,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("uniqueIDKey", uniqueIDKey);
 		config.set("forceSingleSession", forceSingleSession);
 		config.set("forceSingleSessionSameIPBypass", forceSingleSessionSameIPBypass);
-		config.set("delayPreRegisterSecurity", delayPreRegisterSecurity <= 0 ? "false" : delayPreRegisterSecurity);
-		config.set("delayPreLoginSecurity", delayPreLoginSecurity <= 0 ? "false" : delayPreLoginSecurity);
+		config.set("delayPreRegisterSecurity", delayPreRegisterSecurity <= 0 ? false : delayPreRegisterSecurity);
+		config.set("delayPreLoginSecurity", delayPreLoginSecurity <= 0 ? false : delayPreLoginSecurity);
 		config.set("saveLoginEnabled", saveLoginEnabled);
 		config.set("forceSaveLogin", saveLoginEnabled && forceSaveLogin);
 		for (final Entry<String, Location> entry : saveLoginLocations.entrySet())
