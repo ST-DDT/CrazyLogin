@@ -171,7 +171,6 @@ public class PlayerListener implements Listener
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-	@Localized("CRAZYLOGIN.BROADCAST.JOIN $Name$")
 	public void PlayerJoinMessageGet(final PlayerJoinEvent event)
 	{
 		final String message = event.getJoinMessage();
@@ -185,7 +184,7 @@ public class PlayerListener implements Listener
 		}
 		else if (message.equals("CRAZYLOGIN.JOIN"))
 		{
-			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+			sendDefaultPlayerJoinMessage(player);
 			event.setJoinMessage(null);
 		}
 	}
@@ -196,9 +195,27 @@ public class PlayerListener implements Listener
 		if (message == null)
 			return;
 		if (message.equals("CRAZYLOGIN.JOIN"))
-			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName());
+			sendDefaultPlayerJoinMessage(player);
 		else
 			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", message);
+	}
+
+	@Localized("CRAZYLOGIN.BROADCAST.JOIN $Name$ $Group$ $Prefix$ $Suffix$")
+	private void sendDefaultPlayerJoinMessage(final Player player)
+	{
+		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName(), PermissionModule.getGroup(player), PermissionModule.getGroupPrefix(player), PermissionModule.getGroupSuffix(player));
+	}
+
+	@Localized("CRAZYLOGIN.BROADCAST.QUIT $Name$ $Group$ $Prefix$ $Suffix$")
+	private void sendDefaultPlayerQuitMessage(final Player player)
+	{
+		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName(), PermissionModule.getGroup(player), PermissionModule.getGroupPrefix(player), PermissionModule.getGroupSuffix(player));
+	}
+
+	@Localized("CRAZYLOGIN.BROADCAST.KICK $Name$ $Group$ $Prefix$ $Suffix$")
+	private void sendDefaultPlayerKickMessage(final Player player)
+	{
+		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName(), PermissionModule.getGroup(player), PermissionModule.getGroupPrefix(player), PermissionModule.getGroupSuffix(player));
 	}
 
 	@Localized({ "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.REGISTER.HEADER2", "CRAZYLOGIN.REGISTER.REQUEST", "CRAZYLOGIN.LOGIN.REQUEST" })
@@ -401,7 +418,6 @@ public class PlayerListener implements Listener
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	@Localized("CRAZYLOGIN.BROADCAST.QUIT $Name$")
 	public void PlayerQuitMessage(final PlayerQuitEvent event)
 	{
 		final Player player = event.getPlayer();
@@ -409,7 +425,7 @@ public class PlayerListener implements Listener
 			if (event.getQuitMessage() != null)
 				if (event.getQuitMessage().equals("CRAZYLOGIN.QUIT"))
 				{
-					ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName());
+					sendDefaultPlayerQuitMessage(player);
 					event.setQuitMessage(null);
 				}
 	}
@@ -440,7 +456,6 @@ public class PlayerListener implements Listener
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	@Localized("CRAZYLOGIN.BROADCAST.KICK $Name$")
 	public void PlayerKickMessage(final PlayerKickEvent event)
 	{
 		final Player player = event.getPlayer();
@@ -448,7 +463,7 @@ public class PlayerListener implements Listener
 			if (event.getLeaveMessage() != null)
 				if (event.getLeaveMessage().equals("CRAZYLOGIN.KICK"))
 				{
-					ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName());
+					sendDefaultPlayerKickMessage(player);
 					event.setLeaveMessage(null);
 				}
 	}
