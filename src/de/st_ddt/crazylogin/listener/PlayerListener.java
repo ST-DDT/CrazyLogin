@@ -200,22 +200,34 @@ public class PlayerListener implements Listener
 			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", message);
 	}
 
-	@Localized("CRAZYLOGIN.BROADCAST.JOIN $Name$ $Group$ $Prefix$ $Suffix$")
+	@Localized("CRAZYLOGIN.BROADCAST.JOIN $Name$ $IP$ $Group$ $Prefix$ $Suffix$")
 	private void sendDefaultPlayerJoinMessage(final Player player)
 	{
-		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName(), PermissionModule.getGroup(player), PermissionModule.getGroupPrefix(player), PermissionModule.getGroupSuffix(player));
+		final String ip = player.getAddress().getAddress().getHostAddress();
+		final String group = PermissionModule.getGroup(player);
+		final String prefix = PermissionModule.getGroupPrefix(player);
+		final String suffix = PermissionModule.getGroupSuffix(player);
+		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.JOIN"), player.getName(), ip, group == null ? "" : group, prefix == null ? "" : prefix, suffix == null ? "" : suffix);
 	}
 
-	@Localized("CRAZYLOGIN.BROADCAST.QUIT $Name$ $Group$ $Prefix$ $Suffix$")
+	@Localized("CRAZYLOGIN.BROADCAST.QUIT $Name$ $IP$ $Group$ $Prefix$ $Suffix$")
 	private void sendDefaultPlayerQuitMessage(final Player player)
 	{
-		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName(), PermissionModule.getGroup(player), PermissionModule.getGroupPrefix(player), PermissionModule.getGroupSuffix(player));
+		final String ip = player.getAddress().getAddress().getHostAddress();
+		final String group = PermissionModule.getGroup(player);
+		final String prefix = PermissionModule.getGroupPrefix(player);
+		final String suffix = PermissionModule.getGroupSuffix(player);
+		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.QUIT"), player.getName(), ip, group == null ? "" : group, prefix == null ? "" : prefix, suffix == null ? "" : suffix);
 	}
 
-	@Localized("CRAZYLOGIN.BROADCAST.KICK $Name$ $Group$ $Prefix$ $Suffix$")
+	@Localized("CRAZYLOGIN.BROADCAST.KICK $Name$ $IP$ $Group$ $Prefix$ $Suffix$")
 	private void sendDefaultPlayerKickMessage(final Player player)
 	{
-		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName(), PermissionModule.getGroup(player), PermissionModule.getGroupPrefix(player), PermissionModule.getGroupSuffix(player));
+		final String ip = player.getAddress().getAddress().getHostAddress();
+		final String group = PermissionModule.getGroup(player);
+		final String prefix = PermissionModule.getGroupPrefix(player);
+		final String suffix = PermissionModule.getGroupSuffix(player);
+		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName(), ip, group == null ? "" : group, prefix == null ? "" : prefix, suffix == null ? "" : suffix);
 	}
 
 	@Localized({ "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.REGISTER.HEADER2", "CRAZYLOGIN.REGISTER.REQUEST", "CRAZYLOGIN.LOGIN.REQUEST" })
