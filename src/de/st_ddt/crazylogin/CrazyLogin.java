@@ -1635,7 +1635,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			encryptor = EncryptHelper.getEncryptor(this, config.getConfigurationSection("encryptor"));
 		if (encryptor == null)
 			encryptor = new CrazyCrypt1(this, config);
-		minNameLength = config.getInt("minNameLength", 3);
+		minPasswordLength = config.getInt("minPasswordLength", 3);
 		protectedAccountMinPasswordLength = config.getInt("protectedAccountMinPasswordLength", 7);
 		// Logger
 		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Account", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
