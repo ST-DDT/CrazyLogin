@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
+import de.st_ddt.crazycore.CrazyCore;
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazylogin.exceptions.PasswordRejectedException;
@@ -34,8 +35,9 @@ public class CommandPlayerPassword extends CommandExecutor
 		final LoginPlayerData data = plugin.getPlayerData(args[0]);
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player (with Account)", args[0]);
+		CrazyCore.getPlugin().checkProtectedPlayer(data.getName(), sender, "crazylogin.player.password", plugin.getName(), "change player's password");
 		final String[] passwordArgs = ChatHelperExtended.shiftArray(args, 1);
-		String password = null;
+		final String password;
 		if (plugin.isConfirmPasswordEnabled())
 		{
 			if (passwordArgs.length % 2 == 1)

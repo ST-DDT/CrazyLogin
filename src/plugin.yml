@@ -3,7 +3,7 @@ main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
 version: 7.14.1
 website: http://dev.bukkit.org/server-mods/crazylogin/
-# requires CrazyCore v10.4 or later
+# requires CrazyCore v10.5 or later
 depend: [CrazyCore]
 description: >
             CrazyLogin protect your server with passwords and many usefully features.
@@ -41,6 +41,7 @@ permissions:
     description: Access to all commands
     default: false
     children:
+      crazycore.protectedplayer: true
       crazylogin.admin: true
       crazylogin.mode: true
       crazylogin.ensureregistration: true
@@ -72,6 +73,7 @@ permissions:
     description: Allow changing account data for other players
     default: op
     children: 
+      crazycore.protectedplayer: true
       crazylogin.mode: true
       crazylogin.ensureregistration: true
       crazylogin.warnloginfailure: true
@@ -96,7 +98,9 @@ permissions:
       crazylogin.player.info.other: true
       crazylogin.player.create: true
       crazylogin.player.password: true
+      crazylogin.player.password.protected: true
       crazylogin.player.delete: true
+      crazylogin.player.delete.protected: true
       crazylogin.player.list: true
       crazylogin.player.detachip: true
       crazylogin.player.reverify: true
@@ -197,11 +201,21 @@ permissions:
     description: Allow creating player data
     default: op
   crazylogin.player.password:
-    description: Allow changing a players password
+    description: Allow changing a player's password.
     default: op
+  crazylogin.player.password.protect:
+    description: Allow changing a protected player's password.
+    default: op
+    children:
+      crazylogin.player.password: true
   crazylogin.player.delete:
-    description: Allow deleting player data
+    description: Allow deleting a player's account.
     default: op
+  crazylogin.player.delete.protected:
+    description: Allow deleting a protected player's account.
+    default: op
+    children:
+      crazylogin.player.delete: true
   crazylogin.player.list:
     description: Allow viewing all players accounts.
     default: op
