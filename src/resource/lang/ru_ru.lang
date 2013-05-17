@@ -21,6 +21,7 @@ CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Создан аккаунт для $0$!
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Пароль изменен для $0$!
 CRAZYLOGIN.COMMAND.PLAYER.REVERIFY.SUCCESS=$0$ должен войти снова!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CВнимание: &EПодтверждение пароля отключено!\nДостаточно ввести один раз свой пароль.\nЕсли двойной пароль не предназначен, то поменяйте его.
+#CRAZYLOGIN.COMMAND.SAVELOGINLOCATION=
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CВНИМАНИЕ: База данных не доступна!
 CRAZYLOGIN.DATABASE.LOADED=Загружено $0$ записей из базы данных.
 CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH=Слишком много аккаунтов, зарегистрированных для этого IP!\nВы можете зарегистрировать только &C$0$ &Fаккаунтов.\n&FАккаунты: &E$1$

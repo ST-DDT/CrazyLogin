@@ -21,6 +21,7 @@ CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Sukurtas varttojas $0$!
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Pakeitei slaptazodi $0$!
 CRAZYLOGIN.COMMAND.PLAYER.REVERIFY.SUCCESS=$0$ Vel prisijunge!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CWARNING: &ESlaptazodziokartojimas isjungtas!\nSlaptazodi uztenka rasyti viena karta!
+#CRAZYLOGIN.COMMAND.SAVELOGINLOCATION=
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CWARNING: Duomenu baze neprieinama!
 CRAZYLOGIN.DATABASE.LOADED=Loaded $0$ Irasai is duomenu bazes.
 CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH=Per daug vartotoju priregistruota su siuo IP adresu!\nTu gali priregistruoti tik &C$0$ &FVartotoja.\n&FVartotojai audojami su tavo ip adresu: &E$1$

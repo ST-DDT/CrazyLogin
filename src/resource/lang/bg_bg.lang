@@ -21,6 +21,7 @@ CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Направи акаунт за $0$!
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Смени паролата на $0$!
 #CRAZYLOGIN.COMMAND.PLAYER.REVERIFY.SUCCESS=
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CВнимание: &EConfirmPassword е изключен!\nНаписването на паролата веднъж е достатъчно.\nАко тази двойна парола не е предназначена, трябва да я смените.
+#CRAZYLOGIN.COMMAND.SAVELOGINLOCATION=
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CWARNING: Няма достъп до датабазата!
 CRAZYLOGIN.DATABASE.LOADED=Заредени са $0$ Entries от датабазата.
 CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH=Твърде много акаунти са регистрирани от това IP!\nМожете да регистрирате само &C$0$ &Fакаунта.\n&FАкаунти: &E$1$

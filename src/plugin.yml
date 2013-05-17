@@ -1,7 +1,7 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.14.1
+version: 7.15
 website: http://dev.bukkit.org/server-mods/crazylogin/
 # requires CrazyCore v10.5 or later
 depend: [CrazyCore]
@@ -44,6 +44,8 @@ permissions:
       crazycore.protectedplayer: true
       crazylogin.admin: true
       crazylogin.mode: true
+      crazylogin.mode.*: true
+      crazylogin.saveloginlocation: true
       crazylogin.ensureregistration: true
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
@@ -75,6 +77,8 @@ permissions:
     children: 
       crazycore.protectedplayer: true
       crazylogin.mode: true
+      crazylogin.mode.*: true
+      crazylogin.saveloginlocation: true
       crazylogin.ensureregistration: true
       crazylogin.warnloginfailure: true
       crazylogin.warncommandexploits: true
@@ -175,7 +179,13 @@ permissions:
     description: Show all players to this player even if they are hidden due to hidePlayer option.
     default: op
   crazylogin.mode:
-    description: Allow changing plugin mode
+    description: Allow accessing mode command
+    default: op
+  crazylogin.mode.*:
+    description: Allow changing plugin all modes
+    default: op
+  crazylogin.saveloginlocation:
+    description: Allow viewing and changing save login locations
     default: op
   crazylogin.commands:
     description: Allow viewing and editing command whitelist.

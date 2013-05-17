@@ -21,6 +21,7 @@ CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Account für $0$ erstellt!
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Passwort von $0$ geändert!
 CRAZYLOGIN.COMMAND.PLAYER.REVERIFY.SUCCESS=$0$ muss sich neu einloggen!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CWARNUNG: &EDu musst dein Passwort nicht wiederholen!\nÄndere es oder denke beim Login daran!
+CRAZYLOGIN.COMMAND.SAVELOGINLOCATION=Sicherer Login in &E$0$\n&5@$1$ $2$ $3$ $4$ ($5$°)
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CWARNUNG: Datenbank nicht erreichbar!
 CRAZYLOGIN.DATABASE.LOADED=$0$ Einträge aus Datenbank geladen.
 CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH=Es sind maximal &C$0$ &FAccounts pro IP erlaubt.\n&FBenutzer: &E$1$

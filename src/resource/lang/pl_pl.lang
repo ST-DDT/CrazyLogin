@@ -21,6 +21,7 @@ CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Konto utworzone dla $0$!
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Haslo zmienione dla $0$!
 #CRAZYLOGIN.COMMAND.PLAYER.REVERIFY.SUCCESS=
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CUWAGA: &EPotwierdzenieHasla zablokowane!\nWystarczy raz wpisac swoje haslo.\nJesli jest to podwojne haslo, nalezy go zmienic.
+#CRAZYLOGIN.COMMAND.SAVELOGINLOCATION=
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CUWAGA: Baza danych jest niedostepna!
 CRAZYLOGIN.DATABASE.LOADED=Zaladowano $0$ Wpisy z bazy danych.
 CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH=Zbyt wiele kont zarejestrowanych do tego IP\nMozesz zarejestrowac tylko &C$0$ &Fkont.\n&FKonta: &E$1$

@@ -21,6 +21,7 @@ CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Δημιουργήθηκε λογαρι
 CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS=Αλλάχτηκε ο κωδικός πρόσβασης για $0$!
 CRAZYLOGIN.COMMAND.PLAYER.REVERIFY.SUCCESS=Ο παίχτης $0$ πρέπει να ξανασυνδεθεί!
 CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED=&CΠΡΟΣΟΧΗ: &EΗ επιβεβαίωση του κωδικού πρόσβασης είναι απενεργοποιημένη!\nΗ πληκτρολόγηση του κωδικού σας μια φορά, είναι αρκετή.\nΕάν η επιβεβαίωση του κωδικού πρόσβασης σας δεν ήταν σκόπιμη, θα πρέπει να τον αλλάξετε.
+#CRAZYLOGIN.COMMAND.SAVELOGINLOCATION=
 CRAZYLOGIN.DATABASE.ACCESSWARN=&CΠΡΟΣΟΧΗ! Χωρίς πρόσβαση στη βάση δεδομένων!
 CRAZYLOGIN.DATABASE.LOADED=Φορτώθηκαν $0$ καταχωρήσεις από τη βάση δεδομένων.
 CRAZYLOGIN.EXCEPTION.ACCOUNTSPERIP.TOMUCH=Πάρα πολλοί λογαριασμοί έχουν καταχωρηθεί για αυτή την διέυθυνση IP!\nΜπορείτε να καταχωρίσετε μόνο &C$0$ &Fλογαριασμούς.\n&FΛογαριασμοί: &E$1$
