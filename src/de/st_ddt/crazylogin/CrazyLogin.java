@@ -1892,7 +1892,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		final int passwordLength = password.length();
 		final int minLength;
-		if (CrazyCore.getPlugin().getProtectedPlayers().contains(player.getName()))
+		if (CrazyCore.getPlugin().isProtectedPlayer(player))
 			minLength = protectedAccountMinPasswordLength;
 		else
 			minLength = minPasswordLength;
@@ -1946,7 +1946,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return;
 		}
 		final int minLength;
-		if (CrazyCore.getPlugin().getProtectedPlayers().contains(player.getName()))
+		if (CrazyCore.getPlugin().isProtectedPlayer(player))
 			minLength = protectedAccountMinPasswordLength;
 		else
 			minLength = minPasswordLength;
