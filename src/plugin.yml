@@ -69,7 +69,9 @@ permissions:
       crazylogin.player.info.other: true
       crazylogin.player.create: true
       crazylogin.player.password: true
+      crazylogin.player.password.protected: true
       crazylogin.player.delete: true
+      crazylogin.player.delete.protected: true
       crazylogin.player.list: true
   crazylogin.admin:
     description: Allow changing account data for other players
