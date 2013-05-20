@@ -1593,8 +1593,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		commandWhiteList = config.getStringList("commandWhitelist");
 		forceSingleSession = config.getBoolean("forceSingleSession", true);
 		forceSingleSessionSameIPBypass = config.getBoolean("forceSingleSessionSameIPBypass", true);
-		delayPreRegisterSecurity = config.getInt("delayPreRegisterSecurity", 5);
-		delayPreLoginSecurity = config.getInt("delayPreLoginSecurity", 0);
+		if (config.getBoolean("delayPreRegisterSecurity", true))
+			delayPreRegisterSecurity = config.getInt("delayPreRegisterSecurity", 5);
+		else
+			delayPreRegisterSecurity = 0;
+		if (config.getBoolean("delayPreLoginSecurity", true))
+			delayPreLoginSecurity = config.getInt("delayPreLoginSecurity", 0);
+		else
+			delayPreLoginSecurity = 0;
 		saveLoginEnabled = config.getBoolean("saveLoginEnabled", true);
 		forceSaveLogin = saveLoginEnabled && config.getBoolean("forceSaveLogin", false);
 		for (final World world : Bukkit.getWorlds())
