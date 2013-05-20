@@ -116,12 +116,6 @@ permissions:
     children: 
       crazylogin.register.command: true
       crazylogin.register.channel: true
-  crazylogin.register:
-    description: Allow players to create a password. (Depreciated)
-    default: true
-    children: 
-      crazylogin.register.command: true
-      crazylogin.register.channel: true
   crazylogin.register.command:
     description: Allow players to create a password via command.
     default: true
