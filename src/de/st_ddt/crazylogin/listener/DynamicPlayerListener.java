@@ -285,7 +285,7 @@ public class DynamicPlayerListener implements Listener
 			final String IP = player.getAddress().getAddress().getHostAddress();
 			if (plugin.isAutoKickCommandUsers())
 			{
-				player.kickPlayer(plugin.getLocale().getLocaleMessage(player, "KICKED.COMMANDUSAGE"));
+				player.kickPlayer(plugin.getLocale().getFormatedLocaleMessage(player, "KICKED.COMMANDUSAGE"));
 				plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + IP + " has been kicked for trying to execute", event.getMessage());
 			}
 			else

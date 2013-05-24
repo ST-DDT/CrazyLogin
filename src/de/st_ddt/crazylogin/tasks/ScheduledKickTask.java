@@ -49,13 +49,13 @@ public class ScheduledKickTask implements Runnable
 		if (requireAccount)
 			if (!plugin.hasPlayerData(player))
 			{
-				player.kickPlayer(locale.getLanguageText(player));
+				player.kickPlayer(locale.getFormatedLanguageText(player));
 				if (tempBan > 0)
 					plugin.setTempBanned(player, tempBan);
 				return;
 			}
 		if (!plugin.isLoggedIn(player))
-			player.kickPlayer(locale.getLanguageText(player));
+			player.kickPlayer(locale.getFormatedLanguageText(player));
 		if (tempBan > 0)
 			plugin.setTempBanned(player, tempBan);
 	}

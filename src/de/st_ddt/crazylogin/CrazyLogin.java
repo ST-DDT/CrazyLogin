@@ -1850,7 +1850,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				fails++;
 			if (fails % autoKickLoginFailer == 0)
 			{
-				player.kickPlayer(locale.getLocaleMessage(player, "KICKED.LOGINFAIL", fails));
+				player.kickPlayer(locale.getFormatedLocaleMessage(player, "KICKED.LOGINFAIL", fails));
 				if (autoTempBanLoginFailer > 0)
 					setTempBanned(player, autoTempBanLoginFailer);
 			}
@@ -1926,7 +1926,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		player.removeMetadata("Authenticated", this);
 		playerAutoLogouts.remove(player);
-		player.kickPlayer(locale.getLanguageEntry("LOGOUT.SUCCESS").getLanguageText(player));
+		player.kickPlayer(locale.getFormatedLocaleMessage(player, "LOGOUT.SUCCESS"));
 		if (delayJoinQuitMessages)
 			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", locale.getLanguageEntry("BROADCAST.QUIT"), player.getName());
 		logger.log("Logout", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged out.");
