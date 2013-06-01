@@ -63,7 +63,7 @@ public final class CrazyListener implements Listener
 	@EventHandler
 	public void CrazyPlayerNamesConnectedToIPEvent(final CrazyPlayerNamesConnectedToIPEvent event)
 	{
-		for (final LoginPlayerData players : plugin.getPlayerDatasPerIP(event.getSearchedIP()))
+		for (final LoginPlayerData players : plugin.getPlayerDatasPerPartialIP(event.getSearchedIP()))
 			event.add(players.getName());
 	}
 }

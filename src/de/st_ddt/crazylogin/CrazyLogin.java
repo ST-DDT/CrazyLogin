@@ -2449,6 +2449,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
+	public HashSet<LoginPlayerData> getPlayerDatasPerPartialIP(final String partialIP)
+	{
+		final HashSet<LoginPlayerData> res = new HashSet<LoginPlayerData>();
+		if (database == null)
+			return res;
+		synchronized (database.getDatabaseLock())
+		{
+			for (final LoginPlayerData data : database.getAllEntries())
+				for (final String ip : data.getIPs())
+					if (ip.startsWith(partialIP))
+						res.add(data);
+		}
+		return res;
+	}
+
+	@Override
 	public final void broadcastLocaleMessage(final boolean console, final String permission, final boolean loggedInOnly, final String localepath, final Object... args)
 	{
 		broadcastLocaleMessage(console, permission, loggedInOnly, getLocale().getLanguageEntry(localepath), args);
