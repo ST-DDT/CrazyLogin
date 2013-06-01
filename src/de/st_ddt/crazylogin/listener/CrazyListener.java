@@ -9,6 +9,8 @@ import de.st_ddt.crazyplugin.events.CrazyPlayerAssociatesEvent;
 import de.st_ddt.crazyplugin.events.CrazyPlayerIPsConnectedToNameEvent;
 import de.st_ddt.crazyplugin.events.CrazyPlayerNamesConnectedToIPEvent;
 import de.st_ddt.crazyplugin.events.CrazyPlayerRemoveEvent;
+import de.st_ddt.crazyplugin.events.CrazyProtectedPlayerAccessEvent;
+import de.st_ddt.crazyplugin.events.CrazyProtectedPlayerIllegalAccessEvent;
 import de.st_ddt.crazyutil.Named;
 
 public final class CrazyListener implements Listener
@@ -65,5 +67,18 @@ public final class CrazyListener implements Listener
 	{
 		for (final LoginPlayerData players : plugin.getPlayerDatasPerPartialIP(event.getSearchedIP()))
 			event.add(players.getName());
+	}
+
+	@EventHandler
+	public void ProtectedPlayerAccess(final CrazyProtectedPlayerAccessEvent event)
+	{
+		if (!plugin.isLoggedIn(event.getAccessingPlayer()))
+			event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void ProtectedPlayerIllegalAccess(final CrazyProtectedPlayerIllegalAccessEvent event)
+	{
+		plugin.forceRelogin(event.getAccessingPlayer());
 	}
 }

@@ -1,9 +1,9 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.15.1
+version: 7.16
 website: http://dev.bukkit.org/server-mods/crazylogin/
-# requires CrazyCore v10.6 or later
+# requires CrazyCore v10.7 or later
 depend: [CrazyCore]
 description: >
             CrazyLogin protect your server with passwords and many usefully features.
