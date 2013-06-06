@@ -62,6 +62,7 @@ database:
       ips: ips
       lastAction: lastAction
 # if true you have to create a password, if false having a password is optional
+# INFO: This does not affect ops/players with permissions. They always have to create a password.
 alwaysNeedPassword: true
 # whether passwords have to be confirmed
 # Ex: /register <Password> <Password>
