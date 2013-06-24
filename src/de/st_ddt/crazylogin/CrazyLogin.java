@@ -1642,7 +1642,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		else
 			encryptor = EncryptHelper.getEncryptor(this, config.getConfigurationSection("encryptor"));
 		if (encryptor == null)
+		{
+			consoleLog("Could not find an active encryptor.");
+			consoleLog("Defaulting to CrazyCrypt1");
 			encryptor = new CrazyCrypt1(this, config);
+		}
 		minPasswordLength = config.getInt("minPasswordLength", 3);
 		protectedAccountMinPasswordLength = config.getInt("protectedAccountMinPasswordLength", 7);
 		// Logger

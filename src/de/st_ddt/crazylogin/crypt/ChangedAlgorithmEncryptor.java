@@ -15,13 +15,48 @@ public class ChangedAlgorithmEncryptor extends AbstractEncryptor implements Upda
 	public ChangedAlgorithmEncryptor(final LoginPlugin<? extends LoginData> plugin, final ConfigurationSection config)
 	{
 		super(plugin, config);
-		current = EncryptHelper.getEncryptor(plugin, config.getConfigurationSection("current"));
-		old = EncryptHelper.getEncryptor(plugin, config.getConfigurationSection("old"));
+		final Encryptor e1 = EncryptHelper.getEncryptor(plugin, config.getConfigurationSection("current"));
+		final Encryptor e2 = EncryptHelper.getEncryptor(plugin, config.getConfigurationSection("old"));
+		if (e1 == null || e2 == null)
+		{
+			System.err.println();
+			System.err.println("  +-------------------------+");
+			System.err.println("  |         WARNING         |");
+			System.err.println("  +-------------------------+");
+			System.err.println("Something went wrong with your ChangedAlgorithmEncryptor.");
+			System.err.println("Couldn't find the requested encryptor!");
+			System.err.println("I'll fix it for.");
+			if (e1 == null)
+			{
+				System.err.println("Most passwords may be locked!");
+				if (e2 == null)
+				{
+					System.err.println("Something really bad happened to your encryption.");
+					System.err.println("Using default encryption instead.");
+					current = new CrazyCrypt1(plugin, (String[]) null);
+				}
+				else
+					current = e2;
+			}
+			else
+			{
+				System.err.println("Some passwords may be locked!");
+				current = e1;
+			}
+			old = null;
+		}
+		else
+		{
+			current = e1;
+			old = e2;
+		}
 	}
 
 	public ChangedAlgorithmEncryptor(final LoginPlugin<? extends LoginData> plugin, final Encryptor current, final Encryptor old)
 	{
 		super(plugin, (ConfigurationSection) null);
+		if (current == null)
+			throw new IllegalArgumentException("Encryptor cannot be null!");
 		this.current = current;
 		this.old = old;
 	}
@@ -37,12 +72,16 @@ public class ChangedAlgorithmEncryptor extends AbstractEncryptor implements Upda
 	{
 		if (current.match(name, password, encrypted))
 			return true;
-		return old.match(name, password, encrypted);
+		else
+			return matchOld(name, password, encrypted);
 	}
 
 	public boolean matchOld(final String name, final String password, final String encrypted)
 	{
-		return old.match(name, password, encrypted);
+		if (old == null)
+			return false;
+		else
+			return old.match(name, password, encrypted);
 	}
 
 	@Override
@@ -64,10 +103,15 @@ public class ChangedAlgorithmEncryptor extends AbstractEncryptor implements Upda
 	@Override
 	public void save(final ConfigurationSection config, final String path)
 	{
-		super.save(config, path);
-		config.set(path + "type", getClass().getName());
-		current.save(config, path + "current.");
-		old.save(config, path + "old.");
+		if (old == null)
+			current.save(config, path);
+		else
+		{
+			super.save(config, path);
+			config.set(path + "type", getClass().getName());
+			current.save(config, path + "current.");
+			old.save(config, path + "old.");
+		}
 	}
 
 	@Override
@@ -79,6 +123,9 @@ public class ChangedAlgorithmEncryptor extends AbstractEncryptor implements Upda
 	@Override
 	public String toString()
 	{
-		return "ChangedAlgorithm (" + old.toString() + " -> " + current.toString() + ")";
+		if (old == null)
+			return current.toString();
+		else
+			return "ChangedAlgorithm (" + old + " -> " + current + ")";
 	}
 }
