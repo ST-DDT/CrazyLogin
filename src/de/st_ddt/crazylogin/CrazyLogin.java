@@ -1630,17 +1630,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		uniqueIDKey = config.getString("uniqueIDKey");
 		pluginCommunicationEnabled = config.getBoolean("pluginCommunicationEnabled", false);
 		// Encryptor
-		if (isUpdated && !isInstalled && VersionComparator.compareVersions(previousVersion, "7") == -1)
-		{
-			String algorithm = config.getString("algorithm");
-			if (algorithm.startsWith("MD") || algorithm.startsWith("SHA"))
-				algorithm = "Seeded" + algorithm;
-			encryptor = EncryptHelper.getEncryptor(this, algorithm, config.getConfigurationSection("customEncryptor"));
-			config.set("algorithm", null);
-			config.set("customEncryptor", null);
-		}
-		else
-			encryptor = EncryptHelper.getEncryptor(this, config.getConfigurationSection("encryptor"));
+		encryptor = EncryptHelper.getEncryptor(this, config.getConfigurationSection("encryptor"));
 		if (encryptor == null)
 		{
 			consoleLog("Could not find an active encryptor.");
