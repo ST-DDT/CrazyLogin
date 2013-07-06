@@ -1962,7 +1962,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				if (maxRegistrationsPerIP != -1)
 					if (associates.size() >= maxRegistrationsPerIP)
 						throw new CrazyLoginExceedingMaxRegistrationsPerIPException(maxRegistrationsPerIP, associates);
-			final CrazyLoginPreRegisterEvent event = new CrazyLoginPreRegisterEvent(player, data);
+			final CrazyLoginPreRegisterEvent event = new CrazyLoginPreRegisterEvent(player, associates);
 			event.callEvent();
 			if (event.isCancelled())
 				throw new CrazyCommandPermissionException();
@@ -1973,7 +1973,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		else
 			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " changed his password successfully.");
 		if (pluginCommunicationEnabled)
-			new CrazyLoginPasswordEvent(player, password).callEvent();
+			new CrazyLoginPasswordEvent(player, data, password).callEvent();
 		try
 		{
 			data.setPassword(password);

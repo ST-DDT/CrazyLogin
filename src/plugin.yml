@@ -1,7 +1,7 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.16.2
+version: 7.17
 website: http://dev.bukkit.org/server-mods/crazylogin/
 # requires CrazyCore v10.7.1 or later
 depend: [CrazyCore]
