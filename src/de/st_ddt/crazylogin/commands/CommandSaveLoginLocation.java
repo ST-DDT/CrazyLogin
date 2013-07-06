@@ -89,6 +89,7 @@ public class CommandSaveLoginLocation extends CommandExecutor
 				plugin.getSaveLoginLocations().put(world.getName(), location);
 				plugin.sendLocaleMessage("COMMAND.SAVELOGINLOCATION", sender, world.getName(), location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 			}
+			plugin.saveConfiguration();
 		}
 	}
 
