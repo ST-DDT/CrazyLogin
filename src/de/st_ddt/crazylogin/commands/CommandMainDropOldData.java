@@ -13,6 +13,7 @@ import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandMainDropOldData extends CommandExecutor
 {
@@ -23,6 +24,7 @@ public class CommandMainDropOldData extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.dropolddata")
 	@Localized({ "CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN $Name$ $KeptDays$", "CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED $DropCauser$ $KeptDays$ $DroppedAmount$" })
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{

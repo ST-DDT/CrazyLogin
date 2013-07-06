@@ -10,6 +10,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandMainGenerateToken extends CommandExecutor
 {
@@ -35,6 +36,7 @@ public class CommandMainGenerateToken extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.generatetoken")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		return PermissionModule.hasPermission(sender, "crazylogin.generatetoken") && !plugin.isTokenLoginDisabled();

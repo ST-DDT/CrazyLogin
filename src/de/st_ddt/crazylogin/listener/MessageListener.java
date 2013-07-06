@@ -8,6 +8,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyplugin.listener.CrazyPluginMessageListener;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
+import de.st_ddt.crazyutil.source.Permission;
 
 public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin>
 {
@@ -20,6 +21,7 @@ public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin
 	}
 
 	@Override
+	@Permission({ "crazylogin.login.channel", "crazylogin.register.channel", "crazylogin.logout.channel" })
 	protected void pluginMessageQuerryRecieved(final String channel, final Player player, final String header, final String args)
 	{
 		if (channel.equals(plugin.getName()))

@@ -12,6 +12,7 @@ import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ListFormat;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandMainCommands extends CrazyCommandListEditor<CrazyLogin, String>
 {
@@ -45,6 +46,7 @@ public class CommandMainCommands extends CrazyCommandListEditor<CrazyLogin, Stri
 	}
 
 	@Override
+	@Permission("crazylogin.commands")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		if (sender instanceof Player)

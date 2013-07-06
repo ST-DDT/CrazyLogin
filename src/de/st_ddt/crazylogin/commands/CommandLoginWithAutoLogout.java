@@ -9,6 +9,7 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandLoginWithAutoLogout extends CommandExecutor
 {
@@ -32,6 +33,7 @@ public class CommandLoginWithAutoLogout extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.login.command")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		return PermissionModule.hasPermission(sender, "crazylogin.login.command");

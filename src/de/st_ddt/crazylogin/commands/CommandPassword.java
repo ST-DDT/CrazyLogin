@@ -12,6 +12,7 @@ import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandPassword extends CommandExecutor
 {
@@ -22,6 +23,7 @@ public class CommandPassword extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.register.command")
 	@Localized("CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED")
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{

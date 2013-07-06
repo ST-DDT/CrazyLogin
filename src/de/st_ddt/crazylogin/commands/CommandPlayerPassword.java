@@ -17,6 +17,7 @@ import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandPlayerPassword extends CommandExecutor
 {
@@ -81,6 +82,7 @@ public class CommandPlayerPassword extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.player.password")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		return PermissionModule.hasPermission(sender, "crazylogin.player.password");

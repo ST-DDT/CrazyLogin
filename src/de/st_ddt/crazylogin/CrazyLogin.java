@@ -133,8 +133,11 @@ import de.st_ddt.crazyutil.paramitrisable.BooleanParamitrisable;
 import de.st_ddt.crazyutil.paramitrisable.Paramitrisable;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.LocalizedVariable;
+import de.st_ddt.crazyutil.source.Permission;
+import de.st_ddt.crazyutil.source.PermissionVariable;
 
 @LocalizedVariable(variables = { "CRAZYPLUGIN", "CRAZYPLAYERDATAPLUGIN" }, values = { "CRAZYLOGIN", "CRAZYLOGIN" })
+@PermissionVariable(variables = { "CRAZYPLUGIN", "CRAZYPLAYERDATAPLUGIN" }, values = { "CRAZYLOGIN", "CRAZYLOGIN" })
 public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlayerData> implements LoginPlugin<LoginPlayerData>
 {
 
@@ -1927,6 +1930,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
+	@Permission({ "crazylogin.requirepassword", "crazylogin.ensureregistration" })
 	@Localized({ "CRAZYLOGIN.PASSWORDDELETE.SUCCESS", "CRAZYLOGIN.PASSWORDCHANGE.SUCCESS $Password$", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
 	public void playerPassword(final Player player, final String password) throws CrazyException
 	{
@@ -2005,6 +2009,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
+	@Permission("crazylogin.requirepassword")
 	public boolean isLoggedIn(final Player player)
 	{
 		if (player.hasMetadata("NPC"))

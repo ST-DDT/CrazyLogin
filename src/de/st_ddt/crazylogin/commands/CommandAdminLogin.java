@@ -16,6 +16,7 @@ import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandAdminLogin extends CommandExecutor
 {
@@ -29,6 +30,7 @@ public class CommandAdminLogin extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.adminlogin")
 	@Localized({ "CRAZYLOGIN.ADMINLOGIN.FAILEDWARN $Player$ $IP$", "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.LOGIN.SUCCESS" })
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
@@ -76,6 +78,7 @@ public class CommandAdminLogin extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.blockadminlogin")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		return !PermissionModule.hasPermission(sender, "crazylogin.blockadminlogin") && !plugin.isAdminLoginDisabled();

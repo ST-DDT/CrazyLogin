@@ -32,6 +32,7 @@ import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.PlayerSaver;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class PlayerListener implements Listener
 {
@@ -230,6 +231,7 @@ public class PlayerListener implements Listener
 		ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", plugin.getLocale().getLanguageEntry("BROADCAST.KICK"), player.getName(), ip, group == null ? "" : group, prefix == null ? "" : prefix, suffix == null ? "" : suffix);
 	}
 
+	@Permission("crazylogin.requirepassword")
 	@Localized({ "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.REGISTER.HEADER2", "CRAZYLOGIN.REGISTER.REQUEST", "CRAZYLOGIN.LOGIN.REQUEST" })
 	public void PlayerJoin(final Player player)
 	{
@@ -394,6 +396,7 @@ public class PlayerListener implements Listener
 			requestor.start(5);
 	}
 
+	@Permission("crazylogin.requirepassword")
 	private boolean isLoggedInRespawn(final Player player)
 	{
 		if (player.hasMetadata("NPC"))
@@ -649,11 +652,12 @@ public class PlayerListener implements Listener
 		return (savelogin.remove(player.toLowerCase()) != null) || (hiddenInventory.remove(player.toLowerCase()) != null);
 	}
 
+	@Permission("crazylogin.bypasshideplayer")
 	public void hidePlayer(final Player player)
 	{
 		if (plugin.isLoggedIn(player))
 		{
-			if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
+			if (PermissionModule.hasPermission(player, "crazylogin.bypasshideplayer"))
 				return;
 			for (final Player other : Bukkit.getOnlinePlayers())
 				if (player != other)
@@ -674,7 +678,7 @@ public class PlayerListener implements Listener
 			for (final Player other : Bukkit.getOnlinePlayers())
 				if (player != other)
 				{
-					if (!PermissionModule.hasPermission(other, "crazylogin.bypasshidePlayer"))
+					if (!PermissionModule.hasPermission(other, "crazylogin.bypasshideplayer"))
 						if (other.canSee(player))
 						{
 							other.hidePlayer(player);
@@ -691,13 +695,14 @@ public class PlayerListener implements Listener
 		}
 	}
 
+	@Permission("crazylogin.bypasshideplayer")
 	public void unhidePlayer(final Player player)
 	{
 		final Set<Player> hides = hiddenPlayers.remove(player);
 		if (hides != null)
 			for (final Player other : hides)
 				other.showPlayer(player);
-		if (PermissionModule.hasPermission(player, "crazylogin.bypasshidePlayer"))
+		if (PermissionModule.hasPermission(player, "crazylogin.bypasshideplayer"))
 			for (final Entry<Player, Set<Player>> other : hiddenPlayers.entrySet())
 				if (other.getValue().remove(player))
 					player.showPlayer(other.getKey());

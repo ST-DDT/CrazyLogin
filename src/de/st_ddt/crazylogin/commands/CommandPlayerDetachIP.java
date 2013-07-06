@@ -15,6 +15,7 @@ import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandPlayerDetachIP extends CommandExecutor
 {
@@ -63,6 +64,7 @@ public class CommandPlayerDetachIP extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.player.detachip")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		return PermissionModule.hasPermission(sender, "crazylogin.player.detachip");

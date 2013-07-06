@@ -14,6 +14,7 @@ import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandPlayerReverify extends CommandExecutor
 {
@@ -56,6 +57,7 @@ public class CommandPlayerReverify extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.player.reverify")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		return PermissionModule.hasPermission(sender, "crazylogin.player.reverify");
