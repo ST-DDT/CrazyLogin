@@ -179,10 +179,10 @@ permissions:
     description: Allow changing plugin modes.
     default: op
   crazylogin.mode.*:
-    description: Allow changing plugin all modes
+    description: Allow changing plugin all modes.
     default: op
   crazylogin.player.create:
-    description: Allow creating player data
+    description: Allow creating player data.
     default: op
   crazylogin.player.delete:
     description: Allow deleting a player's account.
