@@ -36,15 +36,15 @@ public class CommandPlayerCreate extends CommandExecutor
 	{
 		if (plugin.getCrazyDatabase() == null)
 			throw new CrazyCommandCircumstanceException("when database is accessible");
-		if (args.length < (plugin.isConfirmPasswordEnabled() ? 3 : 2))
-			throw new CrazyCommandUsageException("<Player> <Passwort>" + (plugin.isConfirmPasswordEnabled() ? " <Password>" : ""));
+		if (args.length < (plugin.isConfirmNewPasswordEnabled() ? 3 : 2))
+			throw new CrazyCommandUsageException("<Player> <Passwort>" + (plugin.isConfirmNewPasswordEnabled() ? " <Password>" : ""));
 		final String name = args[0];
 		if (plugin.hasPlayerData(name))
 			throw new CrazyCommandAlreadyExistsException("Account", name);
 		final LoginPlayerData data = new LoginPlayerData(name);
 		final String[] passwordArgs = ChatHelperExtended.shiftArray(args, 1);
 		String password = null;
-		if (plugin.isConfirmPasswordEnabled())
+		if (plugin.isConfirmNewPasswordEnabled())
 		{
 			if (passwordArgs.length % 2 == 1)
 				throw new CrazyCommandUsageException("<Player> <Password> <Password>");
@@ -72,7 +72,7 @@ public class CommandPlayerCreate extends CommandExecutor
 		plugin.sendLocaleMessage("COMMAND.PLAYER.CREATE.SUCCESS", sender, name);
 		plugin.getCrazyDatabase().save(data);
 		plugin.getCrazyLogger().log("Account", data.getName() + " registered successfully (via " + sender.getName() + ").");
-		if (!plugin.isConfirmPasswordEnabled())
+		if (!plugin.isConfirmNewPasswordEnabled())
 			if (passwordArgs.length % 2 == 0)
 				if (ChatHelper.listingString(" ", ChatHelperExtended.cutArray(passwordArgs, passwordArgs.length / 2)).equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(passwordArgs, passwordArgs.length / 2))))
 					plugin.sendLocaleMessage("COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED", sender);

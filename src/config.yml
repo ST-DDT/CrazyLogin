@@ -64,9 +64,12 @@ database:
 # if true you have to create a password, if false having a password is optional
 # INFO: This does not affect ops/players with permissions. They always have to create a password.
 alwaysNeedPassword: true
-# whether passwords have to be confirmed
-# Ex: /register <Password> <Password>
-confirmPassword: false
+# if true you have to repeat the new password if you want to change it.
+# Ex: /register {OldPassword} <NewPassword> <NewPassword>
+confirmNewPassword: false
+# if true you have to insert your old password if you want to change it.
+# Ex: /register <OldPassword> <NewPassword> {NewPassword}
+confirmWithOldPassword: false
 # if true if everyone is logged in protection will be disabled to decrease overall performance usage, 
 # but increase join, login and quit performance 
 dynamicProtection: false

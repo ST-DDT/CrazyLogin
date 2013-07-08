@@ -31,15 +31,15 @@ public class CommandPlayerPassword extends CommandExecutor
 	@Localized({ "CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS $Name$", "CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED" })
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
-		if (args.length < (plugin.isConfirmPasswordEnabled() ? 3 : 2))
-			throw new CrazyCommandUsageException("<Player> <Password>" + (plugin.isConfirmPasswordEnabled() ? " <Password>" : ""));
+		if (args.length < (plugin.isConfirmNewPasswordEnabled() ? 3 : 2))
+			throw new CrazyCommandUsageException("<Player> <Password>" + (plugin.isConfirmNewPasswordEnabled() ? " <Password>" : ""));
 		final LoginPlayerData data = plugin.getPlayerData(args[0]);
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player (with Account)", args[0]);
 		CrazyCore.getPlugin().checkProtectedPlayer(data.getName(), sender, "crazylogin.player.password.protected", plugin.getName(), "change player's password");
 		final String[] passwordArgs = ChatHelperExtended.shiftArray(args, 1);
 		final String password;
-		if (plugin.isConfirmPasswordEnabled())
+		if (plugin.isConfirmNewPasswordEnabled())
 		{
 			if (passwordArgs.length % 2 == 1)
 				throw new CrazyCommandUsageException("<Player> <Password> <Password>");
@@ -67,7 +67,7 @@ public class CommandPlayerPassword extends CommandExecutor
 		plugin.sendLocaleMessage("COMMAND.PLAYER.PASSWORD.SUCCESS", sender, data.getName());
 		plugin.getCrazyDatabase().save(data);
 		plugin.getCrazyLogger().log("Account", data.getName() + " changed his password successfully (via " + sender.getName() + ").");
-		if (!plugin.isConfirmPasswordEnabled())
+		if (!plugin.isConfirmNewPasswordEnabled())
 			if (passwordArgs.length % 2 == 0)
 				if (ChatHelper.listingString(" ", ChatHelperExtended.cutArray(passwordArgs, passwordArgs.length / 2)).equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(passwordArgs, passwordArgs.length / 2))))
 					plugin.sendLocaleMessage("COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED", sender);

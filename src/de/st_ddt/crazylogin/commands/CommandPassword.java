@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
+import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
@@ -30,31 +31,48 @@ public class CommandPassword extends CommandExecutor
 		if (!(sender instanceof Player))
 			throw new CrazyCommandExecutorException(false);
 		final Player player = (Player) sender;
-		if (plugin.hasPlayerData(player))
+		final LoginPlayerData data = plugin.getPlayerData(player);
+		final boolean confirmNewPassword = plugin.isConfirmNewPasswordEnabled();
+		final boolean confirmWithOldPassword = plugin.isConfirmWithOldPasswordEnabled() && data != null;
+		if (args.length < 1 + (confirmNewPassword ? 1 : 0) + (confirmWithOldPassword ? 1 : 0))
+			throw new CrazyCommandUsageException((confirmWithOldPassword ? "<OldPassword> " : "") + "<NewPassword>" + (confirmNewPassword ? " <NewPassword>" : ""));
+		if (data == null)
 		{
-			if (!plugin.isLoggedIn(player))
-			{
-				plugin.sendAuthReminderMessage(player);
+			if (!PermissionModule.hasPermission(player, "crazylogin.register.command"))
 				throw new CrazyCommandPermissionException();
-			}
 		}
-		else if (!PermissionModule.hasPermission(player, "crazylogin.register.command"))
-			throw new CrazyCommandPermissionException();
-		final String password;
-		if (plugin.isConfirmPasswordEnabled())
+		else if (!data.isLoggedIn())
 		{
-			if (args.length % 2 == 1)
-				throw new CrazyCommandUsageException("<Password> <Password>");
-			password = ChatHelper.listingString(" ", ChatHelperExtended.cutArray(args, args.length / 2));
-			if (!password.equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(args, args.length / 2))))
-				throw new CrazyCommandUsageException("<Password> <Password>");
+			plugin.sendAuthReminderMessage(player);
+			throw new CrazyCommandPermissionException();
+		}
+		final String[] pwArgs;
+		if (confirmWithOldPassword)
+		{
+			int i = 1;
+			while (!data.isPassword(ChatHelper.listingString(" ", ChatHelperExtended.cutArray(args, i))) && i < args.length)
+				i++;
+			if (i == args.length)
+				throw new CrazyCommandUsageException("<OldPassword> <NewPassword>" + (confirmNewPassword ? " <NewPassword>" : ""));
+			pwArgs = ChatHelperExtended.shiftArray(args, i);
 		}
 		else
-			password = ChatHelper.listingString(" ", args);
+			pwArgs = args;
+		final String password;
+		if (confirmNewPassword)
+		{
+			if (pwArgs.length % 2 == 1)
+				throw new CrazyCommandUsageException((confirmWithOldPassword ? "<OldPassword> " : "") + "<NewPassword> <NewPassword>");
+			password = ChatHelper.listingString(" ", ChatHelperExtended.cutArray(pwArgs, pwArgs.length / 2));
+			if (!password.equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(pwArgs, pwArgs.length / 2))))
+				throw new CrazyCommandUsageException((confirmWithOldPassword ? "<OldPassword> " : "") + "<NewPassword> <NewPassword>");
+		}
+		else
+			password = ChatHelper.listingString(" ", pwArgs);
 		plugin.playerPassword(player, password);
-		if (!plugin.isConfirmPasswordEnabled())
-			if (args.length % 2 == 0)
-				if (ChatHelper.listingString(" ", ChatHelperExtended.cutArray(args, args.length / 2)).equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(args, args.length / 2))))
+		if (!confirmNewPassword)
+			if (pwArgs.length % 2 == 0)
+				if (ChatHelper.listingString(" ", ChatHelperExtended.cutArray(pwArgs, pwArgs.length / 2)).equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(pwArgs, pwArgs.length / 2))))
 					plugin.sendLocaleMessage("COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED", player);
 	}
 }

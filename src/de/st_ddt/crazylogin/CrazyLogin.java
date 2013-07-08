@@ -155,7 +155,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean dynamicHooksRegistered;
 	// plugin config
 	private boolean alwaysNeedPassword;
-	private boolean confirmPassword;
+	private boolean confirmNewPassword;
+	private boolean confirmWithOldPassword;
 	private boolean dynamicProtection;
 	private boolean hideWarnings;
 	private int autoLogout;
@@ -301,19 +302,35 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(new BooleanFalseMode(this, "confirmPassword")
+		modeCommand.addMode(new BooleanFalseMode(this, "confirmNewPassword")
 		{
 
 			@Override
 			public Boolean getValue()
 			{
-				return confirmPassword;
+				return confirmNewPassword;
 			}
 
 			@Override
 			public void setValue(final Boolean newValue) throws CrazyException
 			{
-				confirmPassword = newValue;
+				confirmNewPassword = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(new BooleanFalseMode(this, "confirmWithOldPassword")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return confirmWithOldPassword;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				confirmWithOldPassword = newValue;
 				saveConfiguration();
 			}
 		});
@@ -1569,7 +1586,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final ConfigurationSection config = getConfig();
 		autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
-		confirmPassword = config.getBoolean("confirmPassword", false);
+		confirmNewPassword = config.getBoolean("confirmNewPassword", config.getBoolean("confirmPassowrd", false));
+		confirmWithOldPassword = config.getBoolean("confirmWithOldPassword", false);
 		dynamicProtection = config.getBoolean("dynamicProtection", false);
 		hideWarnings = config.getBoolean("hideWarnings", false);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
@@ -1733,7 +1751,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("minPasswordLength", minPasswordLength);
 		config.set("protectedAccountMinPasswordLength", protectedAccountMinPasswordLength);
 		config.set("alwaysNeedPassword", alwaysNeedPassword);
-		config.set("confirmPassword", confirmPassword);
+		config.set("confirmNewPassword", confirmNewPassword);
+		config.set("confirmPassword", null);
+		config.set("confirmWithOldPassword", confirmWithOldPassword);
 		config.set("dynamicProtection", dynamicProtection);
 		config.set("hideWarnings", hideWarnings);
 		config.set("autoLogout", autoLogout);
@@ -1942,7 +1962,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (passwordLength == 0)
 		{
 			if (alwaysNeedPassword || PermissionModule.hasPermission(player, "crazylogin.requirepassword"))
-				throw new CrazyCommandUsageException("<Password>" + (confirmPassword ? " <Password>" : ""));
+				throw new CrazyCommandUsageException((confirmWithOldPassword ? "<OldPassword> " : "") + "<NewPassword>" + (confirmNewPassword ? " <NewPassword>" : ""));
 			playerListener.removeMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", player);
 			deletePlayerData(player);
@@ -2074,9 +2094,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		return alwaysNeedPassword;
 	}
 
-	public boolean isConfirmPasswordEnabled()
+	public boolean isConfirmNewPasswordEnabled()
 	{
-		return confirmPassword;
+		return confirmNewPassword;
+	}
+
+	public boolean isConfirmWithOldPasswordEnabled()
+	{
+		return confirmWithOldPassword;
 	}
 
 	public boolean isHidingWarningsEnabled()
