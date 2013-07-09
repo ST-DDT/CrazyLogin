@@ -58,25 +58,25 @@ permissions:
       crazylogin.login.command: true
       crazylogin.logout.channel: true
       crazylogin.logout.command: true
-      crazylogin.mode.*: true
       crazylogin.mode: true
+      crazylogin.mode.*: true
       crazylogin.player.create: true
-      crazylogin.player.delete.protected: true
       crazylogin.player.delete: true
+      crazylogin.player.delete.protected: true
       crazylogin.player.detachip: true
+      crazylogin.player.info: true
       crazylogin.player.info.other: true
       crazylogin.player.info.self: true
-      crazylogin.player.info: true
       crazylogin.player.list: true
-      crazylogin.player.password.protected: true
       crazylogin.player.password: true
+      crazylogin.player.password.protected: true
       crazylogin.player.reverify: true
       crazylogin.register.channel: true
       crazylogin.register.command: true
+      crazylogin.reload: true
       crazylogin.reload.*: true
       crazylogin.reload.config: true
       crazylogin.reload.database: true
-      crazylogin.reload: true
       crazylogin.requirepassword: true
       crazylogin.save: true
       crazylogin.saveloginlocation: true
@@ -99,18 +99,18 @@ permissions:
       crazylogin.login.command: true
       crazylogin.logout.channel: true
       crazylogin.logout.command: true
-      crazylogin.mode.*: true
       crazylogin.mode: true
+      crazylogin.mode.*: true
       crazylogin.player.create: true
-      crazylogin.player.delete.protected: true
       crazylogin.player.delete: true
+      crazylogin.player.delete.protected: true
       crazylogin.player.detachip: true
+      crazylogin.player.info: true
       crazylogin.player.info.other: true
       crazylogin.player.info.self: true
-      crazylogin.player.info: true
       crazylogin.player.list: true
-      crazylogin.player.password.protected: true
       crazylogin.player.password: true
+      crazylogin.player.password.protected: true
       crazylogin.player.reverify: true
       crazylogin.register.channel: true
       crazylogin.register.command: true
