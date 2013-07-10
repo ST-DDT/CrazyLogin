@@ -13,7 +13,6 @@ CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Εντολή αφαιρέθηκε\n($0$)
 CRAZYLOGIN.COMMAND.DETACHIP.FAIL=Δεν ήταν δυνατή η απόσπαση της διεύθυνσης IP $1$ από τις συνδέσεις του $0$.\n(Ίσως δεν ήταν ποτέ συνδεδεμένη)
 CRAZYLOGIN.COMMAND.DETACHIP.SUCCESS=Αποσπάστηκε η διεύθυνση IP $1$ τις συνδέσεις του $0$.
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=Ο παίχτης $0$ διέγραψε $2$ παίχτες, που ήταν ανενεργοί για τουλάχιστον $1$ μέρες.
-CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=Ο παίχτης $0$ προσπάθησε να διαγράψει όλα τα δεδομένα παίχτη, που ήταν ανενεργά για τουλάχιστον $1$ μέρες.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&;ΠΡΟΣΟΧΗ! Εκτέλεση απαγορευμένης  εντολής! $0$ @ $1$: $2$
 #CRAZYLOGIN.COMMAND.GENERATEDTOKEN=
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Δημιουργήθηκε λογαριασμός για $0$!

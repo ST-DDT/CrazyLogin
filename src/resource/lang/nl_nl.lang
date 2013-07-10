@@ -13,7 +13,6 @@ CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Whitelist Commando verwijdert\n($0$)
 CRAZYLOGIN.COMMAND.DETACHIP.FAIL=Kon het ip niet vinden $1$ van $0$'s Connecties.\n(Misschien was het nooit toegevoegt!)
 CRAZYLOGIN.COMMAND.DETACHIP.SUCCESS=Ip gevonden $1$ van $0$'s connectie.
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=$0$ verwijdert $2$ spelers, die inactief zien voor ten minste $1$ dagen.
-CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=$0$ probeerde alle spelerdata te verwijderen, Die inactief zijn voor $1$ dagen.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNING! Verboden commandos uitgevoert! $0$ @ $1$: $2$
 #CRAZYLOGIN.COMMAND.GENERATEDTOKEN=
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Crerde account voor $0$!

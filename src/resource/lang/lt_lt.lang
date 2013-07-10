@@ -13,7 +13,6 @@ CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Komanda panaikinta\n($0$)
 CRAZYLOGIN.COMMAND.DETACHIP.FAIL=Nerastas atskiras IP adresas $1$ is $0$'s prisijungimu.
 CRAZYLOGIN.COMMAND.DETACHIP.SUCCESS=Atskiras IP Adresas $1$ is $0$'s prisijungimu.
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=$0$ deleted $2$ players, kurie buvo neaktyvus $1$ dienas.
-CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=$0$ Bandai istrinti visus registruotus vartotojus, which have been inactive for at least $1$ days.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CWARNING! FUzdrausta komanda! $0$ @ $1$: $2$
 #CRAZYLOGIN.COMMAND.GENERATEDTOKEN=
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Sukurtas varttojas $0$!

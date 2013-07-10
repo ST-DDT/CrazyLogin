@@ -13,7 +13,6 @@ CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Commando eliminado \n($0$)
 CRAZYLOGIN.COMMAND.DETACHIP.FAIL=IP $1$ no se pudo eliminar de $0$s la lista de conexiones.\n(Es posible que nunca se conectó.)
 CRAZYLOGIN.COMMAND.DETACHIP.SUCCESS=IP $1$ se eliminó $0$s de la lista de conexiones con éxito.
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=$0$ ha borrado $2$ jugadores, que estuvieron más de $1$ días inactivos.
-CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=$0$ ha intentado borrar a todos los jugadores, que llevan $1$ días de inactividad.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CCiudado! Commando potencialmente peligroso $0$ @ $1$: $2$
 #CRAZYLOGIN.COMMAND.GENERATEDTOKEN=
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Cuentra para $0$ creada con éxito!

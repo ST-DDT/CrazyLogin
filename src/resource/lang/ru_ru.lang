@@ -13,7 +13,6 @@ CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Комманда удалена
 CRAZYLOGIN.COMMAND.DETACHIP.FAIL=Не удалось отсоединить IP $1$ от $0$'s соединения.\n(Может быть он никогда не был прикреплен)
 CRAZYLOGIN.COMMAND.DETACHIP.SUCCESS=Частный IP $1$ от $0$'s соединений.
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=&EИНФОРМАЦИЯ! $0$ удалено $2$ заброшенных аккаунтов (неактивных &E$1$ &Cдней)!
-CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=&CВнимание! $0$ пробую удалить заброшенные аккаунты (неактивные уже &E$1$ &Cдней)!
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CВНИМАНИЕ! Попытка исполнения запрещенной команды! $0$ @ $1$: $2$
 CRAZYLOGIN.COMMAND.GENERATEDTOKEN=Маркер создан для $0$:\n&3/tokenlogin $1$
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Создан аккаунт для $0$!

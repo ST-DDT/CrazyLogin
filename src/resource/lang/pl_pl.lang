@@ -13,7 +13,6 @@ CRAZYLOGIN.COMMAND.COMMANDS.REMOVED=Usunieto polecenie z Bia³ej listy\n($0$)
 CRAZYLOGIN.COMMAND.DETACHIP.FAIL=Nie mozna odlaczyc IP $1$ od $0$'s polaczenia.\n(Moze nigdy nie byl dolaczony)
 CRAZYLOGIN.COMMAND.DETACHIP.SUCCESS=Odlaczono IP $1$ od $0$'s polaczenia.
 CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED=$0$ usunieto $2$ graczy, ktorzy byli nieaktywni co najmiej $1$ dni.
-CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETEWARN=$0$ probowal usunac wszystkie dane graczy, ktorzy byli nieaktywni przez co najmniej $1$ dni.
 CRAZYLOGIN.COMMAND.EXPLOITWARN=&CUWAGA! Wykonywanie polecen ZABRONIONE! $0$ @ $1$: $2$
 #CRAZYLOGIN.COMMAND.GENERATEDTOKEN=
 CRAZYLOGIN.COMMAND.PLAYER.CREATE.SUCCESS=Konto utworzone dla $0$!
