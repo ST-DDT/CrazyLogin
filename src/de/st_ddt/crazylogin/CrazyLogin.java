@@ -1679,6 +1679,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	@SuppressWarnings("deprecation")
 	@Override
+	@Permission("crazylogin.warndatabase")
 	@Localized({ "CRAZYLOGIN.DATABASE.ACCESSWARN $SaveType$", "CRAZYLOGIN.DATABASE.LOADED $EntryCount$" })
 	public void loadDatabase()
 	{
@@ -1836,6 +1837,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
+	@Permission("crazylogin.warnloginfailure")
 	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$ $AttemptPerIP$ $AttemptPerAccount$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.BROADCAST.JOIN $Name$", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE.LENGTH $CurrentLength$ $MinLength$" })
 	public void playerLogin(final Player player, final String password) throws CrazyCommandException
 	{

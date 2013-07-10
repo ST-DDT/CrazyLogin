@@ -42,7 +42,6 @@ permissions:
     default: op
     children:
       crazycore.protectedplayer: true
-      crazylogin.admin: true
       crazylogin.adminlogin: true
       crazylogin.blockadminlogin: true
       crazylogin.blocktokenlogin: true
@@ -64,7 +63,6 @@ permissions:
       crazylogin.player.delete: true
       crazylogin.player.delete.protected: true
       crazylogin.player.detachip: true
-      crazylogin.player.info: true
       crazylogin.player.info.other: true
       crazylogin.player.info.self: true
       crazylogin.player.list: true
@@ -79,42 +77,6 @@ permissions:
       crazylogin.reload.database: true
       crazylogin.requirepassword: true
       crazylogin.save: true
-      crazylogin.saveloginlocation: true
-      crazylogin.warncommandexploits: true
-      crazylogin.warndatabase: true
-      crazylogin.warndelete: true
-      crazylogin.warnloginfailure: true
-      crazylogin.warnsession: true
-  crazylogin.admin:
-    description: Allow changing account data for other players
-    default: op
-    children:
-      crazycore.protectedplayer: true
-      crazylogin.adminlogin: true
-      crazylogin.bypasshideplayer: true
-      crazylogin.commands: true
-      crazylogin.dropolddata: true
-      crazylogin.ensureregistration: true
-      crazylogin.login.channel: true
-      crazylogin.login.command: true
-      crazylogin.logout.channel: true
-      crazylogin.logout.command: true
-      crazylogin.mode: true
-      crazylogin.mode.*: true
-      crazylogin.player.create: true
-      crazylogin.player.delete: true
-      crazylogin.player.delete.protected: true
-      crazylogin.player.detachip: true
-      crazylogin.player.info: true
-      crazylogin.player.info.other: true
-      crazylogin.player.info.self: true
-      crazylogin.player.list: true
-      crazylogin.player.password: true
-      crazylogin.player.password.protected: true
-      crazylogin.player.reverify: true
-      crazylogin.register.channel: true
-      crazylogin.register.command: true
-      crazylogin.requirepassword: true
       crazylogin.saveloginlocation: true
       crazylogin.warncommandexploits: true
       crazylogin.warndatabase: true
@@ -195,12 +157,6 @@ permissions:
   crazylogin.player.detachip:
     description: Allow removing an IP from a player.
     default: op
-  crazylogin.player.info:
-    description: Allow viewing playerinfo.
-    default: op
-    children:
-      crazylogin.player.info.other: true
-      crazylogin.player.info.self: true
   crazylogin.player.info.other:
     description: Allow viewing playerinfo for other players.
     default: op
@@ -213,7 +169,7 @@ permissions:
   crazylogin.player.password:
     description: Allow changing a player's password.
     default: op
-  crazylogin.player.password.protect:
+  crazylogin.player.password.protected:
     description: Allow changing a protected player's password.
     default: op
     children:
@@ -247,9 +203,6 @@ permissions:
     default: op
   crazylogin.saveloginlocation:
     description: Allow viewing and changing save login locations.
-    default: op
-  crazylogin.warnalgorithm:
-    description: Get informed if no algorithm is set.
     default: op
   crazylogin.warncommandexploits:
     description: Get informed if someone tries to execute a none whitelisted command.

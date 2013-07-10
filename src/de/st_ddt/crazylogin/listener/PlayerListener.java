@@ -103,6 +103,7 @@ public class PlayerListener implements Listener
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	@Permission("crazylogin.warnsession")
 	@Localized({ "CRAZYLOGIN.KICKED.SESSION.DUPLICATE", "CRAZYLOGIN.SESSION.DUPLICATEWARN $Name$ $IP$" })
 	public void PlayerLoginSessionCheck(final PlayerLoginEvent event)
 	{

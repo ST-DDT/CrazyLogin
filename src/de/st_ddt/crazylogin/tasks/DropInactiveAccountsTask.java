@@ -2,6 +2,7 @@ package de.st_ddt.crazylogin.tasks;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class DropInactiveAccountsTask implements Runnable
 {
@@ -15,6 +16,7 @@ public class DropInactiveAccountsTask implements Runnable
 	}
 
 	@Override
+	@Permission("crazylogin.warndelete")
 	@Localized("CRAZYLOGIN.COMMAND.DROPOLDDATA.DELETED $DropCauser$ $KeptDays$ $DroppedAmount$")
 	public void run()
 	{

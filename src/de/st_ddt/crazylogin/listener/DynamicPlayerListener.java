@@ -31,6 +31,7 @@ import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.source.Localized;
+import de.st_ddt.crazyutil.source.Permission;
 
 public class DynamicPlayerListener implements Listener
 {
@@ -264,6 +265,7 @@ public class DynamicPlayerListener implements Listener
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
+	@Permission("crazylogin.warncommandexploits")
 	@Localized({ "CRAZYLOGIN.KICKED.COMMANDUSAGE", "CRAZYLOGIN.COMMAND.EXPLOITWARN $Name$ $IP$ $Command$" })
 	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{

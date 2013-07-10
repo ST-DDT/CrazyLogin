@@ -28,6 +28,7 @@ public class CommandPlayerPassword extends CommandExecutor
 	}
 
 	@Override
+	@Permission("crazylogin.player.password.protected")
 	@Localized({ "CRAZYLOGIN.COMMAND.PLAYER.PASSWORD.SUCCESS $Name$", "CRAZYLOGIN.COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED" })
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
