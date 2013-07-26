@@ -36,6 +36,7 @@ import de.st_ddt.crazylogin.commands.CommandMainGenerateToken;
 import de.st_ddt.crazylogin.commands.CommandPassword;
 import de.st_ddt.crazylogin.commands.CommandPlayerCreate;
 import de.st_ddt.crazylogin.commands.CommandPlayerDetachIP;
+import de.st_ddt.crazylogin.commands.CommandPlayerExpirePassword;
 import de.st_ddt.crazylogin.commands.CommandPlayerPassword;
 import de.st_ddt.crazylogin.commands.CommandPlayerReverify;
 import de.st_ddt.crazylogin.commands.CommandSaveLoginLocation;
@@ -1378,14 +1379,17 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final CommandExecutor changePassword = new CommandPlayerPassword(this);
 		final CommandExecutor detachip = new CommandPlayerDetachIP(this);
 		final CommandExecutor reverify = new CommandPlayerReverify(this);
+		final CommandExecutor expire = new CommandPlayerExpirePassword(this);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, create), "create");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, changePassword), "chgpw", "changepw", "changepassword");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, detachip), "detachip");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, reverify), "reverify");
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, reverify), "expire");
 		playerCommand.addSubCommand(create, "create");
 		playerCommand.addSubCommand(changePassword, "chgpw", "changepw", "changepassword");
 		playerCommand.addSubCommand(detachip, "detachip");
 		playerCommand.addSubCommand(reverify, "reverify");
+		playerCommand.addSubCommand(expire, "expire");
 	}
 
 	private void registerHooks()
@@ -1879,6 +1883,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			if (!plugin.isHidingWarningsEnabled())
 				broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress(), fails, data.getLoginFails());
 			logger.log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong password (AttemptPerIP: " + fails + ", AttemptPerAccount: " + data.getLoginFails() + ")");
+			getCrazyDatabase().saveWithoutPassword(data);
 			return;
 		}
 		new CrazyLoginLoginEvent(player, data).callEvent();
@@ -1893,12 +1898,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			player.setFireTicks(0);
 			playerListener.sendPlayerJoinMessage(player);
 		}
-		playerListener.removeMovementBlocker(player);
-		playerListener.disableSaveLogin(player);
-		playerListener.disableHidenInventory(player);
-		playerListener.unhidePlayer(player);
-		loginFailuresPerIP.remove(player.getAddress().getAddress().getHostAddress());
-		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		if (encryptor instanceof UpdatingEncryptor)
 		{
 			try
@@ -1923,6 +1922,15 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			minLength = minPasswordLength;
 		if (passwordLength < minLength)
 			sendLocaleMessage("LOGIN.PASSWORDREQUIRECHANGE.LENGTH", player, passwordLength, minLength);
+		if (data.isPasswordExpired())
+			sendAuthReminderMessage(player);
+		else
+			playerListener.removeMovementBlocker(player);
+		playerListener.disableSaveLogin(player);
+		playerListener.disableHidenInventory(player);
+		playerListener.unhidePlayer(player);
+		loginFailuresPerIP.remove(player.getAddress().getAddress().getHostAddress());
+		tempBans.remove(player.getAddress().getAddress().getHostAddress());
 		data.addIP(player.getAddress().getAddress().getHostAddress());
 		getCrazyDatabase().saveWithoutPassword(data);
 		player.setMetadata("Authenticated", new Authenticated(this, player));
@@ -2045,6 +2053,19 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return data.checkTimeOut();
 	}
 
+	public boolean isLoggedInPlus(final Player player)
+	{
+		if (player.hasMetadata("NPC"))
+			return true;
+		final LoginPlayerData data = getPlayerData(player);
+		if (data == null)
+			return !alwaysNeedPassword && !PermissionModule.hasPermission(player, "crazylogin.requirepassword");
+		if (player.isOnline())
+			return data.isLoggedIn() && !data.isPasswordExpired();
+		else
+			return data.checkTimeOut();
+	}
+
 	@Override
 	public void forceRelogin(final OfflinePlayer player)
 	{
@@ -2059,14 +2080,32 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	public void forceRelogin(final LoginPlayerData data)
 	{
+		if (data == null)
+			return;
 		data.setLoggedIn(false);
 		final Player player = data.getPlayer();
 		if (player != null)
 			playerListener.PlayerJoin(data.getPlayer());
 	}
 
+	public void expirePassword(final String name)
+	{
+		expirePassword(getPlayerData(name));
+	}
+
+	public void expirePassword(final LoginPlayerData data)
+	{
+		if (data == null)
+			return;
+		data.expirePassword();
+		((CrazyLoginDataDatabase) database).saveWithoutPassword(data);
+		final Player player = data.getPlayer();
+		if (player != null)
+			sendAuthReminderMessage(player);
+	}
+
 	@Override
-	@Localized({ "CRAZYLOGIN.LOGIN.REQUEST", "CRAZYLOGIN.REGISTER.REQUEST" })
+	@Localized({ "CRAZYLOGIN.REGISTER.REQUEST", "CRAZYLOGIN.LOGIN.PASSWORDEXPIRED", "CRAZYLOGIN.LOGIN.REQUEST" })
 	public void sendAuthReminderMessage(final Player player)
 	{
 		if (doNotSpamAuthRequests)
@@ -2084,10 +2123,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				return;
 			date.setTime(now.getTime() + 5000L);
 		}
-		if (hasPlayerData(player))
-			sendLocaleMessage("LOGIN.REQUEST", player);
-		else
+		final LoginPlayerData data = plugin.getPlayerData(player);
+		if (data == null)
 			sendLocaleMessage("REGISTER.REQUEST", player);
+		else if (data.isLoggedIn())
+			sendLocaleMessage("LOGIN.PASSWORDEXPIRED", player);
+		else
+			sendLocaleMessage("LOGIN.REQUEST", player);
 	}
 
 	@Override

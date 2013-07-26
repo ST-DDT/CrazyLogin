@@ -11,12 +11,12 @@ public final class CrazyLoginFlatDatabase extends FlatPlayerDataDatabase<LoginPl
 
 	public CrazyLoginFlatDatabase(final JavaPlugin plugin, final ConfigurationSection config)
 	{
-		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction" }, "accounts.db", plugin, config);
+		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction", "loginFails", "passwordExpired" }, "accounts.db", plugin, config);
 	}
 
 	public CrazyLoginFlatDatabase(final JavaPlugin plugin, final String path)
 	{
-		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction" }, plugin, path);
+		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction", "loginFails", "passwordExpired" }, plugin, path);
 	}
 
 	@Override

@@ -102,7 +102,7 @@ public class DynamicPlayerListener implements Listener
 	public void PlayerInteract(final PlayerInteractEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.isLoggedIn(player))
+		if (plugin.isLoggedInPlus(player))
 			return;
 		event.setCancelled(true);
 		plugin.sendAuthReminderMessage(player);
@@ -112,7 +112,7 @@ public class DynamicPlayerListener implements Listener
 	public void PlayerInteractEntity(final PlayerInteractEntityEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.isLoggedIn(player))
+		if (plugin.isLoggedInPlus(player))
 			return;
 		event.setCancelled(true);
 		plugin.sendAuthReminderMessage(player);
@@ -122,7 +122,7 @@ public class DynamicPlayerListener implements Listener
 	public void PlayerMove(final PlayerMoveEvent event)
 	{
 		final Player player = event.getPlayer();
-		if (plugin.isLoggedIn(player))
+		if (plugin.isLoggedInPlus(player))
 			return;
 		final Location current = playerListener.getMovementBlocker(player);
 		if (current == null)
@@ -247,9 +247,10 @@ public class DynamicPlayerListener implements Listener
 		if (!(event.getEntity() instanceof Player))
 			return;
 		final Player player = (Player) event.getEntity();
-		if (plugin.isLoggedIn(player))
+		if (plugin.isLoggedInPlus(player))
 			return;
-		playerListener.triggerSaveLogin(player);
+		if (!plugin.isLoggedIn(player))
+			playerListener.triggerSaveLogin(player);
 		event.setCancelled(true);
 	}
 
@@ -259,7 +260,7 @@ public class DynamicPlayerListener implements Listener
 		if (!(event.getDamager() instanceof Player))
 			return;
 		final Player player = (Player) event.getDamager();
-		if (plugin.isLoggedIn(player))
+		if (plugin.isLoggedInPlus(player))
 			return;
 		event.setCancelled(true);
 	}

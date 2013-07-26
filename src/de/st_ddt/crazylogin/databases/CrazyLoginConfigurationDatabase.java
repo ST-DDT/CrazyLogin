@@ -11,12 +11,12 @@ public final class CrazyLoginConfigurationDatabase extends ConfigurationPlayerDa
 
 	public CrazyLoginConfigurationDatabase(final JavaPlugin plugin, final ConfigurationSection config)
 	{
-		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction" }, "accounts", plugin, config);
+		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction", "loginFails", "passwordExpired" }, "accounts", plugin, config);
 	}
 
 	public CrazyLoginConfigurationDatabase(final JavaPlugin plugin, final String path, final String[] columnNames)
 	{
-		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction" }, plugin, path, columnNames);
+		super(LoginPlayerData.class, new String[] { "name", "password", "ips", "lastAction", "loginFails", "passwordExpired" }, plugin, path, columnNames);
 	}
 
 	@Override

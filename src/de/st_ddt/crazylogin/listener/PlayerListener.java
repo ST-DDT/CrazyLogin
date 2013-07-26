@@ -258,6 +258,12 @@ public class PlayerListener implements Listener
 			{
 				player.setMetadata("Authenticated", new Authenticated(plugin, player));
 				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server. (Verified)");
+				if (playerdata.isPasswordExpired())
+				{
+					if (getMovementBlocker(player) == null)
+						setMovementBlocker(player, player.getLocation());
+					plugin.sendAuthReminderMessage(player);
+				}
 			}
 			else
 			{

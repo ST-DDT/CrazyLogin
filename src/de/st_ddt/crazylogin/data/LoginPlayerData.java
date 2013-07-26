@@ -32,15 +32,15 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 
 	protected String password;
 	protected final ArrayList<String> ips = new ArrayList<String>(6);
-	protected boolean loggedIn;
-	protected Date lastAction;
-	protected int loginFails;
+	protected boolean loggedIn = false;
+	protected Date lastAction = null;
+	protected int loginFails = 0;
+	protected boolean passwordExpired = false;
 
 	public LoginPlayerData(final String name)
 	{
 		super(name);
 		password = "FAILEDLOADING";
-		loggedIn = false;
 		lastAction = new Date();
 	}
 
@@ -73,7 +73,8 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		for (final String ip : config.getStringList(columnNames[2]))
 			ips.add(ip);
 		lastAction = ObjectSaveLoadHelper.StringToDate(config.getString(columnNames[3]), new Date());
-		loggedIn = false;
+		loginFails = config.getInt(columnNames[4], 0);
+		passwordExpired = config.getBoolean(columnNames[5], false);
 	}
 
 	// in Config-Datenbank speichern
@@ -84,6 +85,8 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		config.set(path + columnNames[1], password);
 		config.set(path + columnNames[2], ips);
 		config.set(path + columnNames[3], ObjectSaveLoadHelper.DateToString(lastAction));
+		config.set(path + columnNames[4], loginFails);
+		config.set(path + columnNames[5], passwordExpired);
 	}
 
 	// aus Flat-Datenbank laden
@@ -91,34 +94,41 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		super(rawData[0]);
 		this.password = rawData[1];
-		try
-		{
+		if (rawData.length >= 3)
 			if (!rawData[2].equals("."))
 			{
 				final String[] ips = rawData[2].split(",");
 				for (final String ip : ips)
 					this.ips.add(ip);
 			}
+		if (rawData.length >= 4)
 			lastAction = ObjectSaveLoadHelper.StringToDate(rawData[3], new Date());
-		}
-		catch (final IndexOutOfBoundsException e)
-		{
+		else
 			lastAction = new Date();
-		}
-		loggedIn = false;
+		if (rawData.length >= 5)
+			try
+			{
+				loginFails = Integer.parseInt(rawData[4]);
+			}
+			catch (final NumberFormatException e)
+			{}
+		if (rawData.length >= 6)
+			passwordExpired = rawData[5].equals("true");
 	}
 
 	// in Flat-Datenbank speichern
 	@Override
 	public String[] saveToFlatDatabase()
 	{
-		final String[] strings = new String[4];
+		final String[] strings = new String[6];
 		strings[0] = name;
 		strings[1] = password;
 		strings[2] = ChatHelper.listingString(",", ips);
 		if (strings[2].equals(""))
 			strings[2] = ".";
 		strings[3] = ObjectSaveLoadHelper.DateToString(lastAction);
+		strings[4] = Integer.toString(loginFails);
+		strings[5] = Boolean.toString(passwordExpired);
 		return strings;
 	}
 
@@ -158,7 +168,22 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 			e.printStackTrace();
 			lastAction = new Date();
 		}
-		loggedIn = false;
+		try
+		{
+			loginFails = rawData.getInt(columnNames[4]);
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
+		try
+		{
+			passwordExpired = rawData.getBoolean(columnNames[5]);
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	// in MySQL-Datenbank speichern
@@ -167,14 +192,14 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());
-		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "'";
+		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "', " + columnNames[4] + "='" + loginFails + "', " + columnNames[5] + "='" + (passwordExpired ? 1 : 0) + "'";
 	}
 
 	public String saveToMySQLDatabaseLight(final String[] columnNames)
 	{
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());
-		return columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "'";
+		return columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "', " + columnNames[4] + "='" + loginFails + "', " + columnNames[5] + "='" + (passwordExpired ? 1 : 0) + "'";
 	}
 
 	@Override
@@ -182,7 +207,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());
-		return "(" + columnNames[0] + ", " + columnNames[1] + ", " + columnNames[2] + ", " + columnNames[3] + ") VALUES ('" + name + "','" + password + "', '" + IPs + "', '" + timestamp + "')";
+		return "(" + columnNames[0] + ", " + columnNames[1] + ", " + columnNames[2] + ", " + columnNames[3] + ", " + columnNames[4] + ", " + columnNames[5] + ") VALUES ('" + name + "','" + password + "', '" + IPs + "', '" + timestamp + "', '" + loginFails + "', '" + (passwordExpired ? 1 : 0) + "')";
 	}
 
 	@Override
@@ -190,7 +215,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());
-		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "'";
+		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "', " + columnNames[4] + "='" + loginFails + "', " + columnNames[5] + "='" + (passwordExpired ? 1 : 0) + "'";
 	}
 
 	protected String getPassword()
@@ -222,6 +247,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	public void setPassword(final String password) throws PasswordRejectedException
 	{
 		this.password = getPlugin().getEncryptor().encrypt(name, genSeed(), password);
+		this.passwordExpired = false;
 	}
 
 	private String genSeed()
@@ -370,6 +396,16 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 		this.loggedIn = loggedIn;
 	}
 
+	public final boolean isPasswordExpired()
+	{
+		return passwordExpired;
+	}
+
+	public final void expirePassword()
+	{
+		this.passwordExpired = true;
+	}
+
 	@Override
 	public String getParameter(final CommandSender sender, final int index)
 	{
@@ -389,6 +425,10 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 				return loggedIn ? ChatColor.YELLOW.toString() : ChatColor.WHITE.toString();
 			case 6:
 				return ChatColor.GREEN.toString();
+			case 7:
+				return Integer.toString(loginFails);
+			case 8:
+				return Boolean.toString(passwordExpired);
 		}
 		return "";
 	}
@@ -396,7 +436,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	@Override
 	public int getParameterCount()
 	{
-		return 7;
+		return 9;
 	}
 
 	public CrazyLogin getPlugin()
@@ -411,7 +451,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.PLAYERINFO.IPADDRESS $IP$", "CRAZYLOGIN.PLAYERINFO.LASTACTION $LastAction$", "CRAZYLOGIN.PLAYERINFO.ASSOCIATES $Associates$" })
+	@Localized({ "CRAZYLOGIN.PLAYERINFO.IPADDRESS $IP$", "CRAZYLOGIN.PLAYERINFO.LASTACTION $LastAction$", "CRAZYLOGIN.PLAYERINFO.ASSOCIATES $Associates$", "CRAZYLOGIN.PLAYERINFO.PASSWORDEXPIRED $Expired$" })
 	public void showDetailed(final CommandSender target, final String chatHeader)
 	{
 		final CrazyLocale locale = CrazyLocale.getLocaleHead().getSecureLanguageEntry("CRAZYLOGIN.PLAYERINFO");
@@ -423,5 +463,6 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 				associates.add(data.getName());
 		associates.remove(name);
 		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("ASSOCIATES"), ChatHelper.listingString(associates));
+		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("PASSWORDEXPIRED"), passwordExpired);
 	}
 }

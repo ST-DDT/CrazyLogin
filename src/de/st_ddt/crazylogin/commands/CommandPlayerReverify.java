@@ -25,7 +25,7 @@ public class CommandPlayerReverify extends CommandExecutor
 	}
 
 	@Override
-	@Localized("CRAZYLOGIN.COMMAND.PLAYER.REVERIFY.SUCCESS $Name$")
+	@Localized("CRAZYLOGIN.COMMAND.PLAYER.REVERIFY.SUCCESS $Player$")
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
 		final String arg = ChatHelper.listingString(" ", args);

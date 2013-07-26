@@ -26,11 +26,13 @@ public final class CrazyLoginSQLiteDatabase extends SQLitePlayerDataDatabase<Log
 
 	private static SQLColumn[] getLoginColumns()
 	{
-		final SQLColumn[] columns = new SQLColumn[4];
+		final SQLColumn[] columns = new SQLColumn[6];
 		columns[0] = new SQLColumn("name", "CHAR(255)", true, false);
 		columns[1] = new SQLColumn("password", "CHAR(255)", null, false, false);
 		columns[2] = new SQLColumn("ips", "CHAR(255)", null, false, false);
 		columns[3] = new SQLColumn("lastAction", "TIMESTAMP", null, false, false);
+		columns[4] = new SQLColumn("loginFails", "INTEGER", "0", false, false);
+		columns[5] = new SQLColumn("passwordExpired", "BIT", "0", false, false);
 		return columns;
 	}
 
