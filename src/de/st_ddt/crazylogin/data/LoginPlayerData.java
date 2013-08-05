@@ -192,14 +192,14 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());
-		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "', " + columnNames[4] + "='" + loginFails + "', " + columnNames[5] + "='" + (passwordExpired ? 1 : 0) + "'";
+		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "', " + columnNames[4] + "='" + loginFails + "', " + columnNames[5] + "=" + (passwordExpired ? 1 : 0);
 	}
 
 	public String saveToMySQLDatabaseLight(final String[] columnNames)
 	{
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());
-		return columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "', " + columnNames[4] + "='" + loginFails + "', " + columnNames[5] + "='" + (passwordExpired ? 1 : 0) + "'";
+		return columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "', " + columnNames[4] + "='" + loginFails + "', " + columnNames[5] + "=" + (passwordExpired ? 1 : 0);
 	}
 
 	@Override
@@ -207,7 +207,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());
-		return "(" + columnNames[0] + ", " + columnNames[1] + ", " + columnNames[2] + ", " + columnNames[3] + ", " + columnNames[4] + ", " + columnNames[5] + ") VALUES ('" + name + "','" + password + "', '" + IPs + "', '" + timestamp + "', '" + loginFails + "', '" + (passwordExpired ? 1 : 0) + "')";
+		return "(" + columnNames[0] + ", " + columnNames[1] + ", " + columnNames[2] + ", " + columnNames[3] + ", " + columnNames[4] + ", " + columnNames[5] + ") VALUES ('" + name + "','" + password + "', '" + IPs + "', '" + timestamp + "', '" + loginFails + "', " + (passwordExpired ? 1 : 0) + ")";
 	}
 
 	@Override
@@ -215,7 +215,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		final String IPs = ChatHelper.listingString(",", ips);
 		final Timestamp timestamp = new Timestamp(lastAction.getTime());
-		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "', " + columnNames[4] + "='" + loginFails + "', " + columnNames[5] + "='" + (passwordExpired ? 1 : 0) + "'";
+		return columnNames[1] + "='" + password + "', " + columnNames[2] + "='" + IPs + "', " + columnNames[3] + "='" + timestamp + "', " + columnNames[4] + "='" + loginFails + "', " + columnNames[5] + "=" + (passwordExpired ? 1 : 0);
 	}
 
 	protected String getPassword()

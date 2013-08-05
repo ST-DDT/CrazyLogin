@@ -59,10 +59,10 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 		if (connection == null)
 			return;
 		Statement query = null;
+		final String sql = "UPDATE `" + tableName + "` SET " + entry.saveToMySQLDatabaseLight(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
 		try
 		{
 			query = connection.createStatement();
-			final String sql = "UPDATE `" + tableName + "` SET " + entry.saveToMySQLDatabaseLight(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
 			if (query.executeUpdate(sql) == 0)
 			{
 				datas.remove(entry.getName().toLowerCase());
@@ -71,8 +71,9 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 					player.kickPlayer("Your account has been deleted!");
 			}
 		}
-		catch (final SQLException e)
+		catch (final Exception e)
 		{
+			System.err.println("Error executing sql statement: " + sql);
 			e.printStackTrace();
 		}
 		finally
