@@ -2053,6 +2053,14 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return data.checkTimeOut();
 	}
 
+	/**
+	 * Checks whether the player is logged in and the password is not expired.
+	 * 
+	 * @param player
+	 *            The player to be checked.
+	 * @return True, if the player is logged in successfully and his password is not expired. Otherwise False.
+	 */
+	@Permission("crazylogin.requirepassword")
 	public boolean isLoggedInPlus(final Player player)
 	{
 		if (player.hasMetadata("NPC"))
