@@ -256,6 +256,7 @@ public class PlayerListener implements Listener
 			}
 			if (playerdata.isLoggedIn())
 			{
+				// Authenticated
 				player.setMetadata("Authenticated", new Authenticated(plugin, player));
 				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server. (Verified)");
 				if (playerdata.isPasswordExpired())
@@ -267,6 +268,7 @@ public class PlayerListener implements Listener
 			}
 			else
 			{
+				// Not Authenticated
 				plugin.getCrazyLogger().log("Join", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " joined the server.");
 				// Default Protection
 				if (plugin.isDelayingPreLoginSecurityEnabled())
