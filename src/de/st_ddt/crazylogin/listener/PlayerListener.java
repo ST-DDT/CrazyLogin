@@ -66,7 +66,7 @@ public class PlayerListener implements Listener
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	@Localized("CRAZYLOGIN.KICKED.NAME.INVALIDCHARS")
 	public void PlayerLoginNameCharCheck(final PlayerLoginEvent event)
 	{
@@ -147,6 +147,8 @@ public class PlayerListener implements Listener
 	@Localized("CRAZYLOGIN.KICKED.NOACCOUNT")
 	public void PlayerLoginDataUpdate(final PlayerLoginEvent event)
 	{
+		if (event.getResult() != Result.ALLOWED)
+			return;
 		final Player player = event.getPlayer();
 		final LoginPlayerData data = plugin.getCrazyDatabase().updateEntry(player.getName());
 		if (!plugin.isBlockingGuestJoinEnabled() || data != null)
