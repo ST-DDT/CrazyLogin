@@ -55,36 +55,20 @@ public class WebCrypt extends AbstractEncryptor
 	@Override
 	public String encrypt(final String name, final String salt, final String password)
 	{
-		String encrpyted = null;
-		try
+		try (InputStream stream = new URL(ChatHelper.putArgs(encryptURL, name, password, salt, idKey)).openStream();)
 		{
-			InputStream stream = null;
-			InputStreamReader inreader = null;
-			BufferedReader reader = null;
-			try
+			if (stream == null)
+				return null;
+			try (InputStreamReader inreader = new InputStreamReader(stream);
+					BufferedReader reader = new BufferedReader(inreader);)
 			{
-				stream = new URL(ChatHelper.putArgs(encryptURL, name, password, salt, idKey)).openStream();
-				if (stream == null)
-					return null;
-				inreader = new InputStreamReader(stream);
-				reader = new BufferedReader(inreader);
-				encrpyted = reader.readLine();
-			}
-			finally
-			{
-				if (inreader != null)
-					inreader.close();
-				if (reader != null)
-					reader.close();
-				if (stream != null)
-					stream.close();
+				return reader.readLine();
 			}
 		}
 		catch (final IOException e)
 		{
 			return null;
 		}
-		return encrpyted;
 	}
 
 	@Override
@@ -92,36 +76,20 @@ public class WebCrypt extends AbstractEncryptor
 	{
 		if (matchURL == null)
 			return encrypted.equals(encrypt(name, null, password));
-		boolean result = false;
-		try
+		try (InputStream stream = new URL(ChatHelper.putArgs(matchURL, name, password, encrypted, idKey)).openStream())
 		{
-			InputStream stream = null;
-			InputStreamReader inreader = null;
-			BufferedReader reader = null;
-			try
+			if (stream == null)
+				return false;
+			try (InputStreamReader inreader = new InputStreamReader(stream);
+					BufferedReader reader = new BufferedReader(inreader);)
 			{
-				stream = new URL(ChatHelper.putArgs(matchURL, name, password, encrypted, idKey)).openStream();
-				if (stream == null)
-					return false;
-				inreader = new InputStreamReader(stream);
-				reader = new BufferedReader(inreader);
-				result = reader.readLine().equalsIgnoreCase("YES");
-			}
-			finally
-			{
-				if (inreader != null)
-					inreader.close();
-				if (reader != null)
-					reader.close();
-				if (stream != null)
-					stream.close();
+				return reader.readLine().equalsIgnoreCase("YES");
 			}
 		}
 		catch (final IOException e)
 		{
 			return false;
 		}
-		return result;
 	}
 
 	@Override
