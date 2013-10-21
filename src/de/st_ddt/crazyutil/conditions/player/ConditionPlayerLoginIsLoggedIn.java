@@ -5,6 +5,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyutil.conditions.checker.PlayerConditionChecker;
 
+//TODO Register this class
 public class ConditionPlayerLoginIsLoggedIn extends BasicPlayerCondition
 {
 
