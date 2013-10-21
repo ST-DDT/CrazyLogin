@@ -1,11 +1,11 @@
 package de.st_ddt.crazyutil.conditions.player;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
+import de.st_ddt.crazyutil.conditions.checker.PlayerConditionChecker;
 
-public class ConditionPlayerLoginIsLoggedIn extends ConditionPlayer
+public class ConditionPlayerLoginIsLoggedIn extends BasicPlayerCondition
 {
 
 	public ConditionPlayerLoginIsLoggedIn()
@@ -19,20 +19,14 @@ public class ConditionPlayerLoginIsLoggedIn extends ConditionPlayer
 	}
 
 	@Override
-	public String getTypeIdentifier()
+	public String getType()
 	{
-		return "PlayerLoginIsLoggedIn";
+		return "PLAYER_LOGIN_ISLOGGEDIN";
 	}
 
 	@Override
-	public void save(final ConfigurationSection config, final String path)
+	public boolean check(final PlayerConditionChecker checker)
 	{
-		super.save(config, path);
-	}
-
-	@Override
-	public boolean match(final Player tester)
-	{
-		return CrazyLogin.getPlugin().isLoggedIn(tester);
+		return CrazyLogin.getPlugin().isLoggedIn(checker.getPlayer());
 	}
 }
