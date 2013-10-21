@@ -30,8 +30,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyutil.ChatHelperExtended;
-import de.st_ddt.crazyutil.source.Localized;
-import de.st_ddt.crazyutil.source.Permission;
 
 public class DynamicPlayerListener implements Listener
 {
@@ -266,39 +264,10 @@ public class DynamicPlayerListener implements Listener
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
-	@Permission("crazylogin.warncommandexploits")
-	@Localized({ "CRAZYLOGIN.KICKED.COMMANDUSAGE", "CRAZYLOGIN.COMMAND.EXPLOITWARN $Name$ $IP$ $Command$" })
 	public void PlayerPreCommand(final PlayerCommandPreprocessEvent event)
 	{
-		final Player player = event.getPlayer();
-		if (plugin.hasPlayerData(player))
-		{
-			if (plugin.isLoggedIn(player))
-				return;
-		}
-		else if (!plugin.isBlockingGuestCommandsEnabled())
-			return;
-		final String message = event.getMessage().toLowerCase();
-		if (message.startsWith("/"))
-		{
-			for (final String command : plugin.getCommandWhiteList())
-				if (message.matches(command))
-					return;
+		if (!plugin.playerCommand(event.getPlayer(), event.getMessage()))
 			event.setCancelled(true);
-			final String IP = player.getAddress().getAddress().getHostAddress();
-			if (plugin.isAutoKickCommandUsers())
-			{
-				player.kickPlayer(plugin.getLocale().getFormatedLocaleMessage(player, "KICKED.COMMANDUSAGE"));
-				plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + IP + " has been kicked for trying to execute", event.getMessage());
-			}
-			else
-			{
-				plugin.sendAuthReminderMessage(player);
-				plugin.getCrazyLogger().log("CommandBlocked", player.getName() + " @ " + IP + " tried to execute", event.getMessage());
-			}
-			if (!plugin.isHidingWarningsEnabled())
-				plugin.broadcastLocaleMessage(true, "crazylogin.warncommandexploits", true, "COMMAND.EXPLOITWARN", player.getName(), IP, event.getMessage().replaceAll("\\$", "_"));
-		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

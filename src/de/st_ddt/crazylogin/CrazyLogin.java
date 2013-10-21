@@ -145,6 +145,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private static CrazyLogin plugin;
 	private final Map<String, Date> antiRequestSpamTable = new HashMap<String, Date>();
 	private final Map<String, Integer> loginFailuresPerIP = new HashMap<String, Integer>();
+	/**
+	 * Number of illegal command executions with the given IP.
+	 */
+	private final Map<String, Integer> illegalCommandUsesPerIP = new HashMap<String, Integer>();
 	private final Map<String, Date> tempBans = new HashMap<String, Date>();
 	private final Map<String, Token> loginTokens = new HashMap<String, Token>();
 	private final Set<Player> playerAutoLogouts = new HashSet<Player>();
@@ -166,7 +170,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private int autoKickUnregistered;
 	private int autoKickLoginFailer;
 	private long autoTempBanLoginFailer;
-	private boolean autoKickCommandUsers;
+	private int autoKickCommandUsers;
+	private long autoTempBanCommandUsers;
 	private boolean blockGuestCommands;
 	private boolean blockGuestChat;
 	private boolean blockGuestJoin;
@@ -820,19 +825,41 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				saveConfiguration();
 			}
 		});
-		modeCommand.addMode(new BooleanFalseMode(this, "autoKickCommandUsers")
+		modeCommand.addMode(new IntegerMode(this, "autoKickCommandUsers")
 		{
 
 			@Override
-			public Boolean getValue()
+			public Integer getValue()
 			{
 				return autoKickCommandUsers;
 			}
 
 			@Override
-			public void setValue(final Boolean newValue) throws CrazyException
+			public void setValue(final Integer newValue) throws CrazyException
 			{
 				autoKickCommandUsers = newValue;
+				saveConfiguration();
+			}
+		});
+		modeCommand.addMode(new LongMode(this, "autoTempBanCommandUsers")
+		{
+
+			@Override
+			public void showValue(final CommandSender sender)
+			{
+				sendLocaleMessage("MODE.CHANGE", sender, name, getValue() == -1 ? "disabled" : getValue() + " seconds");
+			}
+
+			@Override
+			public Long getValue()
+			{
+				return autoTempBanCommandUsers;
+			}
+
+			@Override
+			public void setValue(final Long newValue) throws CrazyException
+			{
+				autoTempBanCommandUsers = Math.max(newValue, -1);
 				saveConfiguration();
 			}
 		});
@@ -1601,7 +1628,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		autoKickLoginFailer = Math.max(config.getInt("autoKickLoginFailer", 3), -1);
 		autoTempBanLoginFailer = Math.max(config.getInt("autoTempBanLoginFailer", -1), -1);
 		loginFailuresPerIP.clear();
-		autoKickCommandUsers = config.getBoolean("autoKickCommandUsers", false);
+		autoKickCommandUsers = Math.max(config.getInt("autoKickCommandUsers", config.getBoolean("autoKickCommandUsers", false) ? 1 : -1), -1);
+		autoTempBanCommandUsers = Math.max(config.getInt("autoTempBanCommandUsers", -1), -1);
+		illegalCommandUsesPerIP.clear();
 		blockGuestCommands = config.getBoolean("blockGuestCommands", true);
 		blockGuestChat = config.getBoolean("blockGuestChat", false);
 		blockGuestJoin = config.getBoolean("blockGuestJoin", false);
@@ -1768,6 +1797,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("autoKickLoginFailer", autoKickLoginFailer);
 		config.set("autoTempBanLoginFailer", autoTempBanLoginFailer);
 		config.set("autoKickCommandUsers", autoKickCommandUsers);
+		config.set("autoTempBanCommandUsers", autoTempBanCommandUsers);
 		config.set("blockGuestCommands", blockGuestCommands);
 		config.set("blockGuestChat", blockGuestChat);
 		config.set("blockGuestJoin", blockGuestJoin);
@@ -1862,27 +1892,31 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			sendLocaleMessage("REGISTER.HEADER", player);
 			return;
 		}
+		final String IP = player.getAddress().getAddress().getHostAddress();
 		final boolean wasOnline = data.isLoggedIn();
 		if (!data.login(password))
 		{
 			new CrazyLoginLoginFailEvent(player, data, LoginFailReason.WRONG_PASSWORD).callEvent();
-			Integer fails = loginFailuresPerIP.get(player.getAddress().getAddress().getHostAddress());
+			Integer fails = loginFailuresPerIP.get(IP);
 			if (fails == null)
 				fails = 1;
 			else
 				fails++;
 			if (fails % autoKickLoginFailer == 0)
 			{
+				logger.log("LoginFail", player.getName() + " @ " + IP + " has been kicked for entering a wrong password (AttemptPerIP: " + fails + ", AttemptPerAccount: " + data.getLoginFails() + ")");
 				player.kickPlayer(locale.getFormatedLocaleMessage(player, "KICKED.LOGINFAIL", fails));
 				if (autoTempBanLoginFailer > 0)
 					setTempBanned(player, autoTempBanLoginFailer);
 			}
 			else
+			{
+				logger.log("LoginFail", player.getName() + " @ " + IP + " entered a wrong password (AttemptPerIP: " + fails + ", AttemptPerAccount: " + data.getLoginFails() + ")");
 				sendLocaleMessage("LOGIN.FAILED", player);
-			loginFailuresPerIP.put(player.getAddress().getAddress().getHostAddress(), fails);
+			}
+			loginFailuresPerIP.put(IP, fails);
 			if (!plugin.isHidingWarningsEnabled())
-				broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), player.getAddress().getAddress().getHostAddress(), fails, data.getLoginFails());
-			logger.log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong password (AttemptPerIP: " + fails + ", AttemptPerAccount: " + data.getLoginFails() + ")");
+				broadcastLocaleMessage(true, "crazylogin.warnloginfailure", true, "LOGIN.FAILEDWARN", player.getName(), IP, fails, data.getLoginFails());
 			getCrazyDatabase().saveWithoutPassword(data);
 			return;
 		}
@@ -1892,7 +1926,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		data.resetLoginFails();
 		if (fails > 0)
 			sendLocaleMessage("LOGIN.FAILINFO", player, fails);
-		logger.log("Login", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged in successfully.");
+		logger.log("Login", player.getName() + " @ " + IP + " logged in successfully.");
 		if (!wasOnline)
 		{
 			player.setFireTicks(0);
@@ -1929,9 +1963,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
 		playerListener.unhidePlayer(player);
-		loginFailuresPerIP.remove(player.getAddress().getAddress().getHostAddress());
-		tempBans.remove(player.getAddress().getAddress().getHostAddress());
-		data.addIP(player.getAddress().getAddress().getHostAddress());
+		loginFailuresPerIP.remove(IP);
+		illegalCommandUsesPerIP.remove(IP);
+		tempBans.remove(IP);
+		data.addIP(IP);
 		getCrazyDatabase().saveWithoutPassword(data);
 		player.setMetadata("Authenticated", new Authenticated(this, player));
 		unregisterDynamicHooks();
@@ -2036,6 +2071,59 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		getCrazyDatabase().save(data);
 		player.setMetadata("Authenticated", new Authenticated(this, player));
 		unregisterDynamicHooks();
+	}
+
+	/**
+	 * Checks whether the player is allowed to execute the given command.
+	 * 
+	 * @param player
+	 *            The player who should be checked.
+	 * @param command
+	 *            The command which should be checked.
+	 * @return True, if the given player is allowed to executed the given command. False otherwise.
+	 */
+	@Permission("crazylogin.warncommandexploits")
+	@Localized({ "CRAZYLOGIN.KICKED.COMMANDUSAGE", "CRAZYLOGIN.COMMAND.EXPLOITWARN $Name$ $IP$ $Command$ $Fails$" })
+	public boolean playerCommand(final Player player, final String command)
+	{
+		if (hasPlayerData(player))
+		{
+			if (isLoggedIn(player))
+				return true;
+		}
+		else if (!blockGuestCommands)
+			return true;
+		final String lowerCommand = command;
+		if (lowerCommand.startsWith("/"))
+		{
+			for (final String whiteCommand : commandWhiteList)
+				if (lowerCommand.matches(whiteCommand))
+					return true;
+			final String IP = player.getAddress().getAddress().getHostAddress();
+			Integer fails = illegalCommandUsesPerIP.get(IP);
+			if (fails == null)
+				fails = 1;
+			else
+				fails++;
+			if (fails % autoKickCommandUsers == 0)
+			{
+				logger.log("CommandBlocked", player.getName() + " @ " + IP + " has been kicked for trying to illegaly execute a command", command, "(AttemptPerIP: " + fails + ")");
+				player.kickPlayer(locale.getFormatedLocaleMessage(player, "KICKED.COMMANDUSAGE"));
+				if (autoTempBanCommandUsers > 0)
+					setTempBanned(player, autoTempBanCommandUsers);
+			}
+			else
+			{
+				logger.log("CommandBlocked", player.getName() + " @ " + IP + " tried to illegaly execute a command", command, "(AttemptPerIP: " + fails + ")");
+				sendAuthReminderMessage(player);
+			}
+			illegalCommandUsesPerIP.put(IP, fails);
+			if (!hideWarnings)
+				broadcastLocaleMessage(true, "crazylogin.warncommandexploits", true, "COMMAND.EXPLOITWARN", player.getName(), IP, command.replaceAll("\\$", "_"), fails);
+			return false;
+		}
+		else
+			return true;
 	}
 
 	@Override
@@ -2234,16 +2322,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	public long getAutoTempBanLoginFailer()
 	{
 		return autoTempBanLoginFailer;
-	}
-
-	public boolean isAutoKickCommandUsers()
-	{
-		return autoKickCommandUsers;
-	}
-
-	public boolean isBlockingGuestCommandsEnabled()
-	{
-		return blockGuestCommands;
 	}
 
 	@Override
