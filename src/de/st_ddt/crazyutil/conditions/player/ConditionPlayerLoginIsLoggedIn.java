@@ -28,6 +28,6 @@ public class ConditionPlayerLoginIsLoggedIn extends BasicPlayerCondition
 	@Override
 	public boolean check(final PlayerConditionChecker checker)
 	{
-		return CrazyLogin.getPlugin().isLoggedIn(checker.getPlayer());
+		return CrazyLogin.getPlugin().isLoggedIn(checker.getEntity());
 	}
 }

@@ -28,6 +28,6 @@ public class ConditionPlayerLoginHasAccount extends BasicPlayerCondition
 	@Override
 	public boolean check(final PlayerConditionChecker checker)
 	{
-		return CrazyLogin.getPlugin().hasPlayerData(checker.getPlayer());
+		return CrazyLogin.getPlugin().hasPlayerData(checker.getEntity());
 	}
 }
