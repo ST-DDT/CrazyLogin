@@ -15,8 +15,8 @@ import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.exceptions.PasswordRejectedException;
-import de.st_ddt.crazyplugin.CrazyLightPluginInterface;
 import de.st_ddt.crazyplugin.data.PlayerData;
+import de.st_ddt.crazyutil.ChatHeaderProvider;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.databases.ConfigurationPlayerDataDatabaseEntry;
@@ -374,9 +374,9 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		final String ip = getLatestIP();
 		if (ip.equals(""))
-			return name + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(lastAction);
+			return name + " " + ChatHeaderProvider.DATETIMEFORMAT.format(lastAction);
 		else
-			return name + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(lastAction) + " @ " + ip;
+			return name + " " + ChatHeaderProvider.DATETIMEFORMAT.format(lastAction) + " @ " + ip;
 	}
 
 	public boolean checkTimeOut()
@@ -414,7 +414,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 			case 0:
 				return getName();
 			case 1:
-				return CrazyLightPluginInterface.DATETIMEFORMAT.format(lastAction);
+				return ChatHeaderProvider.DATETIMEFORMAT.format(lastAction);
 			case 2:
 				return loggedIn ? "Online" : "Offline";
 			case 3:
@@ -456,7 +456,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		final CrazyLocale locale = CrazyLocale.getLocaleHead().getSecureLanguageEntry("CRAZYLOGIN.PLAYERINFO");
 		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("IPADDRESS"), ChatHelper.listingString(ips));
-		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("LASTACTION"), CrazyLightPluginInterface.DATETIMEFORMAT.format(getLastActionTime()));
+		ChatHelper.sendMessage(target, chatHeader, locale.getLanguageEntry("LASTACTION"), ChatHeaderProvider.DATETIMEFORMAT.format(getLastActionTime()));
 		final HashSet<String> associates = new HashSet<String>();
 		for (final String ip : ips)
 			for (final LoginPlayerData data : getPlugin().getPlayerDatasPerIP(ip))

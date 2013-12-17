@@ -9,8 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
-import de.st_ddt.crazyplugin.CrazyLightPluginInterface;
 import de.st_ddt.crazyplugin.data.PlayerData;
+import de.st_ddt.crazyutil.ChatHeaderProvider;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
 import de.st_ddt.crazyutil.source.Localized;
@@ -134,9 +134,9 @@ public final class LoginUnregisteredPlayerData extends PlayerData<LoginUnregiste
 	{
 		final String ip = getLatestIP();
 		if (ip.equals(""))
-			return name + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(getLastActionTime());
+			return name + " " + ChatHeaderProvider.DATETIMEFORMAT.format(getLastActionTime());
 		else
-			return name + " " + CrazyLightPluginInterface.DATETIMEFORMAT.format(getLastActionTime()) + " @ " + ip;
+			return name + " " + ChatHeaderProvider.DATETIMEFORMAT.format(getLastActionTime()) + " @ " + ip;
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public final class LoginUnregisteredPlayerData extends PlayerData<LoginUnregiste
 			case 0:
 				return getName();
 			case 1:
-				return CrazyLightPluginInterface.DATETIMEFORMAT.format(new Date());
+				return ChatHeaderProvider.DATETIMEFORMAT.format(new Date());
 			case 2:
 				return isOnline() ? "Online" : "Offline";
 			case 3:
