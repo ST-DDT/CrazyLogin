@@ -14,6 +14,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
+import de.st_ddt.crazylogin.crypt.Encryptor;
 import de.st_ddt.crazylogin.exceptions.PasswordRejectedException;
 import de.st_ddt.crazyplugin.data.PlayerData;
 import de.st_ddt.crazyutil.ChatHeaderProvider;
