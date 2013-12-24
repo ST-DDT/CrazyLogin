@@ -1,7 +1,7 @@
 name: CrazyLogin
 main: de.st_ddt.crazylogin.CrazyLogin
 author: ST-DDT
-version: 7.21
+version: 7.22
 website: http://dev.bukkit.org/server-mods/crazylogin/
 # requires CrazyCore v10.7.1 or later
 depend: [CrazyCore]
@@ -59,6 +59,7 @@ permissions:
       crazylogin.logout.command: true
       crazylogin.mode: true
       crazylogin.mode.*: true
+      crazylogin.player.checkpassword: true
       crazylogin.player.create: true
       crazylogin.player.delete: true
       crazylogin.player.delete.protected: true
@@ -142,6 +143,9 @@ permissions:
     default: op
   crazylogin.mode.*:
     description: Allow changing plugin all modes.
+    default: op
+  crazylogin.player.checkpassword:
+    description: Allow checking a player's password.
     default: op
   crazylogin.player.create:
     description: Allow creating player data.

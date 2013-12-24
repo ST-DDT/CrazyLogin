@@ -34,6 +34,7 @@ import de.st_ddt.crazylogin.commands.CommandMainCommands;
 import de.st_ddt.crazylogin.commands.CommandMainDropOldData;
 import de.st_ddt.crazylogin.commands.CommandMainGenerateToken;
 import de.st_ddt.crazylogin.commands.CommandPassword;
+import de.st_ddt.crazylogin.commands.CommandPlayerCheckPassword;
 import de.st_ddt.crazylogin.commands.CommandPlayerCreate;
 import de.st_ddt.crazylogin.commands.CommandPlayerDetachIP;
 import de.st_ddt.crazylogin.commands.CommandPlayerExpirePassword;
@@ -1407,16 +1408,19 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final CommandExecutor detachip = new CommandPlayerDetachIP(this);
 		final CommandExecutor reverify = new CommandPlayerReverify(this);
 		final CommandExecutor expire = new CommandPlayerExpirePassword(this);
+		final CommandExecutor checkPassword = new CommandPlayerCheckPassword(this);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, create), "create");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, changePassword), "chgpw", "changepw", "changepassword");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, detachip), "detachip");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, reverify), "reverify");
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, reverify), "expire");
+		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, checkPassword), "chkpw", "checkpw", "checkpassword");
 		playerCommand.addSubCommand(create, "create");
 		playerCommand.addSubCommand(changePassword, "chgpw", "changepw", "changepassword");
 		playerCommand.addSubCommand(detachip, "detachip");
 		playerCommand.addSubCommand(reverify, "reverify");
 		playerCommand.addSubCommand(expire, "expire");
+		playerCommand.addSubCommand(checkPassword, "chkpw", "checkpw", "checkpassword");
 	}
 
 	private void registerHooks()
