@@ -246,7 +246,7 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	@Override
 	public void setPassword(final String password) throws PasswordRejectedException
 	{
-		this.password = getPlugin().getEncryptor().encrypt(name, genSeed(), password);
+		this.password = getEncryptor().encrypt(name, genSeed(), password);
 		this.passwordExpired = false;
 	}
 
@@ -266,7 +266,8 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	{
 		if (password.equals("FAILEDLOADING"))
 			return false;
-		return CrazyLogin.getPlugin().getEncryptor().match(name, password, this.password);
+		else
+			return getEncryptor().match(name, password, this.password);
 	}
 
 	@Override
@@ -448,6 +449,11 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 	protected String getChatHeader()
 	{
 		return getPlugin().getChatHeader();
+	}
+
+	protected Encryptor getEncryptor()
+	{
+		return getPlugin().getEncryptor();
 	}
 
 	@Override
