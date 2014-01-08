@@ -14,7 +14,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.Permission;
 
@@ -37,50 +36,50 @@ public class CommandAdminLogin extends CommandExecutor
 		if (!(sender instanceof Player))
 			throw new CrazyCommandExecutorException(false);
 		final Player player = (Player) sender;
-		final LoginPlayerData playerData = plugin.getPlayerData(player);
+		final LoginPlayerData playerData = owner.getPlayerData(player);
 		if (playerData == null)
 			throw new CrazyCommandCircumstanceException("when this player is protected by a password!");
 		if (args.length < 2)
 			throw new CrazyCommandUsageException("<Admin> <AdminPassword...>");
-		final LoginPlayerData adminData = plugin.getPlayerData(args[0]);
+		final LoginPlayerData adminData = owner.getPlayerData(args[0]);
 		if (adminData == null)
 		{
-			plugin.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to use the adminlogin, but defined an invalid admin. (No account)");
+			owner.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to use the adminlogin, but defined an invalid admin. (No account)");
 			throw new CrazyCommandCircumstanceException("while " + args[0] + " is online and logged in!");
 		}
 		final Player admin = adminData.getPlayer();
 		if (admin == null || !admin.isOnline() || !adminData.isLoggedIn())
 		{
-			plugin.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to use the adminlogin, but defined an invalid admin. (Not online)");
+			owner.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to use the adminlogin, but defined an invalid admin. (Not online)");
 			throw new CrazyCommandCircumstanceException("while " + adminData.getName() + " is online and logged in!");
 		}
 		if (!admin.hasPermission("crazylogin.adminlogin"))
 		{
-			plugin.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to use the adminlogin, but defined an invalid admin. (Permission)");
+			owner.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to use the adminlogin, but defined an invalid admin. (Permission)");
 			throw new CrazyCommandPermissionException();
 		}
 		final String password = ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(args, 1));
 		if (!adminData.isPassword(password))
 		{
-			plugin.sendLocaleMessage("ADMINLOGIN.FAILEDWARN", admin, player.getName(), player.getAddress().getAddress().getHostAddress());
-			plugin.sendLocaleMessage("ADMINLOGIN.FAILEDWARN", Bukkit.getConsoleSender(), player.getName(), player.getAddress().getAddress().getHostAddress());
-			plugin.sendLocaleMessage("LOGIN.FAILED", player);
-			plugin.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong adminpassword.");
+			owner.sendLocaleMessage("ADMINLOGIN.FAILEDWARN", admin, player.getName(), player.getAddress().getAddress().getHostAddress());
+			owner.sendLocaleMessage("ADMINLOGIN.FAILEDWARN", Bukkit.getConsoleSender(), player.getName(), player.getAddress().getAddress().getHostAddress());
+			owner.sendLocaleMessage("LOGIN.FAILED", player);
+			owner.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong adminpassword.");
 			return;
 		}
 		playerData.setLoggedIn(true);
-		plugin.sendLocaleMessage("LOGIN.SUCCESS", player);
-		plugin.getCrazyLogger().log("Login", player.getName() + " (via Admin " + admin.getName() + ") logged in successfully.");
+		owner.sendLocaleMessage("LOGIN.SUCCESS", player);
+		owner.getCrazyLogger().log("Login", player.getName() + " (via Admin " + admin.getName() + ") logged in successfully.");
 		playerListener.removeMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
-		plugin.getPlayerAutoLogouts().add(player);
+		owner.getPlayerAutoLogouts().add(player);
 	}
 
 	@Override
 	@Permission("crazylogin.blockadminlogin")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return !PermissionModule.hasPermission(sender, "crazylogin.blockadminlogin") && !plugin.isAdminLoginDisabled();
+		return !sender.hasPermission("crazylogin.blockadminlogin") && !owner.isAdminLoginDisabled();
 	}
 }

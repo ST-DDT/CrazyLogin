@@ -15,7 +15,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatConverter;
 import de.st_ddt.crazyutil.ChatHelperExtended;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.WorldParamitrisable;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.Permission;
@@ -48,13 +47,13 @@ public class CommandSaveLoginLocation extends CommandExecutor
 			if (world == null)
 				for (final World w : Bukkit.getWorlds())
 				{
-					final Location location = plugin.getSaveLoginLocation(w);
-					plugin.sendLocaleMessage("COMMAND.SAVELOGINLOCATION", sender, w.getName(), location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+					final Location location = owner.getSaveLoginLocation(w);
+					owner.sendLocaleMessage("COMMAND.SAVELOGINLOCATION", sender, w.getName(), location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 				}
 			else
 			{
-				final Location location = plugin.getSaveLoginLocation(world);
-				plugin.sendLocaleMessage("COMMAND.SAVELOGINLOCATION", sender, world.getName(), location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+				final Location location = owner.getSaveLoginLocation(world);
+				owner.sendLocaleMessage("COMMAND.SAVELOGINLOCATION", sender, world.getName(), location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 			}
 		}
 		else
@@ -65,7 +64,7 @@ public class CommandSaveLoginLocation extends CommandExecutor
 				final World w = Bukkit.getWorld(args[1]);
 				if (w == null)
 					throw new CrazyCommandNoSuchException("World", args[1], WorldParamitrisable.tabHelp(args[1]));
-				location = plugin.getSaveLoginLocation(w);
+				location = owner.getSaveLoginLocation(w);
 			}
 			else
 				try
@@ -82,15 +81,15 @@ public class CommandSaveLoginLocation extends CommandExecutor
 			if (world == null)
 			{
 				for (final World w : Bukkit.getWorlds())
-					plugin.getSaveLoginLocations().put(w.getName(), location);
-				plugin.sendLocaleMessage("COMMAND.SAVELOGINLOCATION", sender, "*ALL*", location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+					owner.getSaveLoginLocations().put(w.getName(), location);
+				owner.sendLocaleMessage("COMMAND.SAVELOGINLOCATION", sender, "*ALL*", location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 			}
 			else
 			{
-				plugin.getSaveLoginLocations().put(world.getName(), location);
-				plugin.sendLocaleMessage("COMMAND.SAVELOGINLOCATION", sender, world.getName(), location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+				owner.getSaveLoginLocations().put(world.getName(), location);
+				owner.sendLocaleMessage("COMMAND.SAVELOGINLOCATION", sender, world.getName(), location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 			}
-			plugin.saveConfiguration();
+			owner.saveConfiguration();
 		}
 	}
 
@@ -109,6 +108,6 @@ public class CommandSaveLoginLocation extends CommandExecutor
 	@Permission("crazylogin.saveloginlocation")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return PermissionModule.hasPermission(sender, "crazylogin.saveloginlocation");
+		return sender.hasPermission("crazylogin.saveloginlocation");
 	}
 }

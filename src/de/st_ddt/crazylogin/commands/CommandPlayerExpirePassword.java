@@ -24,17 +24,17 @@ public class CommandPlayerExpirePassword extends CommandExecutor
 		final String arg = ChatHelper.listingString(" ", args);
 		if (arg.equals("*"))
 		{
-			for (final LoginPlayerData data : plugin.getPlayerData())
-				plugin.expirePassword(data);
-			plugin.sendLocaleMessage("COMMAND.PLAYER.EXPIREPASSWORD.SUCCESS", sender, arg);
+			for (final LoginPlayerData data : owner.getPlayerData())
+				owner.expirePassword(data);
+			owner.sendLocaleMessage("COMMAND.PLAYER.EXPIREPASSWORD.SUCCESS", sender, arg);
 		}
 		else
 		{
-			final LoginPlayerData data = plugin.getPlayerData(arg);
+			final LoginPlayerData data = owner.getPlayerData(arg);
 			if (data == null)
 				throw new CrazyCommandNoSuchException("Player (with Account)", arg);
-			plugin.expirePassword(data);
-			plugin.sendLocaleMessage("COMMAND.PLAYER.EXPIREPASSWORD.SUCCESS", sender, data.getName());
+			owner.expirePassword(data);
+			owner.sendLocaleMessage("COMMAND.PLAYER.EXPIREPASSWORD.SUCCESS", sender, data.getName());
 		}
 	}
 }

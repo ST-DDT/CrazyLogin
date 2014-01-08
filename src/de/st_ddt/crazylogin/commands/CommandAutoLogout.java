@@ -23,7 +23,7 @@ public class CommandAutoLogout extends CommandExecutor
 		if (!(sender instanceof Player))
 			throw new CrazyCommandExecutorException(false);
 		final Player player = (Player) sender;
-		plugin.getPlayerAutoLogouts().add(player);
-		plugin.sendLocaleMessage("COMMAND.AUTOLOGOUT", player);
+		owner.getPlayerAutoLogouts().add(player);
+		owner.sendLocaleMessage("COMMAND.AUTOLOGOUT", player);
 	}
 }

@@ -11,7 +11,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.Permission;
 
@@ -31,19 +30,19 @@ public class CommandPassword extends CommandExecutor
 		if (!(sender instanceof Player))
 			throw new CrazyCommandExecutorException(false);
 		final Player player = (Player) sender;
-		final LoginPlayerData data = plugin.getPlayerData(player);
-		final boolean confirmNewPassword = plugin.isConfirmNewPasswordEnabled();
-		final boolean confirmWithOldPassword = plugin.isConfirmWithOldPasswordEnabled() && data != null;
+		final LoginPlayerData data = owner.getPlayerData(player);
+		final boolean confirmNewPassword = owner.isConfirmNewPasswordEnabled();
+		final boolean confirmWithOldPassword = owner.isConfirmWithOldPasswordEnabled() && data != null;
 		if (args.length < 1 + (confirmNewPassword ? 1 : 0) + (confirmWithOldPassword ? 1 : 0))
 			throw new CrazyCommandUsageException((confirmWithOldPassword ? "<OldPassword> " : "") + "<NewPassword>" + (confirmNewPassword ? " <NewPassword>" : ""));
 		if (data == null)
 		{
-			if (!PermissionModule.hasPermission(player, "crazylogin.register.command"))
+			if (!player.hasPermission("crazylogin.register.command"))
 				throw new CrazyCommandPermissionException();
 		}
 		else if (!data.isLoggedIn())
 		{
-			plugin.sendAuthReminderMessage(player);
+			owner.sendAuthReminderMessage(player);
 			throw new CrazyCommandPermissionException();
 		}
 		final String[] pwArgs;
@@ -69,10 +68,10 @@ public class CommandPassword extends CommandExecutor
 		}
 		else
 			password = ChatHelper.listingString(" ", pwArgs);
-		plugin.playerPassword(player, password);
+		owner.playerPassword(player, password);
 		if (!confirmNewPassword)
 			if (pwArgs.length % 2 == 0)
 				if (ChatHelper.listingString(" ", ChatHelperExtended.cutArray(pwArgs, pwArgs.length / 2)).equals(ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(pwArgs, pwArgs.length / 2))))
-					plugin.sendLocaleMessage("COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED", player);
+					owner.sendLocaleMessage("COMMAND.REGISTER.WARNCONFIRMPASSWORDDISABLED", player);
 	}
 }

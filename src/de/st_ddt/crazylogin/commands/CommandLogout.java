@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandLogout extends CommandExecutor
@@ -23,13 +22,13 @@ public class CommandLogout extends CommandExecutor
 		if (!(sender instanceof Player))
 			throw new CrazyCommandExecutorException(false);
 		final Player player = (Player) sender;
-		plugin.playerLogout(player);
+		owner.playerLogout(player);
 	}
 
 	@Override
 	@Permission("crazylogin.logout.command")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return PermissionModule.hasPermission(sender, "crazylogin.logout.command");
+		return sender.hasPermission("crazylogin.logout.command");
 	}
 }

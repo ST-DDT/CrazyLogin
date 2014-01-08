@@ -11,7 +11,6 @@ import de.st_ddt.crazylogin.data.LoginPlayerData;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandNoSuchException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.Permission;
@@ -31,19 +30,19 @@ public class CommandPlayerReverify extends CommandExecutor
 		final String arg = ChatHelper.listingString(" ", args);
 		if (arg.equals("*"))
 		{
-			for (final LoginPlayerData data : plugin.getPlayerData())
+			for (final LoginPlayerData data : owner.getPlayerData())
 				data.setLoggedIn(false);
 			for (final Player player : Bukkit.getOnlinePlayers())
-				plugin.forceRelogin(player);
-			plugin.sendLocaleMessage("COMMAND.PLAYER.REVERIFY.SUCCESS", sender, arg);
+				owner.forceRelogin(player);
+			owner.sendLocaleMessage("COMMAND.PLAYER.REVERIFY.SUCCESS", sender, arg);
 		}
 		else
 		{
-			final LoginPlayerData data = plugin.getPlayerData(arg);
+			final LoginPlayerData data = owner.getPlayerData(arg);
 			if (data == null)
 				throw new CrazyCommandNoSuchException("Player (with Account)", arg);
-			plugin.forceRelogin(data);
-			plugin.sendLocaleMessage("COMMAND.PLAYER.REVERIFY.SUCCESS", sender, data.getName());
+			owner.forceRelogin(data);
+			owner.sendLocaleMessage("COMMAND.PLAYER.REVERIFY.SUCCESS", sender, data.getName());
 		}
 	}
 
@@ -53,13 +52,13 @@ public class CommandPlayerReverify extends CommandExecutor
 		if (args.length != 1)
 			return null;
 		else
-			return PlayerDataParamitrisable.tabHelp(plugin, args[0]);
+			return PlayerDataParamitrisable.tabHelp(owner, args[0]);
 	}
 
 	@Override
 	@Permission("crazylogin.player.reverify")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return PermissionModule.hasPermission(sender, "crazylogin.player.reverify");
+		return sender.hasPermission("crazylogin.player.reverify");
 	}
 }

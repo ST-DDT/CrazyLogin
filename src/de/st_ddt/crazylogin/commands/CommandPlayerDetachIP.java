@@ -12,7 +12,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandNoSuchException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelperExtended;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.Permission;
@@ -31,15 +30,15 @@ public class CommandPlayerDetachIP extends CommandExecutor
 	{
 		if (args.length < 2)
 			throw new CrazyCommandUsageException("<Player> <IP> [IP] ...");
-		final LoginPlayerData data = plugin.getPlayerData(args[0]);
+		final LoginPlayerData data = owner.getPlayerData(args[0]);
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Player (with Account)", args[0]);
 		for (final String ip : ChatHelperExtended.shiftArray(args, 1))
 			if (data.getIPs().remove(ip))
-				plugin.sendLocaleMessage("COMMAND.PLAYER.DETACHIP.SUCCESS", sender, data.getName(), ip);
+				owner.sendLocaleMessage("COMMAND.PLAYER.DETACHIP.SUCCESS", sender, data.getName(), ip);
 			else
-				plugin.sendLocaleMessage("COMMAND.PLAYER.DETACHIP.FAIL", sender, data.getName(), ip);
-		plugin.getCrazyDatabase().saveWithoutPassword(data);
+				owner.sendLocaleMessage("COMMAND.PLAYER.DETACHIP.FAIL", sender, data.getName(), ip);
+		owner.getCrazyDatabase().saveWithoutPassword(data);
 	}
 
 	@Override
@@ -48,10 +47,10 @@ public class CommandPlayerDetachIP extends CommandExecutor
 		if (args.length == 0)
 			return null;
 		else if (args.length == 1)
-			return PlayerDataParamitrisable.tabHelp(plugin, args[0]);
+			return PlayerDataParamitrisable.tabHelp(owner, args[0]);
 		else
 		{
-			final LoginPlayerData data = plugin.getPlayerData(args[0]);
+			final LoginPlayerData data = owner.getPlayerData(args[0]);
 			if (data == null)
 				return null;
 			final List<String> res = new ArrayList<String>();
@@ -67,6 +66,6 @@ public class CommandPlayerDetachIP extends CommandExecutor
 	@Permission("crazylogin.player.detachip")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return PermissionModule.hasPermission(sender, "crazylogin.player.detachip");
+		return sender.hasPermission("crazylogin.player.detachip");
 	}
 }

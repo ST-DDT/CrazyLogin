@@ -12,7 +12,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandCircumstanceException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.Permission;
 
@@ -34,40 +33,40 @@ public class CommandTokenLogin extends CommandExecutor
 		if (!(sender instanceof Player))
 			throw new CrazyCommandExecutorException(false);
 		final Player player = (Player) sender;
-		final LoginPlayerData playerData = plugin.getPlayerData(player);
+		final LoginPlayerData playerData = owner.getPlayerData(player);
 		if (playerData == null)
 			throw new CrazyCommandCircumstanceException("when this player is protected by a password!");
 		if (args.length != 1)
 			throw new CrazyCommandUsageException("<Token>");
-		final Token token = plugin.getLoginTokens().remove(player.getName().toLowerCase());
+		final Token token = owner.getLoginTokens().remove(player.getName().toLowerCase());
 		if (token == null || !token.isValid())
 		{
-			plugin.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to use a token, although there isn't an active one.");
+			owner.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " tried to use a token, although there isn't an active one.");
 			throw new CrazyCommandCircumstanceException("if token is available!");
 		}
 		if (!token.checkToken(args[0]))
 		{
 			final Player creator = Bukkit.getPlayerExact(token.getCreator());
 			if (creator != null)
-				plugin.sendLocaleMessage("TOKENLOGIN.FAILEDWARN", creator, player.getName(), player.getAddress().getAddress().getHostAddress(), token.getCreator());
-			plugin.sendLocaleMessage("TOKENLOGIN.FAILEDWARN", Bukkit.getConsoleSender(), player.getName(), player.getAddress().getAddress().getHostAddress(), token.getCreator());
-			plugin.sendLocaleMessage("LOGIN.FAILED", player);
-			plugin.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong token. (Created by " + token.getCreator() + ")");
+				owner.sendLocaleMessage("TOKENLOGIN.FAILEDWARN", creator, player.getName(), player.getAddress().getAddress().getHostAddress(), token.getCreator());
+			owner.sendLocaleMessage("TOKENLOGIN.FAILEDWARN", Bukkit.getConsoleSender(), player.getName(), player.getAddress().getAddress().getHostAddress(), token.getCreator());
+			owner.sendLocaleMessage("LOGIN.FAILED", player);
+			owner.getCrazyLogger().log("LoginFail", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " entered a wrong token. (Created by " + token.getCreator() + ")");
 			return;
 		}
 		playerData.setLoggedIn(true);
-		plugin.sendLocaleMessage("LOGIN.SUCCESS", player);
-		plugin.getCrazyLogger().log("Login", player.getName() + " (via Token " + token.getCreator() + ") logged in successfully.");
+		owner.sendLocaleMessage("LOGIN.SUCCESS", player);
+		owner.getCrazyLogger().log("Login", player.getName() + " (via Token " + token.getCreator() + ") logged in successfully.");
 		playerListener.removeMovementBlocker(player);
 		playerListener.disableSaveLogin(player);
 		playerListener.disableHidenInventory(player);
-		plugin.getPlayerAutoLogouts().add(player);
+		owner.getPlayerAutoLogouts().add(player);
 	}
 
 	@Override
 	@Permission("crazylogin.blocktokenlogin")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return !PermissionModule.hasPermission(sender, "crazylogin.blocktokenlogin") && !plugin.isTokenLoginDisabled();
+		return !sender.hasPermission("crazylogin.blocktokenlogin") && !owner.isTokenLoginDisabled();
 	}
 }

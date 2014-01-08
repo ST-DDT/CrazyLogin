@@ -22,6 +22,6 @@ public class CommandPlayerDelete extends CrazyPlayerDataPluginCommandPlayerDelet
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
 		super.command(sender, args);
-		plugin.getCrazyLogger().log("Account", ChatHelper.listingString(" ", args) + " deleted his account successfully (via " + sender.getName() + ").");
+		owner.getCrazyLogger().log("Account", ChatHelper.listingString(" ", args) + " deleted his account successfully (via " + sender.getName() + ").");
 	}
 }

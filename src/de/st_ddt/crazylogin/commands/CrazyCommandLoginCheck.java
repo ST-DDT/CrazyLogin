@@ -26,7 +26,7 @@ public class CrazyCommandLoginCheck extends CommandExecutor
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
 		if (sender instanceof Player)
-			if (!plugin.isLoggedIn((Player) sender))
+			if (!owner.isLoggedIn((Player) sender))
 				throw new CrazyCommandPermissionException();
 		command.command(sender, args);
 	}
@@ -41,7 +41,7 @@ public class CrazyCommandLoginCheck extends CommandExecutor
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		if (sender instanceof Player)
-			if (!plugin.isLoggedIn((Player) sender))
+			if (!owner.isLoggedIn((Player) sender))
 				return false;
 		return command.hasAccessPermission(sender);
 	}
@@ -50,7 +50,7 @@ public class CrazyCommandLoginCheck extends CommandExecutor
 	public boolean isAccessible(final CommandSender sender)
 	{
 		if (sender instanceof Player)
-			if (!plugin.isLoggedIn((Player) sender))
+			if (!owner.isLoggedIn((Player) sender))
 				return false;
 		return command.isAccessible(sender);
 	}

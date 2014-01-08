@@ -12,7 +12,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.PlayerDataParamitrisable;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.Permission;
@@ -29,19 +28,19 @@ public class CommandPlayerCheckPassword extends CommandExecutor
 	@Localized({ "CRAZYLOGIN.COMMAND.PLAYER.CHECKPASSWORD.SUCCESS $Player$", "CRAZYLOGIN.COMMAND.PLAYER.CHECKPASSWORD.FAILED $Player$" })
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
-		if (plugin.getCrazyDatabase() == null)
+		if (owner.getCrazyDatabase() == null)
 			throw new CrazyCommandCircumstanceException("when database is accessible");
 		if (args.length < 2)
 			throw new CrazyCommandUsageException("<Player> <Passwort>");
 		final String name = args[0];
-		final LoginPlayerData data = plugin.getPlayerData(name);
+		final LoginPlayerData data = owner.getPlayerData(name);
 		if (data == null)
 			throw new CrazyCommandNoSuchException("Account", name);
 		final String password = ChatHelper.listingString(" ", ChatHelperExtended.shiftArray(args, 1));
 		if (data.isPassword(password))
-			plugin.sendLocaleMessage("COMMAND.PLAYER.CHECKPASSWORD.SUCCESS", sender, data.getName());
+			owner.sendLocaleMessage("COMMAND.PLAYER.CHECKPASSWORD.SUCCESS", sender, data.getName());
 		else
-			plugin.sendLocaleMessage("COMMAND.PLAYER.CHECKPASSWORD.FAILED", sender, data.getName());
+			owner.sendLocaleMessage("COMMAND.PLAYER.CHECKPASSWORD.FAILED", sender, data.getName());
 	}
 
 	@Override
@@ -50,13 +49,13 @@ public class CommandPlayerCheckPassword extends CommandExecutor
 		if (args.length != 1)
 			return null;
 		else
-			return PlayerDataParamitrisable.tabHelp(plugin, args[0]);
+			return PlayerDataParamitrisable.tabHelp(owner, args[0]);
 	}
 
 	@Override
 	@Permission("crazylogin.player.checkpassword")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return PermissionModule.hasPermission(sender, "crazylogin.player.checkpassword");
+		return sender.hasPermission("crazylogin.player.checkpassword");
 	}
 }

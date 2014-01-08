@@ -7,7 +7,6 @@ import de.st_ddt.crazylogin.crypt.CrazyCrypt1;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandPermissionException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyplugin.listener.CrazyPluginMessageListener;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Permission;
 
 public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin>
@@ -49,7 +48,7 @@ public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin
 				}
 				try
 				{
-					if (!PermissionModule.hasPermission(player, "crazylogin.login.channel"))
+					if (!player.hasPermission("crazylogin.login.channel"))
 						throw new CrazyCommandPermissionException();
 					plugin.playerLogin(player, args);
 				}
@@ -84,7 +83,7 @@ public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin
 				try
 				{
 					if (!plugin.hasPlayerData(player))
-						if (!PermissionModule.hasPermission(player, "crazylogin.register.channel"))
+						if (!player.hasPermission("crazylogin.register.channel"))
 							throw new CrazyCommandPermissionException();
 					plugin.playerPassword(player, args);
 				}
@@ -101,7 +100,7 @@ public final class MessageListener extends CrazyPluginMessageListener<CrazyLogin
 			{
 				try
 				{
-					if (!PermissionModule.hasPermission(player, "crazylogin.logout.channel"))
+					if (!player.hasPermission("crazylogin.logout.channel"))
 						throw new CrazyCommandPermissionException();
 					plugin.playerLogout(player);
 				}

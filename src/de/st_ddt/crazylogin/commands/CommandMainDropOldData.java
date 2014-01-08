@@ -10,7 +10,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ChatHelperExtended;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.Permission;
 
@@ -49,10 +48,10 @@ public class CommandMainDropOldData extends CommandExecutor
 			if (!password.equals("CONSOLE_CONFIRM"))
 				throw new CrazyCommandUsageException("<DaysToKeep> CONSOLE_CONFIRM");
 		}
-		else if (!plugin.getPlayerData((Player) sender).isPassword(password))
+		else if (!owner.getPlayerData((Player) sender).isPassword(password))
 			throw new CrazyCommandUsageException("<DaysToKeep> <Password>");
-		final int amount = plugin.dropInactiveAccounts(days);
-		plugin.broadcastLocaleMessage(true, "crazylogin.warndelete", true, "COMMAND.DROPOLDDATA.DELETED", sender.getName(), days, amount);
+		final int amount = owner.dropInactiveAccounts(days);
+		owner.broadcastLocaleMessage(true, "crazylogin.warndelete", true, "COMMAND.DROPOLDDATA.DELETED", sender.getName(), days, amount);
 	}
 
 	@Override
@@ -60,8 +59,8 @@ public class CommandMainDropOldData extends CommandExecutor
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		if (sender instanceof Player)
-			if (!plugin.isLoggedIn((Player) sender))
+			if (!owner.isLoggedIn((Player) sender))
 				return false;
-		return PermissionModule.hasPermission(sender, "crazylogin.dropolddata");
+		return sender.hasPermission("crazylogin.dropolddata");
 	}
 }

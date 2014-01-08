@@ -8,7 +8,6 @@ import de.st_ddt.crazyplugin.exceptions.CrazyCommandExecutorException;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandUsageException;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Permission;
 
 public class CommandLogin extends CommandExecutor
@@ -28,13 +27,13 @@ public class CommandLogin extends CommandExecutor
 		if (args.length == 0)
 			throw new CrazyCommandUsageException("<Passwort...>");
 		final String password = ChatHelper.listingString(" ", args);
-		plugin.playerLogin(player, password);
+		owner.playerLogin(player, password);
 	}
 
 	@Override
 	@Permission("crazylogin.login.command")
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
-		return PermissionModule.hasPermission(sender, "crazylogin.login.command");
+		return sender.hasPermission("crazylogin.login.command");
 	}
 }

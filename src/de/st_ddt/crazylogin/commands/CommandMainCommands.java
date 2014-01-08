@@ -10,7 +10,6 @@ import de.st_ddt.crazyplugin.commands.CrazyCommandListEditor;
 import de.st_ddt.crazyplugin.exceptions.CrazyException;
 import de.st_ddt.crazyutil.ChatHelper;
 import de.st_ddt.crazyutil.ListFormat;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.source.Localized;
 import de.st_ddt.crazyutil.source.Permission;
 
@@ -24,7 +23,7 @@ public class CommandMainCommands extends CrazyCommandListEditor<CrazyLogin, Stri
 		@Localized("CRAZYLOGIN.COMMAND.COMMANDS.LISTHEAD $CurrentPage$ $MaxPage$ $ChatHeader$ $DateTime$")
 		public String headFormat(final CommandSender sender)
 		{
-			return plugin.getLocale().getLanguageEntry("COMMAND.COMMANDS.LISTHEAD").getLanguageText(sender);
+			return owner.getLocale().getLanguageEntry("COMMAND.COMMANDS.LISTHEAD").getLanguageText(sender);
 		}
 
 		@Override
@@ -50,15 +49,15 @@ public class CommandMainCommands extends CrazyCommandListEditor<CrazyLogin, Stri
 	public boolean hasAccessPermission(final CommandSender sender)
 	{
 		if (sender instanceof Player)
-			if (!plugin.isLoggedIn((Player) sender))
+			if (!owner.isLoggedIn((Player) sender))
 				return false;
-		return PermissionModule.hasPermission(sender, "crazylogin.commands");
+		return sender.hasPermission("crazylogin.commands");
 	}
 
 	@Override
 	public List<String> getCollection()
 	{
-		return plugin.getCommandWhiteList();
+		return owner.getCommandWhiteList();
 	}
 
 	@Override
@@ -103,6 +102,6 @@ public class CommandMainCommands extends CrazyCommandListEditor<CrazyLogin, Stri
 	@Override
 	protected void saveChanges()
 	{
-		plugin.saveConfiguration();
+		owner.saveConfiguration();
 	}
 }
