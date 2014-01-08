@@ -130,7 +130,6 @@ import de.st_ddt.crazyutil.modes.LongMode;
 import de.st_ddt.crazyutil.modes.Mode;
 import de.st_ddt.crazyutil.modules.login.CrazyLoginSystem;
 import de.st_ddt.crazyutil.modules.login.LoginModule;
-import de.st_ddt.crazyutil.modules.permissions.PermissionModule;
 import de.st_ddt.crazyutil.paramitrisable.BooleanParamitrisable;
 import de.st_ddt.crazyutil.paramitrisable.Paramitrisable;
 import de.st_ddt.crazyutil.source.Localized;
@@ -2010,7 +2009,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		final int passwordLength = password.length();
 		if (passwordLength == 0)
 		{
-			if (alwaysNeedPassword || PermissionModule.hasPermission(player, "crazylogin.requirepassword"))
+			if (alwaysNeedPassword || player.hasPermission("crazylogin.requirepassword"))
 				throw new CrazyCommandUsageException((confirmWithOldPassword ? "<OldPassword> " : "") + "<NewPassword>" + (confirmNewPassword ? " <NewPassword>" : ""));
 			playerListener.removeMovementBlocker(player);
 			sendLocaleMessage("PASSWORDDELETE.SUCCESS", player);
@@ -2031,7 +2030,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		{
 			final String ip = player.getAddress().getAddress().getHostAddress();
 			final HashSet<LoginPlayerData> associates = getPlayerDatasPerIP(ip);
-			if (!PermissionModule.hasPermission(player, "crazylogin.ensureregistration"))
+			if (!player.hasPermission("crazylogin.ensureregistration"))
 				if (maxRegistrationsPerIP != -1)
 					if (associates.size() >= maxRegistrationsPerIP)
 						throw new CrazyLoginExceedingMaxRegistrationsPerIPException(maxRegistrationsPerIP, associates);
@@ -2138,7 +2137,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return true;
 		final LoginPlayerData data = getPlayerData(player);
 		if (data == null)
-			return !alwaysNeedPassword && !PermissionModule.hasPermission(player, "crazylogin.requirepassword");
+			return !alwaysNeedPassword && !player.hasPermission("crazylogin.requirepassword");
 		if (player.isOnline())
 			return data.isLoggedIn();
 		else
@@ -2159,7 +2158,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			return true;
 		final LoginPlayerData data = getPlayerData(player);
 		if (data == null)
-			return !alwaysNeedPassword && !PermissionModule.hasPermission(player, "crazylogin.requirepassword");
+			return !alwaysNeedPassword && !player.hasPermission("crazylogin.requirepassword");
 		if (player.isOnline())
 			return data.isLoggedIn() && !data.isPasswordExpired();
 		else
@@ -2663,7 +2662,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		Player: for (final Player player : Bukkit.getOnlinePlayers())
 		{
 			for (final String permission : permissions)
-				if (!PermissionModule.hasPermission(player, permission))
+				if (!player.hasPermission(permission))
 					continue Player;
 			if (loggedInOnly)
 				if (!isLoggedIn(player))
