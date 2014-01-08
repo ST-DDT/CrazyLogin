@@ -1875,7 +1875,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 
 	@Override
 	@Permission("crazylogin.warnloginfailure")
-	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$ $AttemptPerIP$ $AttemptPerAccount$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.BROADCAST.JOIN $Name$", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE.LENGTH $CurrentLength$ $MinLength$" })
+	@Localized({ "CRAZYLOGIN.LOGIN.FAILED", "CRAZYLOGIN.KICKED.LOGINFAIL $Fails$", "CRAZYLOGIN.REGISTER.HEADER", "CRAZYLOGIN.LOGIN.FAILEDWARN $Name$ $IP$ $AttemptPerIP$ $AttemptPerAccount$", "CRAZYLOGIN.LOGIN.SUCCESS", "CRAZYLOGIN.LOGIN.FAILINFO $Fails$", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE", "CRAZYLOGIN.LOGIN.PASSWORDREQUIRECHANGE.LENGTH $CurrentLength$ $MinLength$" })
 	public void playerLogin(final Player player, final String password) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1976,7 +1976,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	@Localized({ "CRAZYLOGIN.LOGOUT.SUCCESS", "CRAZYLOGIN.BROADCAST.QUIT $Name$", "CRAZYLOGIN.BROADCAST.QUIT $Name$" })
+	@Localized({ "CRAZYLOGIN.LOGOUT.SUCCESS" })
 	public void playerLogout(final Player player) throws CrazyCommandException
 	{
 		if (database == null)
@@ -1993,13 +1993,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerAutoLogouts.remove(player);
 		player.kickPlayer(locale.getFormatedLocaleMessage(player, "LOGOUT.SUCCESS"));
 		if (delayJoinQuitMessages)
-			ChatHelper.sendMessage(Bukkit.getOnlinePlayers(), "", locale.getLanguageEntry("BROADCAST.QUIT"), player.getName());
+			playerListener.sendDefaultPlayerQuitMessage(player);
 		logger.log("Logout", player.getName() + " @ " + player.getAddress().getAddress().getHostAddress() + " logged out.");
 	}
 
 	@Override
 	@Permission({ "crazylogin.requirepassword", "crazylogin.ensureregistration" })
-	@Localized({ "CRAZYLOGIN.PASSWORDDELETE.SUCCESS", "CRAZYLOGIN.PASSWORDCHANGE.SUCCESS $Password$", "CRAZYLOGIN.BROADCAST.JOIN $Name$" })
+	@Localized({ "CRAZYLOGIN.PASSWORDDELETE.SUCCESS", "CRAZYLOGIN.PASSWORDCHANGE.SUCCESS $Password$" })
 	public void playerPassword(final Player player, final String password) throws CrazyException
 	{
 		if (disableRegistrations)

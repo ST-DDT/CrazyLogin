@@ -215,7 +215,7 @@ public class PlayerListener implements Listener
 	}
 
 	@Localized("CRAZYLOGIN.BROADCAST.QUIT $Name$ $IP$ $Group$ $Prefix$ $Suffix$")
-	private void sendDefaultPlayerQuitMessage(final Player player)
+	public void sendDefaultPlayerQuitMessage(final Player player)
 	{
 		final String ip = player.getAddress().getAddress().getHostAddress();
 		final String group = PermissionModule.getGroup(player);
