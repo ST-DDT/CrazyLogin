@@ -261,7 +261,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 						names.add(data.getName());
 				return names;
 			}
-		};
+		}.register();
 		new PreSetList("login_notverified")
 		{
 
@@ -274,7 +274,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 						names.add(data.getName());
 				return names;
 			}
-		};
+		}.register();
 		new PreSetList("login_guest")
 		{
 
@@ -287,7 +287,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 						names.add(player.getName());
 				return names;
 			}
-		};
+		}.register();
 	}
 
 	@Localized("CRAZYLOGIN.MODE.CHANGE $Name$ $Value$")
