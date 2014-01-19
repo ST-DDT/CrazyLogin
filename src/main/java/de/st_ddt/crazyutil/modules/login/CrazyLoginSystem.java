@@ -4,11 +4,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
-import de.st_ddt.crazyutil.modules.Module.Named;
-import de.st_ddt.crazyutil.modules.Module.PluginDepency;
 
-@Named(name = "CrazyLogin")
-@PluginDepency(depend = "CrazyLogin")
 public class CrazyLoginSystem implements LoginSystem
 {
 

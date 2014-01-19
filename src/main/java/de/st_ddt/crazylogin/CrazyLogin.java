@@ -229,7 +229,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		EncryptHelper.registerAlgorithm("WebCrypt", WebCrypt.class);
 		EncryptHelper.registerAlgorithm("Whirlpool", WhirlPoolCrypt.class);
 		// LoginSystem
-		LoginModule.LOGINSYSTEMS.add(0, CrazyLoginSystem.class);
+		LoginModule.registerLoginSystem(CrazyLoginSystem.class);
+		LoginModule.clear();
 	}
 
 	public static CrazyLogin getPlugin()
