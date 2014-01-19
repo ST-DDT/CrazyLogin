@@ -431,8 +431,9 @@ public class LoginPlayerData extends PlayerData<LoginPlayerData> implements Conf
 				return Integer.toString(loginFails);
 			case 8:
 				return Boolean.toString(passwordExpired);
+			default:
+				return "";
 		}
-		return "";
 	}
 
 	@Override

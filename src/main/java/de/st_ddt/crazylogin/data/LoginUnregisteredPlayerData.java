@@ -158,8 +158,9 @@ public final class LoginUnregisteredPlayerData extends PlayerData<LoginUnregiste
 				return isOnline() ? ChatColor.YELLOW.toString() : ChatColor.WHITE.toString();
 			case 6:
 				return ChatColor.DARK_GREEN.toString();
+			default:
+				return "";
 		}
-		return "";
 	}
 
 	@Override
