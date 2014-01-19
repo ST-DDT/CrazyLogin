@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<prerequisites>
+		<maven>2.2.1</maven>
+	</prerequisites>
+
+	<groupId>de.st_ddt.crazy</groupId>
+	<artifactId>CrazyLogin</artifactId>
+	<version>7.22-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>CrazyLogin</name>
+	<url>http://dev.bukkit.org/bukkit-plugins/crazylogin/</url>
+	<description>CrazyLogin Plugin for additional security on Bukkit Servers.</description>
+	<inceptionYear>2010</inceptionYear>
+
+	<organization>
+		<name>Crazy</name>
+		<url>http://dev.bukkit.org/bukkit-plugins/crazycore/</url>
+	</organization>
+
+	<properties>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<crazycore.version>10.8-SNAPSHOT</crazycore.version>
+		<crazyapi_login.version>7.22</crazyapi_login.version>
+	</properties>
+
+	<dependencies>
+		<!-- Bukkit -->
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>bukkit</artifactId>
+			<version>1.6.4-R1.0</version>
+		</dependency>
+		<!-- Crazy -->
+		<dependency>
+			<groupId>de.st_ddt.crazy</groupId>
+			<artifactId>CrazyCore</artifactId>
+			<version>${crazycore.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.st_ddt.crazy</groupId>
+			<artifactId>CrazyAPI_Login</artifactId>
+			<version>${crazyapi_login.version}</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<!-- Bukkit -->
+		<repository>
+			<id>bukkit-repo</id>
+			<url>http://repo.bukkit.org/content/groups/public</url>
+		</repository>
+	</repositories>
+
+	<scm>
+		<url>https://github.com/st-ddt/CrazyCore</url>
+		<connection>scm:git:git://github.com/st-ddt/CrazyCore.git</connection>
+		<developerConnection>scm:git:git://github.com/st-ddt/CrazyCore.git</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>BukkitDev</system>
+		<url>http://dev.bukkit.org/bukkit-plugins/crazycore/create-ticket/</url>
+	</issueManagement>
+
+	<build>
+		<resources>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>false</filtering>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>plugin.yml</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>plugin.yml</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<artifactSet>
+						<includes>
+							<include>de.st_ddt.crazy:CrazyAPI_Login</include>
+						</includes>
+					</artifactSet>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
