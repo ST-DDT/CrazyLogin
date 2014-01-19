@@ -1,7 +1,6 @@
 package de.st_ddt.crazylogin.databases;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -58,11 +57,9 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 		final Connection connection = connectionPool.getConnection();
 		if (connection == null)
 			return;
-		Statement query = null;
 		final String sql = "UPDATE `" + tableName + "` SET " + entry.saveToMySQLDatabaseLight(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
-		try
+		try (Statement query = connection.createStatement())
 		{
-			query = connection.createStatement();
 			if (query.executeUpdate(sql) == 0)
 			{
 				datas.remove(entry.getName().toLowerCase());
@@ -78,13 +75,6 @@ public final class CrazyLoginMySQLDatabase extends MySQLPlayerDataDatabase<Login
 		}
 		finally
 		{
-			if (query != null)
-				try
-				{
-					query.close();
-				}
-				catch (final SQLException e)
-				{}
 			connectionPool.releaseConnection(connection);
 		}
 	}

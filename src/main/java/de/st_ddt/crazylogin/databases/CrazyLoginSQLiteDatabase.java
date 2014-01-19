@@ -58,10 +58,8 @@ public final class CrazyLoginSQLiteDatabase extends SQLitePlayerDataDatabase<Log
 		final Connection connection = connectionPool.getConnection();
 		if (connection == null)
 			return;
-		Statement query = null;
-		try
+		try (Statement query = connection.createStatement())
 		{
-			query = connection.createStatement();
 			final String sql = "UPDATE `" + tableName + "` SET " + entry.saveToMySQLDatabaseLight(columnNames) + " WHERE " + columnNames[0] + "='" + entry.getName() + "'";
 			if (query.executeUpdate(sql) == 0)
 			{
@@ -77,13 +75,6 @@ public final class CrazyLoginSQLiteDatabase extends SQLitePlayerDataDatabase<Log
 		}
 		finally
 		{
-			if (query != null)
-				try
-				{
-					query.close();
-				}
-				catch (final SQLException e)
-				{}
 			connectionPool.releaseConnection(connection);
 		}
 	}
