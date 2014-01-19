@@ -1,9 +1,9 @@
 # CrazyLogin config.yml
 # For more information visit
-# https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/config.yml
+# https://github.com/ST-DDT/CrazyLogin/blob/master/src/main/resources/config.yml
 version: X.Y
 # required plugins +version can be found there
-# https://github.com/ST-DDT/Crazy/blob/master/CrazyLogin/src/plugin.yml
+# https://github.com/ST-DDT/CrazyLogin/blob/master/src/main/resources/plugin.yml
 # the chat header used ingame (this cannot be changed via any kind of reload)
 chatHeader: '&C[&ACrazyLogin&C] &F'
 database:
@@ -25,7 +25,7 @@ database:
 # path relativ to PluginFolder for the flat database.
     filePath: accounts.db
 # MYSQL Database options
-# additional information about MYSQL can be fould here http://dev.bukkit.org/server-mods/crazycore/pages/mys-ql/
+# additional information about MYSQL can be fould here http://dev.bukkit.org/bukkit-plugins/crazycore/pages/mys-ql/
   MYSQL:
     connection:
       host: localhost
@@ -90,13 +90,15 @@ autoKickUnregistered: -1
 autoKickLoginFailer: 3
 # when enabled you are banned for x seconds for failing to login (-1=disabled)
 autoTempBanLoginFailer: -1
-# when enabled you are kicked when using a none whitelisted command (true/false)
+# when enabled you are kicked when using a none whitelisted command x times. (-1=disabled)
 autoKickCommandUsers: false
-# when enabled you cannot execute a command without having registered (works with autoKickCommandUsers) (true/false)
+# when enabled you are banned for x seconds for executing none whitelisted commands. (-1=disabled)
+autoTempBanCommandUsers:
+# when enabled you cannot execute a command without having registered. (works with autoKickCommandUsers) (true/false)
 blockGuestCommands: true
-# when enabled you cannot chat without having registered (true/false)
+# when enabled you cannot chat without having registered. (true/false)
 blockGuestChat: false
-# when enabled you cannot join without having registered (use with mysql databases) (true/false)
+# when enabled you cannot join without having registered an account (use with mysql databases) (true/false)
 blockGuestJoin: false
 # guest data are removed when leaving the server 
 # this include all CrazyPlugins, playerfile (if enabled), +more (if commands are setup)
@@ -112,6 +114,10 @@ disableTokenLogin: false
 doNotSpamAuthRequests: false
 # only ask the player once to create a password (if alwaysNeedPassword=false) (true/false)
 doNotSpamRegisterRequests: false
+# auth request are delayed for x ticks to prevent it from being displaced by other messages.
+delayAuthRequests: 0
+# repeat requests every x ticks to prevent it from being displaced by other messages.
+repeatAuthRequests: 200
 # these commands can be executed as guest (even if blockGuestCommands is enabled) or when not logged in
 commandWhitelist:
 - /l(ogin)?(\z| .*)
@@ -123,9 +129,10 @@ commandWhitelist:
 # the encryption alogrithm used to encrypt your passwords. http://dev.bukkit.org/server-mods/crazylogin/pages/encryption/
 encryptor:
   name: CrazyCrypt1
-# automatically delete accounts that haven't been used for x days(-1=disabled)
-# WARNING: deletes all data belonging to this player (including those saved in other plugins; equals "/crazycore player delete <Player>")
-autoDelete: -1
+# the minimum allowed password length.
+minPasswordLength: 3
+# the minimum allowed password length for players with permissions.
+protectedAccountMinPasswordLength: 7
 # block player join with an online players name (prevents Logged in from another location messages) (true/false)
 forceSingleSession: true
 # bypass forceSingleSession when using the same ip (true/false)
@@ -137,8 +144,10 @@ delayPreRegisterSecurity: 5
 # this is intended to allow customSpawns and joinRewards
 # WARNING: some hacked clients may be able to use that time to read the inventory/location
 delayPreLoginSecurity: false
-# when enabled you are teleported to spawn until login (true/false)
-# this fixes issues with AntiCheatPlugins whilte not logged in an being in mid air.
+# when enabled you are teleported to spawn until login if recieving damage. (true/false)
+saveLoginEnabled: true
+# when enabled you are teleported to spawn until login. (true/false)
+# this fixes issues with AntiCheatPlugins whilte not logged in and being in mid air.
 forceSaveLogin: false
 # custom saveLogin locations for each world
 saveLoginLocations: {}
@@ -163,10 +172,15 @@ useCustomJoinQuitMessages: true
 # hide Password from Console (Player issues command: /login Password) (true/false)
 # INFO: This could bypass some command protections/mechanics from other plugins in very rare cases.
 hidePasswordsFromConsole: false
+# maximum count of ips stored per player
+maxStoredIPs: 5
 # maximum players allowed to play on your server at once
 maxOnlinesPerIP: 3
 # maximum players allowed to register an account using the same ip on your server
 maxRegistrationsPerIP: 3
+# automatically delete accounts that haven't been used for x days(-1=disabled)
+# WARNING: deletes all data belonging to this player (including those saved in other plugins; equals "/crazycore player delete <Player>")
+autoDelete: -1
 # call special events (do not enable it, if you don't need it)
 # send raw passwords to other plugins when changing passwords
 pluginCommunicationEnabled: false
