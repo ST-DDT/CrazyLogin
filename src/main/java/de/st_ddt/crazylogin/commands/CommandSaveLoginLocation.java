@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazyplugin.exceptions.CrazyCommandException;
@@ -32,7 +33,7 @@ public class CommandSaveLoginLocation extends CommandExecutor
 	public void command(final CommandSender sender, final String[] args) throws CrazyException
 	{
 		if (args.length == 0)
-			throw new CrazyCommandUsageException("<World/*> [Location]");
+			throw new CrazyCommandUsageException("<World/*>", "<World/*> <World> [<X> <Y> <Z>]", "<World/*> here");
 		final World world;
 		if (args[0].equals("*"))
 			world = null;
@@ -61,10 +62,15 @@ public class CommandSaveLoginLocation extends CommandExecutor
 			final Location location;
 			if (args.length == 2)
 			{
-				final World w = Bukkit.getWorld(args[1]);
-				if (w == null)
-					throw new CrazyCommandNoSuchException("World", args[1], WorldParamitrisable.tabHelp(args[1]));
-				location = owner.getSaveLoginLocation(w);
+				if (args[1].equalsIgnoreCase("here") && sender instanceof Player)
+					location = ((Player) sender).getLocation();
+				else
+				{
+					final World w = Bukkit.getWorld(args[1]);
+					if (w == null)
+						throw new CrazyCommandNoSuchException("World", args[1], WorldParamitrisable.tabHelp(args[1]));
+					location = owner.getSaveLoginLocation(w);
+				}
 			}
 			else
 				try
@@ -77,7 +83,7 @@ public class CommandSaveLoginLocation extends CommandExecutor
 					throw e;
 				}
 			if (location.getWorld() == null)
-				throw new CrazyCommandUsageException("<World/*> <World> [<X> <Y> <Z>]");
+				throw new CrazyCommandUsageException("<World/*> <World> [<X> <Y> <Z>]", "<World/*> here");
 			if (world == null)
 			{
 				for (final World w : Bukkit.getWorlds())
