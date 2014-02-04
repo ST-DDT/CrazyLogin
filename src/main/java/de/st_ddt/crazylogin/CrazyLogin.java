@@ -114,7 +114,7 @@ import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.ListOptionsModder;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.PreSetList;
-import de.st_ddt.crazyutil.VersionComparator;
+import de.st_ddt.crazyutil.VersionHelper;
 import de.st_ddt.crazyutil.databases.DatabaseType;
 import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
@@ -1426,12 +1426,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private void registerHooks()
 	{
 		this.playerListener = new PlayerListener(this);
-		final String mcVersion = ChatHelper.getMinecraftVersion();
-		if (VersionComparator.compareVersions(mcVersion, "1.4.7") == 1)
+		if (VersionHelper.hasRequiredVersion("1.4.7"))
 			this.dynamicPlayerListener = new DynamicPlayerListener_1_5(this, playerListener);
-		else if (VersionComparator.compareVersions(mcVersion, "1.3.2") == 1)
+		else if (VersionHelper.hasRequiredVersion("1.3.2"))
 			this.dynamicPlayerListener = new DynamicPlayerListener_1_4_2(this, playerListener);
-		else if (VersionComparator.compareVersions(mcVersion, "1.2.5") == 1)
+		else if (VersionHelper.hasRequiredVersion("1.2.5"))
 			this.dynamicPlayerListener = new DynamicPlayerListener_1_3_2(this, playerListener);
 		else
 			this.dynamicPlayerListener = new DynamicPlayerListener_1_2_5(this, playerListener);
