@@ -2108,7 +2108,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				fails = 1;
 			else
 				fails++;
-			if (fails % autoKickCommandUsers == 0)
+			if (autoKickCommandUsers > 0 && fails % autoKickCommandUsers == 0)
 			{
 				logger.log("CommandBlocked", player.getName() + " @ " + IP + " has been kicked for trying to illegaly execute a command", command, "(AttemptPerIP: " + fails + ")");
 				player.kickPlayer(locale.getFormatedLocaleMessage(player, "KICKED.COMMANDUSAGE"));
