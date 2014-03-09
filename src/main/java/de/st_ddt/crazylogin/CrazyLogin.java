@@ -2096,7 +2096,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		else if (!blockGuestCommands)
 			return true;
-		final String lowerCommand = command;
+		final String lowerCommand = command.toLowerCase();
 		if (lowerCommand.startsWith("/"))
 		{
 			for (final String whiteCommand : commandWhiteList)
