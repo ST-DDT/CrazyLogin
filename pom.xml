@@ -8,7 +8,7 @@
 
 	<groupId>de.st_ddt.crazy</groupId>
 	<artifactId>CrazyLogin</artifactId>
-	<version>7.22-SNAPSHOT</version>
+	<version>7.23</version>
 	<packaging>jar</packaging>
 
 	<name>CrazyLogin</name>
@@ -25,7 +25,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<crazycore.version>10.8-SNAPSHOT</crazycore.version>
-		<crazyapi_login.version>7.22</crazyapi_login.version>
+		<crazyapi_login.version>7.23</crazyapi_login.version>
 	</properties>
 
 	<dependencies>
