@@ -1072,14 +1072,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				return autoDelete;
 			}
 
-			@SuppressWarnings("deprecation")
 			@Override
 			public void setValue(final Integer newValue) throws CrazyException
 			{
 				autoDelete = Math.max(newValue, -1);
 				saveConfiguration();
 				if (autoDelete != -1)
-					getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new DropInactiveAccountsTask(CrazyLogin.this), 20 * 60 * 60, 20 * 60 * 60 * 6);
+					getServer().getScheduler().runTaskTimerAsynchronously(plugin, new DropInactiveAccountsTask(CrazyLogin.this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 			}
 		});
 		modeCommand.addMode(new DoubleMode(this, "moveRange")
@@ -1386,16 +1385,17 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerDataSorters.put("time", lastAction);
 	}
 
-	private void registerCommands()
+	@Override
+	protected void registerCommands()
 	{
 		final CommandExecutor passwordCommand = new CommandPassword(this);
-		getCommand("login").setExecutor(new CommandLogin(this));
-		getCommand("loginonce").setExecutor(new CommandLoginWithAutoLogout(this));
-		getCommand("adminlogin").setExecutor(new CommandAdminLogin(this, playerListener));
-		getCommand("tokenlogin").setExecutor(new CommandTokenLogin(this, playerListener));
-		getCommand("autologout").setExecutor(new CommandAutoLogout(this));
-		getCommand("logout").setExecutor(new CommandLogout(this));
-		getCommand("register").setExecutor(passwordCommand);
+		registerCommand("login", new CommandLogin(this));
+		registerCommand("loginonce", new CommandLoginWithAutoLogout(this));
+		registerCommand("adminlogin", new CommandAdminLogin(this, playerListener));
+		registerCommand("tokenlogin", new CommandTokenLogin(this, playerListener));
+		registerCommand("autologout", new CommandAutoLogout(this));
+		registerCommand("logout", new CommandLogout(this));
+		registerCommand("register", passwordCommand);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, playerCommand), "p", "plr", "player", "players", "account", "accounts");
 		mainCommand.addSubCommand(passwordCommand, "pw", "password");
 		mainCommand.addSubCommand(new CommandMainGenerateToken(this), "generatetoken");
@@ -1423,7 +1423,8 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerCommand.addSubCommand(checkPassword, "chkpw", "checkpw", "checkpassword");
 	}
 
-	private void registerHooks()
+	@Override
+	protected void registerHooks()
 	{
 		this.playerListener = new PlayerListener(this);
 		if (VersionHelper.hasRequiredVersion("1.4.7"))
@@ -1579,21 +1580,18 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	public void onLoad()
+	protected void initialize()
 	{
 		LoginPlugin.LOGINPLUGINPROVIDER.setPlugin(this);
 		plugin = this;
-		super.onLoad();
+		super.initialize();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public void onEnable()
+	protected void enable()
 	{
-		registerHooks();
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new ScheduledCheckTask(this), 30 * 60 * 20, 15 * 60 * 20);
-		super.onEnable();
-		registerCommands();
+		super.enable();
+		getServer().getScheduler().runTaskTimerAsynchronously(this, new ScheduledCheckTask(this), 30 * 60 * 20, 15 * 60 * 20);
 		registerMetrics();
 		// OnlinePlayer
 		for (final Player player : Bukkit.getOnlinePlayers())
@@ -1604,20 +1602,18 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	public void onDisable()
+	protected void disable()
 	{
 		// OnlinePlayer
 		for (final Player player : Bukkit.getOnlinePlayers())
 			playerListener.PlayerQuit2(player);
-		super.onDisable();
+		super.disable();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public void loadConfiguration()
+	public void loadConfiguration(final ConfigurationSection config)
 	{
-		super.loadConfiguration();
-		final ConfigurationSection config = getConfig();
+		super.loadConfiguration(config);
 		autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		confirmNewPassword = config.getBoolean("confirmNewPassword", config.getBoolean("confirmPassowrd", false));
@@ -1673,7 +1669,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
 		if (autoDelete != -1)
-			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
+			getServer().getScheduler().runTaskTimerAsynchronously(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		moveRange = config.getDouble("moveRange", 5);
 		playerListener.clearMovementBlocker(false);
 		filterNames = config.getString("filterNames", "true");
@@ -1696,8 +1692,12 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		minPasswordLength = config.getInt("minPasswordLength", 3);
 		protectedAccountMinPasswordLength = config.getInt("protectedAccountMinPasswordLength", 7);
-		// Logger
-		logger.createLogChannels(config.getConfigurationSection("logs"), "Join", "Quit", "Login", "Account", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied");
+	}
+
+	@Override
+	protected String[] getLogChannels()
+	{
+		return new String[] { "Join", "Quit", "Login", "Account", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied" };
 	}
 
 	public void loadConfigurationForWorld(final World world)
@@ -1713,13 +1713,11 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	@Permission("crazylogin.warndatabase")
 	@Localized({ "CRAZYLOGIN.DATABASE.ACCESSWARN $SaveType$", "CRAZYLOGIN.DATABASE.LOADED $EntryCount$" })
-	public void loadDatabase()
+	protected void loadDatabase(final ConfigurationSection config)
 	{
-		final ConfigurationSection config = getConfig();
 		final String saveType = config.getString("database.saveType", "FLAT").toUpperCase();
 		DatabaseType type = null;
 		try
@@ -1752,7 +1750,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (database == null)
 		{
 			broadcastLocaleMessage(true, "crazylogin.warndatabase", "DATABASE.ACCESSWARN", saveType);
-			Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable()
+			getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable()
 			{
 
 				@Override
@@ -1764,25 +1762,13 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			}, 600, 600);
 		}
 		else
-		{
-			dropInactiveAccounts();
 			sendLocaleMessage("DATABASE.LOADED", Bukkit.getConsoleSender(), database.size());
-		}
 	}
 
 	@Override
-	public void saveDatabase()
+	protected void saveConfiguration(final ConfigurationSection config)
 	{
-		dropInactiveAccounts();
-		super.saveDatabase();
-	}
-
-	@Override
-	public void saveConfiguration()
-	{
-		final ConfigurationSection config = getConfig();
-		if (database != null)
-			database.save(config, "database.");
+		super.saveConfiguration(config);
 		config.set("encryptor", null);
 		encryptor.save(config, "encryptor.");
 		config.set("minPasswordLength", minPasswordLength);
@@ -1841,7 +1827,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("blockDifferentNameCases", blockDifferentNameCases);
 		config.set("minNameLength", minNameLength);
 		config.set("maxNameLength", maxNameLength);
-		super.saveConfiguration();
 	}
 
 	public int dropInactiveAccounts()
