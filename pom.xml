@@ -116,6 +116,15 @@
 					</artifactSet>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<finalName>${project.name}</finalName>
+					<outputDirectory>.</outputDirectory>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
