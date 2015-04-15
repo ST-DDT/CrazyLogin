@@ -8,7 +8,7 @@
 
 	<groupId>de.st_ddt.crazy</groupId>
 	<artifactId>CrazyLogin</artifactId>
-	<version>7.23</version>
+	<version>7.23.1</version>
 	<packaging>jar</packaging>
 
 	<name>CrazyLogin</name>

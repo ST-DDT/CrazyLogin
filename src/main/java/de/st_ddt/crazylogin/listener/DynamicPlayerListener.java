@@ -6,7 +6,9 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Location;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -255,12 +257,26 @@ public class DynamicPlayerListener implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void PlayerDamageDeal(final EntityDamageByEntityEvent event)
 	{
-		if (!(event.getDamager() instanceof Player))
+		final Player player = getDamager(event.getDamager());
+		if (player == null) {
 			return;
-		final Player player = (Player) event.getDamager();
+		}
 		if (plugin.isLoggedInPlus(player))
 			return;
 		event.setCancelled(true);
+	}
+
+	private Player getDamager(Entity entity) {
+		if (entity == null){
+			return null;
+		} else
+		if (entity instanceof Player) {
+			return (Player) entity;
+		} else if (entity instanceof Projectile) {
+			return getDamager(((Projectile) entity).getShooter());
+		} else {
+			return null;
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
