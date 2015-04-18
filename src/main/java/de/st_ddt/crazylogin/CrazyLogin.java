@@ -1593,12 +1593,6 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		super.enable();
 		getServer().getScheduler().runTaskTimerAsynchronously(this, new ScheduledCheckTask(this), 30 * 60 * 20, 15 * 60 * 20);
 		registerMetrics();
-		// OnlinePlayer
-		for (final Player player : Bukkit.getOnlinePlayers())
-		{
-			playerListener.PlayerJoin(player);
-			messageListener.sendPluginMessage(player, "A_State " + (hasPlayerData(player) ? "1" : "0") + " 0");
-		}
 	}
 
 	@Override
@@ -1747,22 +1741,25 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 				e.printStackTrace();
 				database = null;
 			}
-		if (database == null)
-		{
+		if (database == null) {
 			broadcastLocaleMessage(true, "crazylogin.warndatabase", "DATABASE.ACCESSWARN", saveType);
-			getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable()
-			{
+			getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
 
 				@Override
-				public void run()
-				{
+				public void run() {
 					if (database == null)
 						broadcastLocaleMessage(true, "crazylogin.warndatabase", "DATABASE.ACCESSWARN", saveType);
 				}
 			}, 600, 600);
 		}
-		else
+		else {
 			sendLocaleMessage("DATABASE.LOADED", Bukkit.getConsoleSender(), database.size());
+		}
+		// OnlinePlayer
+		for (final Player player : Bukkit.getOnlinePlayers()) {
+			playerListener.PlayerJoin(player);
+			messageListener.sendPluginMessage(player, "A_State " + (hasPlayerData(player) ? "1" : "0") + " 0");
+		}
 	}
 
 	@Override
