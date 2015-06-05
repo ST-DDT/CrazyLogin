@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -105,18 +106,42 @@ public class PlayerListener implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	@Permission("crazylogin.warnsession")
 	@Localized({ "CRAZYLOGIN.KICKED.SESSION.DUPLICATE", "CRAZYLOGIN.SESSION.DUPLICATEWARN $Name$ $IP$" })
-	public void PlayerLoginSessionCheck(final PlayerLoginEvent event)
-	{
-		final Player player = event.getPlayer();
-		if (plugin.isForceSingleSessionEnabled())
-			if (player.isOnline())
-			{
-				if (plugin.isForceSingleSessionSameIPBypassEnabled())
-				{
+	public void PlayerLoginSessionCheck(final AsyncPlayerPreLoginEvent event) {
+		if (plugin.isForceSingleSessionEnabled()) {
+			final Player player = Bukkit.getPlayerExact(event.getName());
+			if (player != null) {
+				if (plugin.isForceSingleSessionSameIPBypassEnabled()) {
 					final LoginPlayerData data = plugin.getPlayerData(player);
-					if (data != null)
-						if (event.getAddress().getHostAddress().equals(data.getLatestIP()))
+					if (data != null) {
+						if (event.getAddress().getHostAddress().equals(data.getLatestIP())) {
 							return;
+						}
+					}
+				}
+				event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
+				event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "KICKED.SESSION.DUPLICATE"));
+				plugin.broadcastLocaleMessage(true, "crazylogin.warnsession", true, "SESSION.DUPLICATEWARN", player.getName(), event.getAddress().getHostAddress());
+				plugin.sendLocaleMessage("SESSION.DUPLICATEWARN", player, event.getAddress().getHostAddress(), player.getName());
+				plugin.getCrazyLogger().log("AccessDenied", "Denied access for player " + player.getName() + " @ " + event.getAddress().getHostAddress() + " because of a player with this name being already online");
+				return;
+			}
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+	@Permission("crazylogin.warnsession")
+	@Localized({ "CRAZYLOGIN.KICKED.SESSION.DUPLICATE", "CRAZYLOGIN.SESSION.DUPLICATEWARN $Name$ $IP$" })
+	public void PlayerLoginSessionCheck(final PlayerLoginEvent event) {
+		if (plugin.isForceSingleSessionEnabled()) {
+			final Player player = event.getPlayer();
+			if (player != null && player.isOnline()) {
+				if (plugin.isForceSingleSessionSameIPBypassEnabled()) {
+					final LoginPlayerData data = plugin.getPlayerData(player);
+					if (data != null) {
+						if (event.getAddress().getHostAddress().equals(data.getLatestIP())) {
+							return;
+						}
+					}
 				}
 				event.setResult(Result.KICK_OTHER);
 				event.setKickMessage(plugin.getLocale().getLocaleMessage(player, "KICKED.SESSION.DUPLICATE"));
@@ -125,6 +150,7 @@ public class PlayerListener implements Listener
 				plugin.getCrazyLogger().log("AccessDenied", "Denied access for player " + player.getName() + " @ " + event.getAddress().getHostAddress() + " because of a player with this name being already online");
 				return;
 			}
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
