@@ -16,6 +16,7 @@ import de.st_ddt.crazyutil.source.Permission;
 public class CommandMainCommands extends CrazyCommandListEditor<CrazyLogin, String>
 {
 
+	private final CrazyLogin owner;
 	private final ListFormat format = new ListFormat()
 	{
 
@@ -42,6 +43,7 @@ public class CommandMainCommands extends CrazyCommandListEditor<CrazyLogin, Stri
 	public CommandMainCommands(final CrazyLogin plugin)
 	{
 		super(plugin, true, false, true);
+		this.owner = plugin;
 	}
 
 	@Override

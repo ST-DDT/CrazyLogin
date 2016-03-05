@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -86,8 +87,6 @@ import de.st_ddt.crazylogin.exceptions.PasswordRejectedException;
 import de.st_ddt.crazylogin.exceptions.PasswordRejectedLengthException;
 import de.st_ddt.crazylogin.listener.CrazyListener;
 import de.st_ddt.crazylogin.listener.DynamicPlayerListener;
-import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_2_5;
-import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_3_2;
 import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_4_2;
 import de.st_ddt.crazylogin.listener.DynamicPlayerListener_1_5;
 import de.st_ddt.crazylogin.listener.DynamicVehicleListener;
@@ -97,6 +96,7 @@ import de.st_ddt.crazylogin.listener.WorldListener;
 import de.st_ddt.crazylogin.metadata.Authenticated;
 import de.st_ddt.crazylogin.tasks.DropInactiveAccountsTask;
 import de.st_ddt.crazylogin.tasks.ScheduledCheckTask;
+import de.st_ddt.crazylogin.util.temp.VersionHelper;
 import de.st_ddt.crazyplugin.CrazyPlayerDataPlugin;
 import de.st_ddt.crazyplugin.data.PlayerDataFilter;
 import de.st_ddt.crazyplugin.data.PlayerDataNameFilter;
@@ -114,7 +114,6 @@ import de.st_ddt.crazyutil.ChatHelperExtended;
 import de.st_ddt.crazyutil.ListOptionsModder;
 import de.st_ddt.crazyutil.ObjectSaveLoadHelper;
 import de.st_ddt.crazyutil.PreSetList;
-import de.st_ddt.crazyutil.VersionHelper;
 import de.st_ddt.crazyutil.databases.DatabaseType;
 import de.st_ddt.crazyutil.databases.PlayerDataDatabase;
 import de.st_ddt.crazyutil.locales.CrazyLocale;
@@ -261,7 +260,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 						names.add(data.getName());
 				return names;
 			}
-		}.register();
+		};
 		new PreSetList("login_notverified")
 		{
 
@@ -274,7 +273,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 						names.add(data.getName());
 				return names;
 			}
-		}.register();
+		};
 		new PreSetList("login_guest")
 		{
 
@@ -287,7 +286,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 						names.add(player.getName());
 				return names;
 			}
-		}.register();
+		};
 	}
 
 	@Localized("CRAZYLOGIN.MODE.CHANGE $Name$ $Value$")
@@ -1385,17 +1384,16 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerDataSorters.put("time", lastAction);
 	}
 
-	@Override
 	protected void registerCommands()
 	{
 		final CommandExecutor passwordCommand = new CommandPassword(this);
-		registerCommand("login", new CommandLogin(this));
-		registerCommand("loginonce", new CommandLoginWithAutoLogout(this));
-		registerCommand("adminlogin", new CommandAdminLogin(this, playerListener));
-		registerCommand("tokenlogin", new CommandTokenLogin(this, playerListener));
-		registerCommand("autologout", new CommandAutoLogout(this));
-		registerCommand("logout", new CommandLogout(this));
-		registerCommand("register", passwordCommand);
+		registerCommand2("login", new CommandLogin(this));
+		registerCommand2("loginonce", new CommandLoginWithAutoLogout(this));
+		registerCommand2("adminlogin", new CommandAdminLogin(this, playerListener));
+		registerCommand2("tokenlogin", new CommandTokenLogin(this, playerListener));
+		registerCommand2("autologout", new CommandAutoLogout(this));
+		registerCommand2("logout", new CommandLogout(this));
+		registerCommand2("register", passwordCommand);
 		mainCommand.addSubCommand(new CrazyCommandLoginCheck(this, playerCommand), "p", "plr", "player", "players", "account", "accounts");
 		mainCommand.addSubCommand(passwordCommand, "pw", "password");
 		mainCommand.addSubCommand(new CommandMainGenerateToken(this), "generatetoken");
@@ -1422,19 +1420,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		playerCommand.addSubCommand(expire, "expire");
 		playerCommand.addSubCommand(checkPassword, "chkpw", "checkpw", "checkpassword");
 	}
+	
 
-	@Override
+	public final void registerCommand2(final String commandName, final CommandExecutor commandExecutor)
+	{
+		final PluginCommand command = getCommand(commandName);
+		if (command != null)
+			command.setExecutor(commandExecutor);
+	}
+
 	protected void registerHooks()
 	{
 		this.playerListener = new PlayerListener(this);
 		if (VersionHelper.hasRequiredVersion("1.4.7"))
 			this.dynamicPlayerListener = new DynamicPlayerListener_1_5(this, playerListener);
-		else if (VersionHelper.hasRequiredVersion("1.3.2"))
-			this.dynamicPlayerListener = new DynamicPlayerListener_1_4_2(this, playerListener);
-		else if (VersionHelper.hasRequiredVersion("1.2.5"))
-			this.dynamicPlayerListener = new DynamicPlayerListener_1_3_2(this, playerListener);
 		else
-			this.dynamicPlayerListener = new DynamicPlayerListener_1_2_5(this, playerListener);
+			this.dynamicPlayerListener = new DynamicPlayerListener_1_4_2(this, playerListener);
 		this.dynamicVehicleListener = new DynamicVehicleListener(this);
 		final CrazyListener crazylistener = new CrazyListener(this, playerListener);
 		final PluginManager pm = Bukkit.getPluginManager();
@@ -1580,34 +1581,37 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	protected void initialize()
+	public void onLoad()
 	{
 		LoginPlugin.LOGINPLUGINPROVIDER.setPlugin(this);
 		plugin = this;
-		super.initialize();
+		super.onLoad();
 	}
 
 	@Override
-	protected void enable()
+	public void onEnable()
 	{
-		super.enable();
+		registerHooks();
+		super.onEnable();
 		getServer().getScheduler().runTaskTimerAsynchronously(this, new ScheduledCheckTask(this), 30 * 60 * 20, 15 * 60 * 20);
 		registerMetrics();
+		registerCommands();
 	}
 
 	@Override
-	protected void disable()
+	public void onDisable()
 	{
 		// OnlinePlayer
 		for (final Player player : Bukkit.getOnlinePlayers())
 			playerListener.PlayerQuit2(player);
-		super.disable();
+		super.onDisable();
 	}
 
 	@Override
-	public void loadConfiguration(final ConfigurationSection config)
+	public void loadConfiguration()
 	{
-		super.loadConfiguration(config);
+		super.loadConfiguration();
+		ConfigurationSection config = getConfig();
 		autoLogout = config.getInt("autoLogout", 60 * 60);
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		confirmNewPassword = config.getBoolean("confirmNewPassword", config.getBoolean("confirmPassowrd", false));
@@ -1686,9 +1690,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 		minPasswordLength = config.getInt("minPasswordLength", 3);
 		protectedAccountMinPasswordLength = config.getInt("protectedAccountMinPasswordLength", 7);
+		 this.logger.createLogChannels(config.getConfigurationSection("logs"), getLogChannels());
 	}
 
-	@Override
 	protected String[] getLogChannels()
 	{
 		return new String[] { "Join", "Quit", "Login", "Account", "Logout", "LoginFail", "ChatBlocked", "CommandBlocked", "AccessDenied" };
@@ -1710,8 +1714,9 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	@Override
 	@Permission("crazylogin.warndatabase")
 	@Localized({ "CRAZYLOGIN.DATABASE.ACCESSWARN $SaveType$", "CRAZYLOGIN.DATABASE.LOADED $EntryCount$" })
-	protected void loadDatabase(final ConfigurationSection config)
+	public void loadDatabase()
 	{
+		ConfigurationSection config = getConfig();
 		final String saveType = config.getString("database.saveType", "FLAT").toUpperCase();
 		DatabaseType type = null;
 		try
@@ -1763,9 +1768,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	}
 
 	@Override
-	protected void saveConfiguration(final ConfigurationSection config)
+	public void saveConfiguration()
 	{
-		super.saveConfiguration(config);
+		super.saveConfiguration();
+		ConfigurationSection config = getConfig();
 		config.set("encryptor", null);
 		encryptor.save(config, "encryptor.");
 		config.set("minPasswordLength", minPasswordLength);

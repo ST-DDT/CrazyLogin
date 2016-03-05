@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.projectiles.ProjectileSource;
 
 import de.st_ddt.crazylogin.CrazyLogin;
 import de.st_ddt.crazylogin.data.LoginPlayerData;
@@ -273,7 +274,12 @@ public class DynamicPlayerListener implements Listener
 		if (entity instanceof Player) {
 			return (Player) entity;
 		} else if (entity instanceof Projectile) {
-			return getDamager(((Projectile) entity).getShooter());
+			final ProjectileSource source = ((Projectile) entity).getShooter();
+			if (source instanceof Entity) {
+				return getDamager((Entity) source);
+			} else {
+				return null;
+			}
 		} else {
 			return null;
 		}

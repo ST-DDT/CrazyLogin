@@ -12,9 +12,12 @@ import de.st_ddt.crazyutil.source.Localized;
 public class CommandPlayerDelete extends CrazyPlayerDataPluginCommandPlayerDelete<LoginData>
 {
 
+	protected final CrazyLogin owner;
+	
 	public CommandPlayerDelete(final CrazyLogin plugin)
 	{
 		super(plugin);
+		this.owner = plugin;
 	}
 
 	@Override
