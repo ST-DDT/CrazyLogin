@@ -1849,11 +1849,15 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		if (database == null)
 			return 0;
 		final LinkedList<String> deletions = new LinkedList<String>();
+		Set<String> onlineNames = new HashSet<String>();
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			onlineNames.add(p.getName());
+		}
 		synchronized (database.getDatabaseLock())
 		{
 			for (final LoginPlayerData data : database.getAllEntries())
 				if (data.getLastActionTime().before(limit))
-					if (!data.isOnline())
+					if (!onlineNames.contains(data.getName()))
 						deletions.add(data.getName());
 		}
 		for (final String name : deletions)
