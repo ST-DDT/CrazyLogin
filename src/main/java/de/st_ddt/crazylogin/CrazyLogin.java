@@ -200,6 +200,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private int minPasswordLength;
 	private int protectedAccountMinPasswordLength;
 	private int autoDelete;
+	private boolean broadcastPlayerDataRemoval;
 	private int maxStoredIPs;
 	private int maxOnlinesPerIP;
 	private int maxRegistrationsPerIP;
@@ -1080,6 +1081,22 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					getServer().getScheduler().runTaskTimerAsynchronously(plugin, new DropInactiveAccountsTask(CrazyLogin.this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 			}
 		});
+		modeCommand.addMode(new BooleanTrueMode(this, "broadcastPlayerDataRemoval")
+		{
+
+			@Override
+			public Boolean getValue()
+			{
+				return broadcastPlayerDataRemoval;
+			}
+
+			@Override
+			public void setValue(final Boolean newValue) throws CrazyException
+			{
+				broadcastPlayerDataRemoval = newValue == null ? true : false;
+				saveConfiguration();
+			}
+		});
 		modeCommand.addMode(new DoubleMode(this, "moveRange")
 		{
 
@@ -1666,6 +1683,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		maxOnlinesPerIP = config.getInt("maxOnlinesPerIP", 3);
 		maxRegistrationsPerIP = config.getInt("maxRegistrationsPerIP", 3);
 		autoDelete = Math.max(config.getInt("autoDelete", -1), -1);
+		broadcastPlayerDataRemoval = config.getBoolean("broadcastPlayerDataRemoval", true);
 		if (autoDelete != -1)
 			getServer().getScheduler().runTaskTimerAsynchronously(this, new DropInactiveAccountsTask(this), 20 * 60 * 60, 20 * 60 * 60 * 6);
 		moveRange = config.getDouble("moveRange", 5);
@@ -1818,6 +1836,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("useCustomJoinQuitMessages", useCustomJoinQuitMessages);
 		config.set("hidePasswordsFromConsole", hidePasswordsFromConsole);
 		config.set("autoDelete", autoDelete);
+		config.set("broadcastPlayerDataRemoval", broadcastPlayerDataRemoval);
 		config.set("maxStoredIPs", maxStoredIPs);
 		config.set("maxOnlinesPerIP", maxOnlinesPerIP);
 		config.set("maxRegistrationsPerIP", maxRegistrationsPerIP);
@@ -1860,8 +1879,21 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 					if (!onlineNames.contains(data.getName()))
 						deletions.add(data.getName());
 		}
-		for (final String name : deletions)
-			new CrazyPlayerRemoveEvent(name).checkAndCallEvent();
+		
+		if (broadcastPlayerDataRemoval) {
+			for (final String name : deletions)
+				new CrazyPlayerRemoveEvent(name).checkAndCallEvent();
+		} else {
+			Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+				
+				@Override
+				public void run() {
+					for (final String name : deletions)
+						deletePlayerData(name);
+				}
+			},1);
+			
+		}
 		return deletions.size();
 	}
 

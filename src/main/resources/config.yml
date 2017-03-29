@@ -181,6 +181,8 @@ maxRegistrationsPerIP: 3
 # automatically delete accounts that haven't been used for x days(-1=disabled)
 # WARNING: deletes all data belonging to this player (including those saved in other plugins; equals "/crazycore player delete <Player>")
 autoDelete: -1
+# Send an event if a player is automatically removed due to inactivity
+broadcastPlayerDataRemoval: true
 # call special events (do not enable it, if you don't need it)
 # send raw passwords to other plugins when changing passwords
 pluginCommunicationEnabled: false
