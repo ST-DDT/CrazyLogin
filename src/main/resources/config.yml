@@ -70,6 +70,10 @@ confirmNewPassword: false
 # if true you have to insert your old password if you want to change it.
 # Ex: /register <OldPassword> <NewPassword> {NewPassword}
 confirmWithOldPassword: false
+# These command list will be executed half a second after the player registered.
+# "{name}" will be replaced with the newly registered player name.
+# "{uuid}" will be replaced with the newly registered player uuid.
+afterRegistrationCommands: []
 # if true if everyone is logged in protection will be disabled to decrease overall performance usage, 
 # but increase join, login and quit performance 
 dynamicProtection: false

@@ -162,6 +162,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private boolean confirmNewPassword;
 	private boolean confirmWithOldPassword;
 	private boolean dynamicProtection;
+	private List<String> afterRegistrationCommands;
 	private boolean hideWarnings;
 	private int autoLogout;
 	private int autoKick;
@@ -1633,6 +1634,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		alwaysNeedPassword = config.getBoolean("alwaysNeedPassword", true);
 		confirmNewPassword = config.getBoolean("confirmNewPassword", config.getBoolean("confirmPassowrd", false));
 		confirmWithOldPassword = config.getBoolean("confirmWithOldPassword", false);
+		afterRegistrationCommands = config.getStringList("afterRegistrationCommands");
+		if (afterRegistrationCommands == null) {
+			afterRegistrationCommands = new ArrayList<String>();
+		}
 		dynamicProtection = config.getBoolean("dynamicProtection", false);
 		hideWarnings = config.getBoolean("hideWarnings", false);
 		autoKick = Math.max(config.getInt("autoKick", -1), -1);
@@ -1798,6 +1803,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		config.set("confirmNewPassword", confirmNewPassword);
 		config.set("confirmPassword", null);
 		config.set("confirmWithOldPassword", confirmWithOldPassword);
+		config.set("afterRegistrationCommands", afterRegistrationCommands);
 		config.set("dynamicProtection", dynamicProtection);
 		config.set("hideWarnings", hideWarnings);
 		config.set("autoLogout", autoLogout);
@@ -2063,6 +2069,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 			if (event.isCancelled())
 				throw new CrazyCommandPermissionException();
 			data = new LoginPlayerData(player);
+			
 			tempBans.remove(player.getAddress().getAddress().getHostAddress());
 			logger.log("Account", player.getName() + "@" + player.getAddress().getAddress().getHostAddress() + " registered successfully.");
 		}
@@ -2098,6 +2105,21 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		getCrazyDatabase().save(data);
 		player.setMetadata("Authenticated", new Authenticated(this, player));
 		unregisterDynamicHooks();
+		if (wasGuest) {
+			final String playerName = player.getName();
+			final String playerUUID = player.getUniqueId().toString();
+			Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+
+				@Override
+				public void run() {
+					for (String command : afterRegistrationCommands) {
+						String pCommand = command.replaceAll("\\{name\\}", playerName).replaceAll("\\{uuid\\}", playerUUID);
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), pCommand);
+					}
+
+				}
+			}, 10);
+		}
 	}
 
 	/**
