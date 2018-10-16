@@ -66,8 +66,8 @@ public class CommandPlayerCreate extends CommandExecutor
 		{
 			throw new CrazyCommandErrorException(e);
 		}
-		if (data.isOnline())
-			owner.getMessageListener().sendPluginMessage(data.getPlayer(), "Q_StorePW " + password);
+//		if (data.isOnline())
+//			owner.getMessageListener().sendPluginMessage(data.getPlayer(), "Q_StorePW " + password);
 		owner.sendLocaleMessage("COMMAND.PLAYER.CREATE.SUCCESS", sender, name);
 		owner.getCrazyDatabase().save(data);
 		owner.getCrazyLogger().log("Account", data.getName() + " registered successfully (via " + sender.getName() + ").");

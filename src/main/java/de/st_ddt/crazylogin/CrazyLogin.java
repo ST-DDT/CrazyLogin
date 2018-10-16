@@ -155,7 +155,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 	private PlayerListener playerListener;
 	private DynamicPlayerListener dynamicPlayerListener;
 	private DynamicVehicleListener dynamicVehicleListener;
-	private MessageListener messageListener;
+//	private MessageListener messageListener;
 	private boolean dynamicHooksRegistered;
 	// plugin config
 	private boolean alwaysNeedPassword;
@@ -1461,10 +1461,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		pm.registerEvents(crazylistener, this);
 		pm.registerEvents(new WorldListener(this), this);
 		registerDynamicHooks();
-		messageListener = new MessageListener(this);
-		final Messenger ms = getServer().getMessenger();
-		ms.registerIncomingPluginChannel(this, "CrazyLogin", messageListener);
-		ms.registerOutgoingPluginChannel(this, "CrazyLogin");
+//		messageListener = new MessageListener(this);
+//		final Messenger ms = getServer().getMessenger();
+//		ms.registerIncomingPluginChannel(this, "CrazyLogin", messageListener);
+//		ms.registerOutgoingPluginChannel(this, "CrazyLogin");
 	}
 
 	public synchronized void registerDynamicHooks()
@@ -1786,7 +1786,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		// OnlinePlayer
 		for (final Player player : Bukkit.getOnlinePlayers()) {
 			playerListener.PlayerJoin(player);
-			messageListener.sendPluginMessage(player, "A_State " + (hasPlayerData(player) ? "1" : "0") + " 0");
+//			messageListener.sendPluginMessage(player, "A_State " + (hasPlayerData(player) ? "1" : "0") + " 0");
 		}
 	}
 
@@ -2089,7 +2089,7 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		{
 			throw new CrazyCommandErrorException(e);
 		}
-		messageListener.sendPluginMessage(player, "Q_StorePW " + password);
+//		messageListener.sendPluginMessage(player, "Q_StorePW " + password);
 		data.login(password);
 		sendLocaleMessage("PASSWORDCHANGE.SUCCESS", player, password);
 		if (wasGuest)
@@ -2717,10 +2717,10 @@ public final class CrazyLogin extends CrazyPlayerDataPlugin<LoginData, LoginPlay
 		}
 	}
 
-	public MessageListener getMessageListener()
-	{
-		return messageListener;
-	}
+//	public MessageListener getMessageListener()
+//	{
+//		return messageListener;
+//	}
 
 	public boolean isDynamicProtectionEnabled()
 	{
